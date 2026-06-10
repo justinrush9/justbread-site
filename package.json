@@ -1,0 +1,10 @@
+{
+  "name": "justbread-checkout",
+  "version": "1.0.0",
+  "description": "JustBread Stripe checkout backend",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "stripe": "^16.0.0"
+  }
+}

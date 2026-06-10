@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — JustBread</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --black: #0a0a0a; --near: #111; --border: #222; --mid: #2a2a2a; --muted: #666; --sub: #999; --white: #fff; --yellow: #f5e600; --green: #6dff9a; }
+  body { background: var(--black); color: var(--white); font-family: 'Arial Black', Arial, sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  nav { background: var(--black); border-bottom: 1px solid var(--border); padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-size: 18px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--white); text-decoration: none; }
+  .nav-logo span { color: var(--yellow); }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { font-family: Arial, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+  .nav-links a:hover { color: var(--yellow); }
+
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+  }
+  .confirm-box {
+    max-width: 520px;
+    width: 100%;
+    text-align: center;
+  }
+  .check {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 32px;
+    font-size: 28px;
+  }
+  .eyebrow {
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .body-copy {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--sub);
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+  .body-copy strong {
+    color: var(--white);
+    font-style: normal;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 13px;
+  }
+  .details {
+    background: var(--near);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px;
+    margin-bottom: 32px;
+    text-align: left;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-row strong { color: var(--white); }
+  .btn-home {
+    display: inline-block;
+    padding: 16px 40px;
+    background: var(--yellow);
+    color: #000;
+    border: none;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 3px;
+    transition: background 0.15s;
+  }
+  .btn-home:hover { background: var(--white); }
+
+  @media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">Just<span>Bread</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/order/">Order</a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="confirm-box">
+    <div class="check">✓</div>
+    <div class="eyebrow">Order confirmed</div>
+    <h1>You're in.<br>See you Friday.</h1>
+    <p class="body-copy">
+      Your order is confirmed and your bread is on its way into fermentation.
+      <strong>Check your email for a receipt from Stripe.</strong>
+      Questions? Email us at info@justbread.shop.
+    </p>
+    <div class="details" id="order-details">
+      <div class="detail-row"><span>Status</span><span style="color:var(--green)"><strong>Confirmed</strong></span></div>
+      <div class="detail-row"><span>Receipt</span><span>Sent to your email</span></div>
+      <div class="detail-row"><span>Questions</span><span>info@justbread.shop</span></div>
+    </div>
+    <a class="btn-home" href="/">Back to Home</a>
+  </div>
+</main>
+
+</body>
+</html>
