@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options",        "value": "DENY" }
-      ]
-    }
+  "builds": [
+    { "src": "api/checkout.js", "use": "@vercel/node" },
+    { "src": "**/*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/checkout.js" },
+    { "src": "/order", "dest": "/order/index.html" },
+    { "src": "/order/", "dest": "/order/index.html" },
+    { "src": "/order-confirmed", "dest": "/order-confirmed/index.html" },
+    { "src": "/order-confirmed/", "dest": "/order-confirmed/index.html" },
+    { "src": "/", "dest": "/index.html" }
   ]
 }
