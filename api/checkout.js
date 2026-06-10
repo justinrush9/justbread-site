@@ -72,8 +72,10 @@ function computeShippingCents(loaves) {
 
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  // CORS — only accept requests from the JustBread site
-  const origin = process.env.ALLOWED_ORIGIN || 'https://justbread.shop';
+  // CORS — accept both www and non-www origins
+  const requestOrigin = req.headers.origin || '';
+  const allowedOrigins = ['https://justbread.shop', 'https://www.justbread.shop'];
+  const origin = allowedOrigins.includes(requestOrigin) ? requestOrigin : (process.env.ALLOWED_ORIGIN || 'https://justbread.shop');
   res.setHeader('Access-Control-Allow-Origin', origin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
