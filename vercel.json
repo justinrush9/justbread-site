@@ -1,11 +1,7 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/order", "destination": "/order/index.html" },
-    { "source": "/order/", "destination": "/order/index.html" },
-    { "source": "/order-confirmed", "destination": "/order-confirmed/index.html" },
-    { "source": "/order-confirmed/", "destination": "/order-confirmed/index.html" }
-  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/api/(.*)",
