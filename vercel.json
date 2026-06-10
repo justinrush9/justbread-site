@@ -1,9 +1,4 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/api/checkout", "dest": "/api/checkout.js" },
-    { "src": "/order(.*)", "dest": "/order/index.html" },
-    { "src": "/order-confirmed(.*)", "dest": "/order-confirmed/index.html" },
-    { "src": "/", "dest": "/index.html" }
-  ]
+  "version": 2
 }
+
