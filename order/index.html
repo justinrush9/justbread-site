@@ -259,6 +259,10 @@
   .jb-zip-row button:hover { opacity: 0.85; }
   .jb-zip-note { font-family: Arial, sans-serif; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
   #zip-entry-panel { margin-bottom: 32px; }
+  .jb-zip-display { font-family: Arial, sans-serif; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .jb-zip-display span { color: var(--white); font-weight: 700; }
+  .jb-zip-display button { background: none; border: none; color: var(--yellow); font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; padding: 0; text-decoration: underline; }
+  .jb-zip-display button:hover { opacity: 0.8; }
   .jb-error {
     font-size: 14px;
     color: var(--red);
@@ -335,6 +339,8 @@
   </div>
 
   <div id="form-panel">
+
+    <div class="jb-zip-display">Delivering to <span id="zip-display"></span> · <button type="button" id="change-zip-btn">Change ZIP</button></div>
 
     <div class="jb-toggle">
       <button type="button" class="active" id="btn-sub">Subscribe &amp; Save</button>
@@ -531,16 +537,27 @@
     return null;
   }
 
+  var zipDisplay   = document.getElementById('zip-display');
+  var changeZipBtn = document.getElementById('change-zip-btn');
+
   function applyZip(zip) {
     customerZip = zip;
     isIL = !LOCAL_ZIPS.has(zip);
     try { sessionStorage.setItem('jb_zip', zip); } catch(e) {}
+    zipDisplay.textContent = zip;
     zipPanel.classList.add('jb-hidden');
     formPanel.classList.remove('jb-hidden');
     updateFacts();
     updateNote();
     updateSummary();
   }
+
+  changeZipBtn.addEventListener('click', function() {
+    formPanel.classList.add('jb-hidden');
+    zipPanel.classList.remove('jb-hidden');
+    zipInput.value = customerZip || '';
+    zipInput.focus();
+  });
 
   function handleZipSubmit() {
     var zip = zipInput.value.trim();
@@ -567,6 +584,7 @@
     zipPanel.classList.remove('jb-hidden');
     formPanel.classList.add('jb-hidden');
   } else {
+    zipDisplay.textContent = customerZip;
     updateFacts();
     updateNote();
     updateSummary();
