@@ -502,6 +502,14 @@
   updateFacts();
   updateNote();
   updateSummary();
+
+  // Reset button if user hits Back from Stripe checkout
+  window.addEventListener('pageshow', function(e) {
+    if (e.persisted) {
+      checkoutBtn.textContent = 'Checkout →';
+      checkoutBtn.disabled = false;
+    }
+  });
 })();
 </script>
 </body>
