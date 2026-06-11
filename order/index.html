@@ -345,7 +345,7 @@
     <div class="jb-zip-display">Delivering to <span id="zip-display"></span> · <button type="button" id="change-zip-btn">Change ZIP</button></div>
 
     <div class="jb-toggle">
-      <button type="button" class="active" id="btn-sub">Subscribe &amp; Save</button>
+      <button type="button" class="active" id="btn-sub">Subscribe</button>
       <button type="button" id="btn-ot">One-Time Order</button>
     </div>
 
@@ -429,6 +429,10 @@
       if (cadenceBtns[i].classList.contains('active')) return cadenceBtns[i].dataset.cadence;
     }
     return 'weekly';
+  }
+
+  function updateToggleLabel() {
+    btnSub.textContent = isIL ? 'Subscribe' : 'Subscribe & Save';
   }
 
   function cadenceLabel(c) {
@@ -565,6 +569,7 @@
     updateNote();
     updateSummary();
     updateDeliveryInfo();
+    updateToggleLabel();
   }
 
   changeZipBtn.addEventListener('click', function() {
@@ -604,6 +609,7 @@
     updateNote();
     updateSummary();
     updateDeliveryInfo();
+    updateToggleLabel();
   }
 
   // Reset button if user hits Back from Stripe checkout
