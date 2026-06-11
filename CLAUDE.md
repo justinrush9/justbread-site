@@ -138,5 +138,8 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 
 ---
 
+## Known Issues / Watch Out For
+- **Base64 corruption**: faq/index.html and manage/index.html have been corrupted to raw base64 text at least twice. Root cause unknown — possibly a tool writing base64 instead of decoded content. fix-base64.py in repo root decodes them. Run it if either page shows raw text instead of rendering. After running, always check the nav links are correct and push.
+
 ## Outstanding / Future Work
 - (Add items here as they come up)
