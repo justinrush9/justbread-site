@@ -263,6 +263,8 @@
   .jb-zip-display span { color: var(--white); font-weight: 700; }
   .jb-zip-display button { background: none; border: none; color: var(--yellow); font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; padding: 0; text-decoration: underline; }
   .jb-zip-display button:hover { opacity: 0.8; }
+  .jb-delivery-info { margin-top: 16px; border: 1px solid var(--border); border-left: 3px solid var(--yellow); border-radius: 0 3px 3px 0; padding: 12px 14px; font-family: Arial, sans-serif; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .jb-delivery-info strong { color: var(--white); display: block; margin-bottom: 2px; }
   .jb-error {
     font-size: 14px;
     color: var(--red);
@@ -373,6 +375,7 @@
 
     <button class="jb-cta" id="checkout-btn" type="button">Checkout →</button>
     <div class="jb-error" id="order-error" role="alert" aria-live="polite"></div>
+    <div id="delivery-info" class="jb-delivery-info"></div>
     <div class="jb-note" id="delivery-note">Delivered Friday · Geneva, Batavia &amp; St. Charles · cancel anytime.</div>
 
   </div>
@@ -537,6 +540,17 @@
     return null;
   }
 
+  var deliveryInfo = document.getElementById('delivery-info');
+
+  function updateDeliveryInfo() {
+    if (!customerZip) { deliveryInfo.innerHTML = ''; return; }
+    if (isIL) {
+      deliveryInfo.innerHTML = '<strong>Illinois shipping</strong>Baked Wednesday morning, ships same day via UPS Ground. Most customers receive Thursday. Tracking number sent by email.';
+    } else {
+      deliveryInfo.innerHTML = '<strong>Local delivery · Geneva, Batavia &amp; St. Charles</strong>Delivered Friday. Baked fresh that morning, typically within hours of coming out of the oven.';
+    }
+  }
+
   var zipDisplay   = document.getElementById('zip-display');
   var changeZipBtn = document.getElementById('change-zip-btn');
 
@@ -550,6 +564,7 @@
     updateFacts();
     updateNote();
     updateSummary();
+    updateDeliveryInfo();
   }
 
   changeZipBtn.addEventListener('click', function() {
@@ -588,6 +603,7 @@
     updateFacts();
     updateNote();
     updateSummary();
+    updateDeliveryInfo();
   }
 
   // Reset button if user hits Back from Stripe checkout
