@@ -20,10 +20,10 @@
   .nav-links { display: flex; gap: 32px; list-style: none; }
   .nav-links a { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.15s; }
   .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
-  .eyebrow { font-family: Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 20px; }
-  .jb-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 12px; font-family: Arial, sans-serif; font-weight: 700; }
+  .eyebrow { font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 20px; }
+  .jb-label { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin-bottom: 12px; font-family: Arial, sans-serif; font-weight: 700; }
   .facts { display: flex; flex-direction: column; gap: 10px; }
-  .fact { display: flex; align-items: baseline; gap: 10px; font-family: Arial, sans-serif; font-size: 13px; color: var(--muted); }
+  .fact { display: flex; align-items: baseline; gap: 10px; font-family: Arial, sans-serif; font-size: 15px; color: var(--muted); }
   .fact-dot { width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
   .fact strong { color: #ddd; }
   @media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } }
@@ -142,7 +142,7 @@
     border-right: 1.5px solid var(--mid);
     color: var(--muted);
     font-family: 'Arial Black', Arial, sans-serif;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 900;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -200,7 +200,7 @@
     border: 1.5px solid var(--mid);
     color: var(--muted);
     font-family: 'Arial Black', Arial, sans-serif;
-    font-size: 11px; font-weight: 900;
+    font-size: 13px; font-weight: 900;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     cursor: pointer;
@@ -252,8 +252,14 @@
   .jb-cta:hover { background: var(--white); }
   .jb-cta:disabled { background: var(--mid); color: #555; cursor: default; }
 
+  .jb-zip-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .jb-zip-row input { flex: 1; background: var(--near); border: 1.5px solid var(--mid); border-radius: 3px; color: var(--white); font-family: Arial, sans-serif; font-size: 16px; padding: 12px 14px; outline: none; transition: border-color 0.15s; }
+  .jb-zip-row input:focus { border-color: var(--yellow); }
+  .jb-zip-row button { background: var(--yellow); color: #000; border: none; border-radius: 3px; font-family: 'Arial Black', Arial, sans-serif; font-size: 13px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase; padding: 12px 20px; cursor: pointer; white-space: nowrap; transition: opacity 0.15s; }
+  .jb-zip-row button:hover { opacity: 0.85; }
+  .jb-zip-note { font-family: Arial, sans-serif; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+  #zip-entry-panel { margin-bottom: 32px; }
   .jb-error {
-    font-family: Arial, sans-serif;
     font-size: 14px;
     color: var(--red);
     margin-top: 10px;
@@ -261,7 +267,7 @@
   }
   .jb-note {
     font-family: Arial, sans-serif;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
     text-align: center;
     margin-top: 14px;
@@ -316,6 +322,16 @@
       <div class="fact"><div class="fact-dot"></div><span><strong>9-day cold ferment</strong> · no commercial yeast · ever</span></div>
       <div class="fact"><div class="fact-dot"></div><span><strong>Flour, water, salt.</strong> The entire ingredient list.</span></div>
     </div>
+  </div>
+
+  <div id="zip-entry-panel" class="jb-hidden">
+    <div class="jb-label">Enter your ZIP code</div>
+    <div class="jb-zip-row">
+      <input type="text" id="zip-input" inputmode="numeric" maxlength="5" placeholder="60175" autocomplete="postal-code">
+      <button type="button" id="zip-submit-btn">Check →</button>
+    </div>
+    <div class="jb-error" id="zip-error" role="alert" aria-live="polite"></div>
+    <div class="jb-zip-note">We deliver locally to Geneva, Batavia &amp; St. Charles, and ship anywhere in Illinois.</div>
   </div>
 
   <div id="form-panel">
@@ -500,9 +516,61 @@
     });
   });
 
-  updateFacts();
-  updateNote();
-  updateSummary();
+  // ── ZIP ENTRY PANEL ─────────────────────────────────────────
+  var zipPanel    = document.getElementById('zip-entry-panel');
+  var zipInput    = document.getElementById('zip-input');
+  var zipSubmitBtn = document.getElementById('zip-submit-btn');
+  var zipError    = document.getElementById('zip-error');
+  var formPanel   = document.getElementById('form-panel');
+
+  function getZoneFromZip(zip) {
+    if (!zip || !/^\d{5}$/.test(zip)) return null;
+    if (LOCAL_ZIPS.has(zip)) return 'local';
+    var prefix = parseInt(zip.slice(0, 2), 10);
+    if (prefix >= 60 && prefix <= 62) return 'il';
+    return null;
+  }
+
+  function applyZip(zip) {
+    customerZip = zip;
+    isIL = !LOCAL_ZIPS.has(zip);
+    try { sessionStorage.setItem('jb_zip', zip); } catch(e) {}
+    zipPanel.classList.add('jb-hidden');
+    formPanel.classList.remove('jb-hidden');
+    updateFacts();
+    updateNote();
+    updateSummary();
+  }
+
+  function handleZipSubmit() {
+    var zip = zipInput.value.trim();
+    zipError.textContent = '';
+    if (!/^\d{5}$/.test(zip)) {
+      zipError.textContent = 'Please enter a valid 5-digit ZIP code.';
+      return;
+    }
+    var zone = getZoneFromZip(zip);
+    if (!zone) {
+      zipError.textContent = 'Sorry, we don\'t deliver outside Illinois yet.';
+      return;
+    }
+    applyZip(zip);
+  }
+
+  zipSubmitBtn.addEventListener('click', handleZipSubmit);
+  zipInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') handleZipSubmit();
+  });
+
+  // Show zip panel or form depending on whether we have a zip
+  if (!customerZip) {
+    zipPanel.classList.remove('jb-hidden');
+    formPanel.classList.add('jb-hidden');
+  } else {
+    updateFacts();
+    updateNote();
+    updateSummary();
+  }
 
   // Reset button if user hits Back from Stripe checkout
   window.addEventListener('pageshow', function(e) {
