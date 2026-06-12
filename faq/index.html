@@ -7,148 +7,78 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream: #F7F4EE; --ink: #1C1B18; --warm: #8B6F47;
-      --light-warm: #EDE5D8; --mid: #6B6259; --rule: #D4C9BA;
-      --cta-bg: #1C1B18; --cta-text: #F7F4EE;
-      --serif: 'Georgia', 'Times New Roman', serif;
-      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --black: #0a0a0a; --near: #111; --border: #222; --mid: #2a2a2a;
+      --muted: #666; --sub: #999; --white: #fff; --yellow: #f5e600;
+      --red: #ff6b6b; --green: #6dff9a;
     }
-    body {
-      background: var(--cream); color: var(--ink); font-family: var(--sans);
-      font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased;
-    }
-    nav {
-      position: sticky; top: 0; z-index: 100;
-      background: var(--cream); border-bottom: 1px solid var(--rule);
-      padding: 0 1.5rem; display: flex; align-items: center;
-      justify-content: space-between; height: 56px;
-    }
-    .nav-logo {
-      font-family: var(--serif); font-size: 1.25rem; font-weight: normal;
-      letter-spacing: 0.04em; color: var(--ink); text-decoration: none;
-    }
-    .nav-links { display: flex; align-items: center; gap: 2rem; list-style: none; }
-    .nav-links a { color: var(--mid); text-decoration: none; font-size: 0.875rem; }
-    .nav-links a:hover { color: var(--ink); }
-    .nav-cta {
-      background: var(--cta-bg); color: var(--cta-text) !important;
-      padding: 0.5rem 1.1rem; border-radius: 4px;
-    }
-    .hamburger {
-      display: none; flex-direction: column; gap: 5px;
-      background: none; border: none; cursor: pointer; padding: 6px;
-    }
-    .hamburger span {
-      display: block; width: 22px; height: 1.5px; background: var(--ink);
-      transition: transform 0.25s, opacity 0.25s; transform-origin: center;
-    }
-    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    nav { background: var(--black); border-bottom: 1px solid var(--border); padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .nav-logo { font-size: 18px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--white); text-decoration: none; font-family: 'Arial Black', Arial, sans-serif; }
+    .nav-logo span { color: var(--yellow); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-family: Arial, sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
+    .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); transition: all 0.2s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; }
-    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-    .mobile-menu {
-      display: none; position: fixed; inset: 56px 0 0 0;
-      background: var(--cream); z-index: 99; padding: 2rem 1.5rem;
-      flex-direction: column; border-top: 1px solid var(--rule);
-    }
-    .mobile-menu.open { display: flex; }
-    .mobile-menu a {
-      color: var(--ink); text-decoration: none; font-size: 1.1rem;
-      padding: 1rem 0; border-bottom: 1px solid var(--rule);
-    }
-    .mobile-menu a:last-child { border-bottom: none; }
-    .mobile-menu .mobile-cta {
-      margin-top: 1.5rem; background: var(--cta-bg); color: var(--cta-text);
-      padding: 0.9rem 1.25rem; border-radius: 4px; text-align: center; border-bottom: none;
-    }
-    @media (max-width: 680px) { .hamburger { display: flex; } .nav-links { display: none; } }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav-mobile-menu { display: none; position: fixed; top: 56px; left: 0; right: 0; background: var(--black); border-bottom: 1px solid var(--border); padding: 24px; z-index: 150; flex-direction: column; gap: 0; }
+    .nav-mobile-menu.open { display: flex; }
+    .nav-mobile-menu a { font-family: Arial, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); text-decoration: none; padding: 14px 0; border-bottom: 1px solid var(--border); transition: color 0.15s; }
+    .nav-mobile-menu a:last-child { border-bottom: none; }
+    .nav-mobile-menu a:hover, .nav-mobile-menu a.active { color: var(--yellow); }
+    @media (max-width: 600px) { nav { padding: 0 20px; } .nav-links { display: none; } .hamburger { display: flex; } }
 
     .page { max-width: 680px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
 
-    .page-eyebrow {
-      font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--warm); margin-bottom: 0.5rem;
-    }
-    .page-title {
-      font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem);
-      font-weight: normal; line-height: 1.15; margin-bottom: 3rem;
-    }
+    .page-eyebrow { font-family: Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.5rem; }
+    .page-title { font-family: 'Arial Black', Arial, sans-serif; font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 900; line-height: 1.05; text-transform: uppercase; margin-bottom: 3rem; color: var(--white); }
 
     .faq-section { margin-bottom: 3rem; }
-    .faq-section-title {
-      font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--warm); margin-bottom: 1rem;
-      padding-bottom: 0.5rem; border-bottom: 1px solid var(--rule);
-    }
+    .faq-section-title { font-family: Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
 
-    .faq-item { border-bottom: 1px solid var(--rule); }
+    .faq-item { border-bottom: 1px solid var(--border); }
     .faq-item:last-child { border-bottom: none; }
 
-    .faq-q {
-      width: 100%; text-align: left; background: none; border: none;
-      padding: 1.1rem 0; cursor: pointer; display: flex;
-      align-items: center; justify-content: space-between; gap: 1rem;
-      font-family: var(--sans); font-size: 0.95rem; font-weight: 500;
-      color: var(--ink); line-height: 1.4;
-    }
-    .faq-q:hover { color: var(--warm); }
-    .faq-chevron {
-      flex-shrink: 0; width: 16px; height: 16px;
-      transition: transform 0.2s;
-    }
+    .faq-q { width: 100%; text-align: left; background: none; border: none; padding: 1.1rem 0; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-family: Arial, sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--white); line-height: 1.4; transition: color 0.15s; }
+    .faq-q:hover { color: var(--yellow); }
+    .faq-chevron { flex-shrink: 0; width: 16px; height: 16px; transition: transform 0.2s; color: var(--muted); }
     .faq-q[aria-expanded="true"] .faq-chevron { transform: rotate(180deg); }
 
-    .faq-a {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.25s ease, padding 0.25s ease;
-    }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height 0.25s ease, padding 0.25s ease; }
     .faq-a.open { max-height: 500px; }
-    .faq-a-inner {
-      padding: 0 0 1.25rem;
-      font-size: 0.9rem; color: var(--mid); line-height: 1.75;
-    }
-    .faq-a-inner a { color: var(--warm); }
-    .faq-a-inner strong { color: var(--ink); font-weight: 500; }
+    .faq-a-inner { padding: 0 0 1.25rem; font-size: 0.9rem; color: var(--muted); line-height: 1.75; }
+    .faq-a-inner a { color: var(--yellow); }
+    .faq-a-inner strong { color: var(--white); font-weight: 700; }
 
-    .cta-strip {
-      background: var(--light-warm); border-radius: 6px;
-      padding: 2rem; text-align: center; margin-top: 3rem;
-    }
-    .cta-strip h3 {
-      font-family: var(--serif); font-size: 1.4rem; font-weight: normal;
-      margin-bottom: 0.5rem;
-    }
-    .cta-strip p { font-size: 0.875rem; color: var(--mid); margin-bottom: 1.25rem; }
-    .btn-primary {
-      display: inline-block; background: var(--cta-bg); color: var(--cta-text);
-      text-decoration: none; border-radius: 4px; padding: 0.7rem 1.6rem;
-      font-size: 0.95rem; letter-spacing: 0.02em; transition: opacity 0.15s;
-    }
+    .cta-strip { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 2rem; text-align: center; margin-top: 3rem; }
+    .cta-strip h3 { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.2rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--white); }
+    .cta-strip p { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.25rem; }
+    .btn-primary { display: inline-block; background: var(--yellow); color: #000; text-decoration: none; border-radius: 3px; padding: 0.7rem 1.6rem; font-size: 0.95rem; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; letter-spacing: 0.5px; text-transform: uppercase; transition: opacity 0.15s; }
     .btn-primary:hover { opacity: 0.85; }
   </style>
 </head>
 <body>
 
 <nav>
-  <a href="/" class="nav-logo">JustBread</a>
+  <a href="/" class="nav-logo">Just<span>Bread</span></a>
   <ul class="nav-links">
-    <li><a href="/#how-it-works">How it works</a></li>
-    <li><a href="/#delivery">Delivery</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/order/">Order</a></li>
     <li><a href="/faq/" class="active">FAQ</a></li>
-    <li><a href="/manage/">My subscription</a></li>
-    <li><a href="/order/" class="nav-cta">Order now</a></li>
+    <li><a href="/manage/">Manage</a></li>
   </ul>
-  <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+  <button class="hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
-<nav class="mobile-menu" id="mobile-menu">
+<nav class="nav-mobile-menu" id="nav-mobile-menu">
   <a href="/">Home</a>
-  <a href="/#how-it-works">How it works</a>
-  <a href="/#delivery">Delivery</a>
-  <a href="/faq/">FAQ</a>
-  <a href="/manage/">My subscription</a>
-  <a href="/order/" class="mobile-cta">Order now →</a>
+  <a href="/order/">Order</a>
+  <a href="/faq/" class="active">FAQ</a>
+  <a href="/manage/">Manage</a>
 </nav>
 
 <div class="page">
@@ -323,14 +253,14 @@
         <svg class="faq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6l5 5 5-5"/></svg>
       </button>
       <div class="faq-a"><div class="faq-a-inner">
-        The <strong>Center for Food Equity in Medicine (CFFEM)</strong> runs a grocery delivery program that gets real food to people in need in our community. JustBread donates bread to this program regularly — when you order, you're helping keep that going. Learn more at <a href="https://www.cffem.org" target="_blank" rel="noopener">cffem.org</a>.
+        The <strong>Center for Food Equity in Medicine (CFFEM)</strong> runs a grocery delivery program that gets real food to people in need in our community. JustBread donates bread to this program regularly — when you order, you're helping keep that going. Learn more at <a href="https://www.foodequityinmedicine.org/" target="_blank" rel="noopener">foodequityinmedicine.org</a>.
       </div></div>
     </div>
   </div>
 
   <div class="cta-strip">
     <h3>Still have questions?</h3>
-    <p>Email us at <a href="mailto:hello@justbread.shop" style="color:var(--warm)">hello@justbread.shop</a> — we respond quickly.</p>
+    <p>Email us at <a href="mailto:hello@justbread.shop" style="color:var(--yellow)">hello@justbread.shop</a> — we respond quickly.</p>
     <a href="/order/" class="btn-primary">Ready to order →</a>
   </div>
 </div>
@@ -342,8 +272,8 @@
     btn.setAttribute('aria-expanded', isOpen);
   }
 
-  const hamburger = document.getElementById('hamburger');
-  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburger = document.getElementById('nav-hamburger');
+  const mobileMenu = document.getElementById('nav-mobile-menu');
   hamburger.addEventListener('click', () => {
     const isOpen = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open', isOpen);
