@@ -7,7 +7,7 @@
 <meta name="description" content="Everything ASC members need in one place.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{--olive:#2e3120;--tan:#c8a86b;--orange:#c0622a;--paper:#f5f2ec;--ink:#1c1e18;--muted:#7a7a6a;--rule:#dedad0;--white:#ffffff;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -26,7 +26,9 @@
   .btn-card:active{transform:translateY(0);}
   .btn-icon{width:56px;height:56px;border-radius:14px;background:var(--olive);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
   .btn-label{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--olive);line-height:1.1;}
-  .btn-sub{font-size:12px;color:var(--muted);line-height:1.4;margin-top:-6px;}
+  .btn-sub{list-style:none;margin-top:-4px;text-align:left;}
+  .btn-sub li{font-size:12px;font-weight:600;color:var(--muted);line-height:1.8;padding-left:12px;position:relative;}
+  .btn-sub li::before{content:'•';position:absolute;left:0;color:var(--tan);}
   footer{background:var(--olive);border-top:3px solid var(--tan);padding:28px 20px;text-align:center;}
   footer img{height:36px;margin-bottom:10px;opacity:.8;display:block;margin-left:auto;margin-right:auto;}
   footer p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;}
@@ -56,37 +58,69 @@
   <a class="btn-card" href="/asc/events/">
     <div class="btn-icon">📅</div>
     <div class="btn-label">Events &amp;<br>Calendar</div>
-    <div class="btn-sub">Matches, clinics,<br>range schedule</div>
+    <ul class="btn-sub">
+      <li>Matches</li>
+      <li>Clinics</li>
+      <li>Range schedule</li>
+    </ul>
   </a>
 
   <a class="btn-card" href="/asc/membership/">
     <div class="btn-icon">💳</div>
     <div class="btn-label">Dues &amp;<br>Membership</div>
-    <div class="btn-sub">Pay, renew,<br>manage account</div>
+    <ul class="btn-sub">
+      <li>Pay &amp; renew</li>
+      <li>Manage account</li>
+    </ul>
   </a>
 
   <a class="btn-card" href="/asc/rules/">
     <div class="btn-icon">📋</div>
     <div class="btn-label">Rules &amp;<br>Onboarding</div>
-    <div class="btn-sub">Range rules,<br>constitution, new members</div>
+    <ul class="btn-sub">
+      <li>Range rules</li>
+      <li>Constitution</li>
+      <li>New members</li>
+    </ul>
   </a>
 
-  <a class="btn-card" href="/asc/help/">
+  <a class="btn-card" href="/asc/contact/">
+    <div class="btn-icon">📞</div>
+    <div class="btn-label">Contact</div>
+    <ul class="btn-sub">
+      <li>Departments</li>
+      <li>General inquiry</li>
+    </ul>
+  </a>
+
+  <a class="btn-card" href="/asc/volunteer/">
     <div class="btn-icon">🙋</div>
-    <div class="btn-label">Help Out &amp;<br>Contact</div>
-    <div class="btn-sub">Departments,<br>volunteer sign-up</div>
+    <div class="btn-label">Volunteer</div>
+    <ul class="btn-sub">
+      <li>Sign up</li>
+      <li>Log hours</li>
+      <li>Requirements</li>
+    </ul>
   </a>
 
   <a class="btn-card" href="/asc/connect/">
     <div class="btn-icon">📣</div>
     <div class="btn-label">Connect</div>
-    <div class="btn-sub">Facebook, forum,<br>newsletter</div>
+    <ul class="btn-sub">
+      <li>Facebook</li>
+      <li>Forum</li>
+      <li>Newsletter</li>
+    </ul>
   </a>
 
   <a class="btn-card" href="/asc/plans/">
     <div class="btn-icon">🏗️</div>
     <div class="btn-label">Plans &amp;<br>Decisions</div>
-    <div class="btn-sub">Projects, minutes,<br>what's coming</div>
+    <ul class="btn-sub">
+      <li>Capital plans</li>
+      <li>Board minutes</li>
+      <li>What's coming</li>
+    </ul>
   </a>
 </div>
 
