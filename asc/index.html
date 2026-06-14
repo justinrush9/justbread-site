@@ -9,137 +9,30 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --olive:  #2e3120;
-    --tan:    #c8a86b;
-    --orange: #c0622a;
-    --paper:  #f5f2ec;
-    --ink:    #1c1e18;
-    --muted:  #7a7a6a;
-    --rule:   #dedad0;
-    --white:  #ffffff;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* HEADER */
-  header {
-    background: var(--olive);
-    border-bottom: 3px solid var(--tan);
-    display: flex; align-items: center; justify-content: center;
-    padding: 0 20px; height: 60px; gap: 12px;
-  }
-  header img { height: 38px; }
-  header span {
-    font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600;
-    color: var(--tan); text-transform: uppercase; letter-spacing: .06em;
-  }
-
-  /* HERO */
-  .hero {
-    background: var(--olive);
-    background-image: url('https://aurorasc.org/images/slider/cache/b783fc4fa40718805674519ccc17c317/slider-1.jpg');
-    background-size: cover; background-position: center 30%;
-    position: relative; padding: 48px 24px 44px;
-    text-align: center;
-  }
-  .hero::before {
-    content: ''; position: absolute; inset: 0;
-    background: rgba(30,33,20,.78);
-  }
-  .hero-inner { position: relative; z-index: 1; }
-  .hero h1 {
-    font-family: 'Oswald', sans-serif; font-size: clamp(32px, 8vw, 56px);
-    font-weight: 700; text-transform: uppercase; color: #fff;
-    line-height: 1.05; letter-spacing: .01em;
-  }
-  .hero h1 em { color: var(--tan); font-style: normal; display: block; }
-  .hero p {
-    color: rgba(255,255,255,.65); font-size: 16px; margin-top: 10px;
-    max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;
-  }
-
-  /* GRID */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    padding: 24px 16px 32px;
-    max-width: 680px; margin: 0 auto;
-  }
-
-  /* BUTTON CARDS */
-  .btn-card {
-    background: var(--white);
-    border: 1.5px solid var(--rule);
-    border-radius: 16px;
-    text-decoration: none; color: var(--ink);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center;
-    padding: 32px 16px 28px;
-    gap: 14px;
-    transition: border-color .15s, box-shadow .15s, transform .15s;
-    min-height: 160px;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn-card:hover, .btn-card:active {
-    border-color: var(--tan);
-    box-shadow: 0 4px 20px rgba(46,49,32,.12);
-    transform: translateY(-2px);
-  }
-  .btn-card:active { transform: translateY(0); }
-
-  .btn-icon {
-    width: 56px; height: 56px; border-radius: 14px;
-    background: var(--olive); display: flex; align-items: center; justify-content: center;
-    font-size: 26px; flex-shrink: 0;
-  }
-  .btn-label {
-    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .04em;
-    color: var(--olive); line-height: 1.1;
-  }
-  .btn-sub {
-    font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: -6px;
-  }
-
-  /* accent colors per card */
-  .c-events  .btn-icon { background: #1f3d2b; }
-  .c-dues    .btn-icon { background: #2a3320; }
-  .c-rules   .btn-icon { background: #3d2a10; }
-  .c-help    .btn-icon { background: #3a1e10; }
-  .c-connect .btn-icon { background: #1a2a3d; }
-  .c-plans   .btn-icon { background: #1e2e1e; }
-
-  /* DIVIDER */
-  .divider {
-    text-align: center; padding: 0 16px 8px;
-    font-size: 12px; color: var(--muted); letter-spacing: .08em;
-    text-transform: uppercase;
-  }
-
-  /* FOOTER */
-  footer {
-    background: var(--olive);
-    border-top: 3px solid var(--tan);
-    padding: 28px 20px; text-align: center;
-  }
-  footer img { height: 36px; margin-bottom: 10px; opacity: .8; display: block; margin-left: auto; margin-right: auto; }
-  footer p { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.8; }
-  footer a { color: var(--tan); text-decoration: none; }
-  footer a:hover { text-decoration: underline; }
-
-  /* MOBILE: single column on very small screens */
-  @media (max-width: 380px) {
-    .grid { grid-template-columns: 1fr; }
-    .btn-card { min-height: 120px; flex-direction: row; justify-content: flex-start; text-align: left; padding: 20px 20px; }
-  }
+  :root{--olive:#2e3120;--tan:#c8a86b;--orange:#c0622a;--paper:#f5f2ec;--ink:#1c1e18;--muted:#7a7a6a;--rule:#dedad0;--white:#ffffff;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  header{background:var(--olive);border-bottom:3px solid var(--tan);display:flex;align-items:center;justify-content:center;padding:0 20px;height:60px;gap:12px;}
+  header img{height:38px;}
+  header span{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--tan);text-transform:uppercase;letter-spacing:.06em;}
+  .hero{background:var(--olive);background-image:url('https://aurorasc.org/images/slider/cache/b783fc4fa40718805674519ccc17c317/slider-1.jpg');background-size:cover;background-position:center 30%;position:relative;padding:48px 24px 44px;text-align:center;}
+  .hero::before{content:'';position:absolute;inset:0;background:rgba(30,33,20,.78);}
+  .hero-inner{position:relative;z-index:1;}
+  .hero h1{font-family:'Oswald',sans-serif;font-size:clamp(32px,8vw,56px);font-weight:700;text-transform:uppercase;color:#fff;line-height:1.05;letter-spacing:.01em;}
+  .hero h1 em{color:var(--tan);font-style:normal;display:block;}
+  .hero p{color:rgba(255,255,255,.65);font-size:16px;margin-top:10px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:24px 16px 32px;max-width:680px;margin:0 auto;}
+  .btn-card{background:var(--white);border:1.5px solid var(--rule);border-radius:16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 16px 28px;gap:14px;transition:border-color .15s,box-shadow .15s,transform .15s;min-height:160px;-webkit-tap-highlight-color:transparent;}
+  .btn-card:hover{border-color:var(--tan);box-shadow:0 4px 20px rgba(46,49,32,.12);transform:translateY(-2px);}
+  .btn-card:active{transform:translateY(0);}
+  .btn-icon{width:56px;height:56px;border-radius:14px;background:var(--olive);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;}
+  .btn-label{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--olive);line-height:1.1;}
+  .btn-sub{font-size:12px;color:var(--muted);line-height:1.4;margin-top:-6px;}
+  footer{background:var(--olive);border-top:3px solid var(--tan);padding:28px 20px;text-align:center;}
+  footer img{height:36px;margin-bottom:10px;opacity:.8;display:block;margin-left:auto;margin-right:auto;}
+  footer p{font-size:13px;color:rgba(255,255,255,.5);line-height:1.8;}
+  footer a{color:var(--tan);text-decoration:none;}
+  @media(max-width:380px){.grid{grid-template-columns:1fr;}.btn-card{min-height:120px;flex-direction:row;justify-content:flex-start;text-align:left;padding:20px;}.btn-icon{flex-shrink:0;}}
 </style>
 </head>
 <body>
@@ -157,52 +50,46 @@
 </div>
 
 <div class="grid">
-
-  <a class="btn-card c-events" href="https://aurorasc.org/events" target="_blank" rel="noopener">
+  <a class="btn-card" href="events/">
     <div class="btn-icon">📅</div>
     <div class="btn-label">Events &amp;<br>Calendar</div>
     <div class="btn-sub">Matches, clinics,<br>range schedule</div>
   </a>
 
-  <a class="btn-card c-dues" href="https://aurorasc.org/membership" target="_blank" rel="noopener">
+  <a class="btn-card" href="membership/">
     <div class="btn-icon">💳</div>
     <div class="btn-label">Dues &amp;<br>Membership</div>
     <div class="btn-sub">Pay, renew,<br>manage account</div>
   </a>
 
-  <a class="btn-card c-rules" href="https://aurorasc.org/about-asc/range-rules" target="_blank" rel="noopener">
+  <a class="btn-card" href="rules/">
     <div class="btn-icon">📋</div>
     <div class="btn-label">Rules &amp;<br>Onboarding</div>
     <div class="btn-sub">Range rules,<br>constitution, new members</div>
   </a>
 
-  <a class="btn-card c-help" href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">
+  <a class="btn-card" href="help/">
     <div class="btn-icon">🙋</div>
     <div class="btn-label">Help Out &amp;<br>Contact</div>
     <div class="btn-sub">Departments,<br>volunteer sign-up</div>
   </a>
 
-  <a class="btn-card c-connect" href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">
+  <a class="btn-card" href="connect/">
     <div class="btn-icon">📣</div>
     <div class="btn-label">Connect</div>
     <div class="btn-sub">Facebook, forum,<br>newsletter</div>
   </a>
 
-  <a class="btn-card c-plans" href="https://aurorasc.org/about-asc/board-minutes" target="_blank" rel="noopener">
+  <a class="btn-card" href="plans/">
     <div class="btn-icon">🏗️</div>
     <div class="btn-label">Plans &amp;<br>Decisions</div>
     <div class="btn-sub">Projects, minutes,<br>what's coming</div>
   </a>
-
 </div>
 
 <footer>
   <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="Aurora Sportsmen's Club">
-  <p>
-    <a href="https://aurorasc.org" target="_blank" rel="noopener">aurorasc.org</a> ·
-    <a href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">Contact</a> ·
-    <a href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">Facebook</a>
-  </p>
+  <p><a href="https://aurorasc.org" target="_blank" rel="noopener">aurorasc.org</a> · <a href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">Contact</a> · <a href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">Facebook</a></p>
   <p style="margin-top:8px;font-size:11px;opacity:.4">Member hub — all links go to aurorasc.org</p>
 </footer>
 

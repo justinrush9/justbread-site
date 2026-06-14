@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASC — Dues &amp; Membership</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--olive:#2e3120;--tan:#c8a86b;--orange:#c0622a;--paper:#f5f2ec;--ink:#1c1e18;--muted:#7a7a6a;--rule:#dedad0;--white:#ffffff;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;}
+header{background:var(--olive);border-bottom:3px solid var(--tan);display:flex;align-items:center;padding:0 20px;height:60px;gap:16px;}
+.back{color:var(--tan);text-decoration:none;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.06em;text-transform:uppercase;opacity:.8;white-space:nowrap;}
+.back:hover{opacity:1;}
+header img{height:36px;}
+header .htitle{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:.05em;}
+.hero{background:var(--olive);padding:32px 20px 28px;text-align:center;border-bottom:3px solid var(--tan);}
+.hero h1{font-family:'Oswald',sans-serif;font-size:clamp(28px,7vw,46px);font-weight:700;text-transform:uppercase;color:#fff;line-height:1.05;}
+.hero h1 em{color:var(--tan);font-style:normal;}
+.page{max-width:680px;margin:0 auto;padding:24px 16px 48px;}
+.big-btn{background:var(--olive);border-radius:16px;text-decoration:none;color:#fff;display:flex;align-items:center;gap:18px;padding:28px 24px;margin-bottom:16px;transition:opacity .15s,transform .15s;-webkit-tap-highlight-color:transparent;border:2px solid var(--tan);}
+.big-btn:hover{opacity:.92;transform:translateY(-2px);}
+.big-btn:active{transform:translateY(0);}
+.big-icon{width:60px;height:60px;border-radius:14px;background:rgba(200,168,107,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
+.big-label{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tan);line-height:1.1;}
+.big-sub{font-size:14px;color:rgba(255,255,255,.65);margin-top:4px;line-height:1.4;}
+.big-arrow{margin-left:auto;font-size:24px;color:var(--tan);flex-shrink:0;}
+.note{background:var(--white);border:1.5px solid var(--rule);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--muted);line-height:1.6;}
+.note strong{color:var(--ink);}
+footer{background:var(--olive);border-top:3px solid var(--tan);padding:24px 20px;text-align:center;}
+footer img{height:32px;margin-bottom:8px;opacity:.8;display:block;margin-left:auto;margin-right:auto;}
+footer p{font-size:12px;color:rgba(255,255,255,.5);}
+footer a{color:var(--tan);text-decoration:none;}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="../">← Back</a>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
+  <span class="htitle">Dues &amp; Membership</span>
+</header>
+<div class="hero"><h1>Dues &amp; <em>Membership</em></h1></div>
+<div class="page">
+
+  <a class="big-btn" href="https://aurorasc.clubexpress.com/" target="_blank" rel="noopener">
+    <div class="big-icon">💳</div>
+    <div>
+      <div class="big-label">Go to ClubExpress</div>
+      <div class="big-sub">Pay dues · Renew membership · Manage your account</div>
+    </div>
+    <div class="big-arrow">→</div>
+  </a>
+
+  <div class="note">
+    <strong>Everything membership-related lives in ClubExpress.</strong> That includes paying your annual dues, renewing, updating your contact info, checking your membership status, and viewing your account history. Log in with the email address you used when you joined.
+    <br><br>
+    Questions? Contact <a href="mailto:membership@aurorasc.org" style="color:var(--orange);">membership@aurorasc.org</a>
+  </div>
+
+</div>
+<footer>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
+  <p><a href="https://aurorasc.org" target="_blank">aurorasc.org</a> · <a href="../">← Member Hub</a></p>
+</footer>
+</body>
+</html>
