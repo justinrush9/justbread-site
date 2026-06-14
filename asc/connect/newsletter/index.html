@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ASC — Newsletter Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--olive:#2e3120;--tan:#c8a86b;--orange:#c0622a;--paper:#f5f2ec;--ink:#1c1e18;--muted:#7a7a6a;--rule:#dedad0;--white:#ffffff;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;}
+header{background:var(--olive);border-bottom:3px solid var(--tan);display:flex;align-items:center;padding:0 20px;height:60px;gap:16px;}
+.back{color:var(--tan);text-decoration:none;font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.06em;text-transform:uppercase;opacity:.8;white-space:nowrap;}
+.back:hover{opacity:1;}
+header img{height:36px;}
+header .htitle{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:.05em;}
+.hero{background:var(--olive);padding:32px 20px 28px;text-align:center;border-bottom:3px solid var(--tan);}
+.hero h1{font-family:'Oswald',sans-serif;font-size:clamp(28px,7vw,46px);font-weight:700;text-transform:uppercase;color:#fff;line-height:1.05;}
+.hero h1 em{color:var(--tan);font-style:normal;}
+.page{max-width:680px;margin:0 auto;padding:24px 16px 48px;}
+.year-label{font-family:'Oswald',sans-serif;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:28px 0 12px;display:flex;align-items:center;gap:10px;}
+.year-label::after{content:'';flex:1;height:1px;background:var(--rule);}
+.year-label:first-of-type{margin-top:0;}
+.btn-card{background:var(--white);border:1.5px solid var(--rule);border-radius:16px;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:18px;padding:18px 22px;margin-bottom:10px;transition:border-color .15s,box-shadow .15s,transform .15s;-webkit-tap-highlight-color:transparent;}
+.btn-card:hover{border-color:var(--tan);box-shadow:0 4px 20px rgba(46,49,32,.12);transform:translateY(-2px);}
+.btn-card:active{transform:translateY(0);}
+.month-badge{flex:0 0 52px;height:52px;border-radius:12px;background:var(--olive);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.month-badge .mon{font-family:'Oswald',sans-serif;font-size:13px;font-weight:700;color:var(--tan);text-transform:uppercase;letter-spacing:.06em;line-height:1;}
+.month-badge .yr{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.06em;}
+.btn-label{font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--olive);line-height:1.1;}
+.btn-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.btn-card.latest .month-badge{background:var(--orange);}
+.btn-card.latest{border-color:var(--tan);}
+.latest-tag{font-size:10px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);font-weight:600;margin-top:2px;}
+.btn-arrow{margin-left:auto;font-size:20px;color:var(--tan);flex-shrink:0;}
+footer{background:var(--olive);border-top:3px solid var(--tan);padding:24px 20px;text-align:center;}
+footer img{height:32px;margin-bottom:8px;opacity:.8;display:block;margin-left:auto;margin-right:auto;}
+footer p{font-size:12px;color:rgba(255,255,255,.5);}
+footer a{color:var(--tan);text-decoration:none;}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="../../connect/">← Back</a>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
+  <span class="htitle">Newsletter Archive</span>
+</header>
+<div class="hero"><h1>Newsletter <em>Archive</em></h1></div>
+<div class="page">
+
+  <div class="year-label">2026</div>
+
+  <a class="btn-card latest" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Jun</span><span class="yr">2026</span></div>
+    <div>
+      <div class="btn-label">June 2026</div>
+      <div class="latest-tag">Latest issue</div>
+    </div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">May</span><span class="yr">2026</span></div>
+    <div><div class="btn-label">May 2026</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Apr</span><span class="yr">2026</span></div>
+    <div><div class="btn-label">April 2026</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Mar</span><span class="yr">2026</span></div>
+    <div><div class="btn-label">March 2026</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Feb</span><span class="yr">2026</span></div>
+    <div><div class="btn-label">February 2026</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Jan</span><span class="yr">2026</span></div>
+    <div><div class="btn-label">January 2026</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <div class="year-label">2025</div>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Dec</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">December 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Nov</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">November 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Oct</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">October 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Sep</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">September 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Aug</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">August 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://drive.google.com/file/d/1BJyUEXOcZ61oDMivt2MS-84WSysU9nLT/view" target="_blank" rel="noopener">
+    <div class="month-badge"><span class="mon">Jul</span><span class="yr">2025</span></div>
+    <div><div class="btn-label">July 2025</div></div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+</div>
+<footer>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
+  <p><a href="https://aurorasc.org" target="_blank">aurorasc.org</a> · <a href="../../connect/">← Connect</a></p>
+</footer>
+</body>
+</html>
