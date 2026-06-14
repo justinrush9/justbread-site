@@ -4,385 +4,206 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aurora Sportsmen's Club — Member Hub</title>
-<meta name="description" content="Everything ASC members need in one place — events, dues, rules, contacts, and more.">
+<meta name="description" content="Everything ASC members need in one place.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --olive:    #2e3120;
-    --olive-2:  #3d4229;
-    --tan:      #c8a86b;
-    --tan-2:    #e0c48a;
-    --orange:   #c0622a;
-    --paper:    #f5f2ec;
-    --ink:      #1c1e18;
-    --muted:    #6b6b5e;
-    --rule:     #dedad0;
-    --white:    #ffffff;
-    --card-r:   12px;
+    --olive:  #2e3120;
+    --tan:    #c8a86b;
+    --orange: #c0622a;
+    --paper:  #f5f2ec;
+    --ink:    #1c1e18;
+    --muted:  #7a7a6a;
+    --rule:   #dedad0;
+    --white:  #ffffff;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
   body {
     font-family: 'Inter', system-ui, sans-serif;
     background: var(--paper);
     color: var(--ink);
-    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── HEADER ── */
-  .site-header {
+  /* HEADER */
+  header {
     background: var(--olive);
     border-bottom: 3px solid var(--tan);
-    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 20px; height: 60px; gap: 12px;
   }
-  .header-inner {
-    max-width: 1100px; margin: 0 auto;
-    padding: 0 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 64px;
+  header img { height: 38px; }
+  header span {
+    font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600;
+    color: var(--tan); text-transform: uppercase; letter-spacing: .06em;
   }
-  .logo-wrap { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-  .logo-wrap img { height: 44px; width: auto; }
-  .logo-text { font-family: 'Oswald', sans-serif; color: var(--tan); font-size: 15px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; line-height: 1.2; }
-  .logo-text span { display: block; color: rgba(255,255,255,.55); font-size: 11px; font-weight: 400; letter-spacing: .1em; }
-  .header-link {
-    color: var(--tan-2); font-size: 13px; font-family: 'Oswald', sans-serif;
-    text-transform: uppercase; letter-spacing: .08em; text-decoration: none;
-    border: 1px solid rgba(200,168,107,.35); border-radius: 6px; padding: 6px 14px;
-    transition: background .18s, border-color .18s;
-  }
-  .header-link:hover { background: rgba(200,168,107,.12); border-color: var(--tan); }
 
-  /* ── HERO ── */
+  /* HERO */
   .hero {
-    position: relative; overflow: hidden;
-    height: clamp(220px, 36vw, 400px);
-    display: flex; align-items: flex-end;
-  }
-  .hero-bg {
-    position: absolute; inset: 0;
+    background: var(--olive);
     background-image: url('https://aurorasc.org/images/slider/cache/b783fc4fa40718805674519ccc17c317/slider-1.jpg');
     background-size: cover; background-position: center 30%;
-    filter: brightness(.55);
+    position: relative; padding: 48px 24px 44px;
+    text-align: center;
   }
-  .hero-overlay {
-    position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(46,49,32,.92) 0%, rgba(46,49,32,.2) 60%, transparent 100%);
+  .hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: rgba(30,33,20,.78);
   }
-  .hero-content {
-    position: relative; z-index: 1;
-    max-width: 1100px; margin: 0 auto; width: 100%;
-    padding: 0 24px 32px;
+  .hero-inner { position: relative; z-index: 1; }
+  .hero h1 {
+    font-family: 'Oswald', sans-serif; font-size: clamp(32px, 8vw, 56px);
+    font-weight: 700; text-transform: uppercase; color: #fff;
+    line-height: 1.05; letter-spacing: .01em;
   }
-  .hero-eyebrow {
-    font-family: 'Oswald', sans-serif; font-size: 12px; font-weight: 500;
-    letter-spacing: .18em; text-transform: uppercase; color: var(--tan);
-    margin-bottom: 6px;
+  .hero h1 em { color: var(--tan); font-style: normal; display: block; }
+  .hero p {
+    color: rgba(255,255,255,.65); font-size: 16px; margin-top: 10px;
+    max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;
   }
-  .hero-title {
-    font-family: 'Oswald', sans-serif; font-size: clamp(28px, 5vw, 52px);
-    font-weight: 700; text-transform: uppercase; letter-spacing: .02em;
-    color: #fff; line-height: 1.05;
-  }
-  .hero-title em { color: var(--tan); font-style: normal; }
-  .hero-sub { color: rgba(255,255,255,.72); font-size: 15px; margin-top: 8px; max-width: 480px; }
 
-  /* ── SECTION WRAPPER ── */
-  .section { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
-  .section-title {
-    font-family: 'Oswald', sans-serif; text-transform: uppercase;
-    letter-spacing: .1em; font-size: 13px; font-weight: 600;
-    color: var(--muted); display: flex; align-items: center; gap: 12px;
-    margin-bottom: 24px;
-  }
-  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
-
-  /* ── CATEGORY GRID ── */
-  .cat-grid {
+  /* GRID */
+  .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 24px 16px 32px;
+    max-width: 680px; margin: 0 auto;
   }
-  .cat-card {
-    background: var(--white); border-radius: var(--card-r);
-    border: 1px solid var(--rule);
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    transition: box-shadow .2s, transform .2s;
-    text-decoration: none; color: inherit;
-  }
-  .cat-card:hover { box-shadow: 0 8px 32px rgba(46,49,32,.13); transform: translateY(-2px); }
-  .cat-card-img {
-    height: 160px; overflow: hidden; flex-shrink: 0;
-    background: var(--olive-2);
-    position: relative;
-  }
-  .cat-card-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; display: block; transition: transform .4s; }
-  .cat-card:hover .cat-card-img img { transform: scale(1.04); }
-  .cat-badge {
-    position: absolute; top: 12px; left: 12px;
-    font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600;
-    letter-spacing: .12em; text-transform: uppercase;
-    background: var(--olive); color: var(--tan);
-    padding: 3px 10px; border-radius: 4px;
-  }
-  .cat-body { padding: 20px 22px 18px; flex: 1; display: flex; flex-direction: column; }
-  .cat-icon { font-size: 22px; margin-bottom: 8px; }
-  .cat-name {
-    font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: .04em; color: var(--olive);
-    margin-bottom: 6px;
-  }
-  .cat-desc { font-size: 13.5px; color: var(--muted); line-height: 1.55; flex: 1; }
-  .cat-links { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
-  .cat-link {
-    font-size: 13px; font-weight: 500; color: var(--orange);
-    text-decoration: none; display: flex; align-items: center; gap: 6px;
-    padding: 7px 0; border-top: 1px solid var(--rule);
-    transition: color .15s;
-  }
-  .cat-link:hover { color: var(--olive); }
-  .cat-link::after { content: '→'; margin-left: auto; opacity: .5; }
 
-  /* ── QUICK STRIP ── */
-  .quick-strip {
+  /* BUTTON CARDS */
+  .btn-card {
+    background: var(--white);
+    border: 1.5px solid var(--rule);
+    border-radius: 16px;
+    text-decoration: none; color: var(--ink);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 32px 16px 28px;
+    gap: 14px;
+    transition: border-color .15s, box-shadow .15s, transform .15s;
+    min-height: 160px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-card:hover, .btn-card:active {
+    border-color: var(--tan);
+    box-shadow: 0 4px 20px rgba(46,49,32,.12);
+    transform: translateY(-2px);
+  }
+  .btn-card:active { transform: translateY(0); }
+
+  .btn-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: var(--olive); display: flex; align-items: center; justify-content: center;
+    font-size: 26px; flex-shrink: 0;
+  }
+  .btn-label {
+    font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .04em;
+    color: var(--olive); line-height: 1.1;
+  }
+  .btn-sub {
+    font-size: 12px; color: var(--muted); line-height: 1.4; margin-top: -6px;
+  }
+
+  /* accent colors per card */
+  .c-events  .btn-icon { background: #1f3d2b; }
+  .c-dues    .btn-icon { background: #2a3320; }
+  .c-rules   .btn-icon { background: #3d2a10; }
+  .c-help    .btn-icon { background: #3a1e10; }
+  .c-connect .btn-icon { background: #1a2a3d; }
+  .c-plans   .btn-icon { background: #1e2e1e; }
+
+  /* DIVIDER */
+  .divider {
+    text-align: center; padding: 0 16px 8px;
+    font-size: 12px; color: var(--muted); letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  footer {
     background: var(--olive);
     border-top: 3px solid var(--tan);
-    border-bottom: 3px solid var(--tan);
+    padding: 28px 20px; text-align: center;
   }
-  .quick-inner {
-    max-width: 1100px; margin: 0 auto; padding: 0 24px;
-    display: flex; flex-wrap: wrap; gap: 0;
-  }
-  .quick-item {
-    flex: 1 1 180px; padding: 22px 20px;
-    text-decoration: none; color: var(--tan-2);
-    border-right: 1px solid rgba(200,168,107,.2);
-    transition: background .18s;
-    display: flex; flex-direction: column; gap: 4px;
-  }
-  .quick-item:last-child { border-right: none; }
-  .quick-item:hover { background: rgba(200,168,107,.08); }
-  .quick-label {
-    font-family: 'Oswald', sans-serif; font-size: 11px; font-weight: 500;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--tan); opacity: .7;
-  }
-  .quick-title { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  footer img { height: 36px; margin-bottom: 10px; opacity: .8; display: block; margin-left: auto; margin-right: auto; }
+  footer p { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.8; }
+  footer a { color: var(--tan); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
 
-  /* ── PHOTO ROW ── */
-  .photo-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    border-radius: var(--card-r);
-    overflow: hidden;
-  }
-  .photo-row img { width: 100%; height: 130px; object-fit: cover; display: block; filter: brightness(.85) saturate(.9); transition: filter .3s; }
-  .photo-row img:hover { filter: brightness(1) saturate(1); }
-
-  /* ── FOOTER ── */
-  .site-footer {
-    background: var(--olive); color: rgba(255,255,255,.55);
-    padding: 32px 24px; text-align: center;
-    border-top: 3px solid var(--tan);
-    font-size: 13px;
-  }
-  .site-footer a { color: var(--tan); text-decoration: none; }
-  .site-footer a:hover { text-decoration: underline; }
-  .footer-logo { height: 40px; margin-bottom: 12px; opacity: .85; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .cat-grid { grid-template-columns: 1fr; }
-    .photo-row { grid-template-columns: repeat(2, 1fr); }
-    .quick-item { flex-basis: 50%; }
-    .header-inner { padding: 0 16px; }
-    .logo-text { display: none; }
+  /* MOBILE: single column on very small screens */
+  @media (max-width: 380px) {
+    .grid { grid-template-columns: 1fr; }
+    .btn-card { min-height: 120px; flex-direction: row; justify-content: flex-start; text-align: left; padding: 20px 20px; }
   }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="site-header">
-  <div class="header-inner">
-    <a href="https://aurorasc.org" class="logo-wrap" target="_blank" rel="noopener">
-      <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="Aurora Sportsmen's Club logo">
-      <div class="logo-text">Aurora Sportsmen's Club<span>Member Hub</span></div>
-    </a>
-    <a href="https://aurorasc.org/events" class="header-link" target="_blank" rel="noopener">Full Site →</a>
-  </div>
+<header>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
+  <span>Member Hub</span>
 </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-overlay"></div>
-  <div class="hero-content">
-    <div class="hero-eyebrow">Aurora Sportsmen's Club · Waterman, IL</div>
-    <h1 class="hero-title">Everything you need.<br><em>One place.</em></h1>
-    <p class="hero-sub">Find events, pay dues, read the rules, connect with your department, or learn what the board is planning — without hunting through six different places.</p>
-  </div>
-</section>
-
-<!-- QUICK LINKS STRIP -->
-<div class="quick-strip">
-  <div class="quick-inner">
-    <a class="quick-item" href="https://aurorasc.org/events" target="_blank" rel="noopener">
-      <span class="quick-label">This week</span>
-      <span class="quick-title">Club Calendar</span>
-    </a>
-    <a class="quick-item" href="https://aurorasc.org/membership" target="_blank" rel="noopener">
-      <span class="quick-label">Account</span>
-      <span class="quick-title">Pay Dues</span>
-    </a>
-    <a class="quick-item" href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">
-      <span class="quick-label">Need help?</span>
-      <span class="quick-title">Contact Us</span>
-    </a>
-    <a class="quick-item" href="https://aurorasc.org/about-asc/newsletter" target="_blank" rel="noopener">
-      <span class="quick-label">Latest</span>
-      <span class="quick-title">Newsletter</span>
-    </a>
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Find what<em>you need.</em></h1>
+    <p>Tap the button. Get there.</p>
   </div>
 </div>
 
-<!-- MAIN CATEGORIES -->
-<div class="section">
-  <h2 class="section-title">What do you need?</h2>
-  <div class="cat-grid">
+<div class="grid">
 
-    <!-- 1. Events & Calendar -->
-    <a class="cat-card" href="https://aurorasc.org/events" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/970ad5d511364534571ec8015514612a/67449777_716140128847788_8491474395179515904_o.jpg" alt="Action shooting match at ASC" loading="lazy">
-        <span class="cat-badge">Events</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Events &amp; Calendar</div>
-        <p class="cat-desc">Every match, clinic, and range event — sorted by date. Tap any event to register or get details.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://aurorasc.org/events" target="_blank" rel="noopener" onclick="event.stopPropagation()">Club calendar</a>
-          <a class="cat-link" href="https://practiscore.com/clubs/aurora-sportsmens-club" target="_blank" rel="noopener" onclick="event.stopPropagation()">Practiscore match sign-ups</a>
-          <a class="cat-link" href="https://aurorasc.org/departments/civilian-marksmanship" target="_blank" rel="noopener" onclick="event.stopPropagation()">CMP clinic registration</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-events" href="https://aurorasc.org/events" target="_blank" rel="noopener">
+    <div class="btn-icon">📅</div>
+    <div class="btn-label">Events &amp;<br>Calendar</div>
+    <div class="btn-sub">Matches, clinics,<br>range schedule</div>
+  </a>
 
-    <!-- 2. Membership & Dues -->
-    <a class="cat-card" href="https://aurorasc.org/membership" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/f7ef298ac2b5d865461a92002da41ad0/67581787_716140162181118_2848726175348424704_o.jpg" alt="ASC facility" loading="lazy">
-        <span class="cat-badge">Membership</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Membership &amp; Dues</div>
-        <p class="cat-desc">Pay dues, renew your membership, update your account, or check your volunteer hours — all through ClubExpress.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://aurorasc.org/membership" target="_blank" rel="noopener" onclick="event.stopPropagation()">Pay dues / renew</a>
-          <a class="cat-link" href="https://aurorasc.org/membership" target="_blank" rel="noopener" onclick="event.stopPropagation()">Manage your account</a>
-          <a class="cat-link" href="https://aurorasc.org/membership" target="_blank" rel="noopener" onclick="event.stopPropagation()">Membership information</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-dues" href="https://aurorasc.org/membership" target="_blank" rel="noopener">
+    <div class="btn-icon">💳</div>
+    <div class="btn-label">Dues &amp;<br>Membership</div>
+    <div class="btn-sub">Pay, renew,<br>manage account</div>
+  </a>
 
-    <!-- 3. Rules & Onboarding -->
-    <a class="cat-card" href="https://aurorasc.org/about-asc/range-rules" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/f97eaa85f454f9ed6593b7717bcd560a/unnamed1.jpg" alt="ASC range" loading="lazy">
-        <span class="cat-badge">Rules</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Rules &amp; Onboarding</div>
-        <p class="cat-desc">Range rules, safety requirements, the club constitution, and everything a new member needs to get started.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://aurorasc.org/about-asc/range-rules" target="_blank" rel="noopener" onclick="event.stopPropagation()">Range rules</a>
-          <a class="cat-link" href="https://aurorasc.org/about-asc/constitution-and-by-laws" target="_blank" rel="noopener" onclick="event.stopPropagation()">Constitution &amp; by-laws</a>
-          <a class="cat-link" href="https://aurorasc.org/membership" target="_blank" rel="noopener" onclick="event.stopPropagation()">New member orientation</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-rules" href="https://aurorasc.org/about-asc/range-rules" target="_blank" rel="noopener">
+    <div class="btn-icon">📋</div>
+    <div class="btn-label">Rules &amp;<br>Onboarding</div>
+    <div class="btn-sub">Range rules,<br>constitution, new members</div>
+  </a>
 
-    <!-- 4. Help Out & Contact -->
-    <a class="cat-card" href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/6d2ad567943461fc04a73e4475133085/1941395_694269933991117_4757313895621308744_o.jpg" alt="Volunteers at ASC" loading="lazy">
-        <span class="cat-badge">Help Out</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Help Out &amp; Contact</div>
-        <p class="cat-desc">Reach a department head, sign up to volunteer, or report your hours. One page, one place.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://aurorasc.org/contact-us" target="_blank" rel="noopener" onclick="event.stopPropagation()">Department contacts</a>
-          <a class="cat-link" href="https://signup.com/Group/807452878073/" target="_blank" rel="noopener" onclick="event.stopPropagation()">Volunteer sign-up</a>
-          <a class="cat-link" href="https://aurorasc.wufoo.com/forms/volunteer-hours-reporting" target="_blank" rel="noopener" onclick="event.stopPropagation()">Report volunteer hours</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-help" href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">
+    <div class="btn-icon">🙋</div>
+    <div class="btn-label">Help Out &amp;<br>Contact</div>
+    <div class="btn-sub">Departments,<br>volunteer sign-up</div>
+  </a>
 
-    <!-- 5. Connect -->
-    <a class="cat-card" href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/78ebbc0ad2809f1077760bb1583fc0d9/IMG_2811.jpg" alt="ASC community" loading="lazy">
-        <span class="cat-badge">Connect</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Connect</div>
-        <p class="cat-desc">Stay in the loop — follow us on social, join the forum, and read the monthly newsletter archive.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener" onclick="event.stopPropagation()">Facebook — main page</a>
-          <a class="cat-link" href="https://www.facebook.com/groups/ASCActionShooting" target="_blank" rel="noopener" onclick="event.stopPropagation()">Facebook — action shooting</a>
-          <a class="cat-link" href="https://aurorasc.org/about-asc/newsletter" target="_blank" rel="noopener" onclick="event.stopPropagation()">Newsletter archive</a>
-          <a class="cat-link" href="https://aurorasc.org/forum" target="_blank" rel="noopener" onclick="event.stopPropagation()">Member forum</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-connect" href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">
+    <div class="btn-icon">📣</div>
+    <div class="btn-label">Connect</div>
+    <div class="btn-sub">Facebook, forum,<br>newsletter</div>
+  </a>
 
-    <!-- 6. Plans & Decisions -->
-    <a class="cat-card" href="https://aurorasc.org/about-asc/board-minutes" target="_blank" rel="noopener">
-      <div class="cat-card-img">
-        <img src="https://aurorasc.org/images/slider/cache/0ed841454f4e2c411ea6a8bc7a20e597/PPR1.jpg" alt="ASC range construction and improvements" loading="lazy">
-        <span class="cat-badge">Board</span>
-      </div>
-      <div class="cat-body">
-        <div class="cat-name">Plans &amp; Decisions</div>
-        <p class="cat-desc">What the club is building, planning, and deciding — capital projects, board updates, and meeting minutes.</p>
-        <div class="cat-links">
-          <a class="cat-link" href="https://aurorasc.org/about-asc/board-minutes" target="_blank" rel="noopener" onclick="event.stopPropagation()">Board meeting minutes</a>
-          <a class="cat-link" href="https://aurorasc.org/about-asc/capital-plan" target="_blank" rel="noopener" onclick="event.stopPropagation()">Capital plan &amp; projects</a>
-          <a class="cat-link" href="https://aurorasc.org/about-asc/newsletter" target="_blank" rel="noopener" onclick="event.stopPropagation()">President's updates</a>
-        </div>
-      </div>
-    </a>
+  <a class="btn-card c-plans" href="https://aurorasc.org/about-asc/board-minutes" target="_blank" rel="noopener">
+    <div class="btn-icon">🏗️</div>
+    <div class="btn-label">Plans &amp;<br>Decisions</div>
+    <div class="btn-sub">Projects, minutes,<br>what's coming</div>
+  </a>
 
-  </div>
 </div>
 
-<!-- PHOTO STRIP -->
-<div class="section" style="padding-top:0">
-  <div class="photo-row">
-    <img src="https://aurorasc.org/images/slider/cache/9fced97af54ee3ffd73091f4096055bc/1009102_470713313013448_450205921_o.jpg" alt="ASC range" loading="lazy">
-    <img src="https://aurorasc.org/images/slider/cache/67562366_10214584921840317_87269.jpg" alt="ASC event" loading="lazy"
-      onerror="this.src='https://aurorasc.org/images/slider/cache/2c4889ab7e954ef5ac09ec1fb84532c9/67562366_10214584921840317_87269.jpg'">
-    <img src="https://aurorasc.org/images/slider/cache/2c4889ab7e954ef5ac09ec1fb84532c9/67562366_10214584921840317_87269.jpg" alt="ASC shooting sports" loading="lazy"
-      onerror="this.src='https://aurorasc.org/images/slider/cache/6d2ad567943461fc04a73e4475133085/1941395_694269933991117_4757313895621308744_o.jpg'">
-    <img src="https://aurorasc.org/images/slider/cache/970ad5d511364534571ec8015514612a/67449777_716140128847788_8491474395179515904_o.jpg" alt="ASC action sports" loading="lazy">
-  </div>
-</div>
-
-<!-- FOOTER -->
-<footer class="site-footer">
-  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="Aurora Sportsmen's Club" class="footer-logo">
-  <p>Aurora Sportsmen's Club · Waterman, IL · <a href="tel:+1XXXXXXXXXX">847-xxx-xxxx</a></p>
-  <p style="margin-top:6px">
+<footer>
+  <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="Aurora Sportsmen's Club">
+  <p>
     <a href="https://aurorasc.org" target="_blank" rel="noopener">aurorasc.org</a> ·
     <a href="https://aurorasc.org/contact-us" target="_blank" rel="noopener">Contact</a> ·
     <a href="https://www.facebook.com/AuroraSportsmenClub" target="_blank" rel="noopener">Facebook</a>
   </p>
-  <p style="margin-top:12px; font-size:11px; opacity:.45">Member hub — not the official ASC website. All links route to aurorasc.org.</p>
+  <p style="margin-top:8px;font-size:11px;opacity:.4">Member hub — all links go to aurorasc.org</p>
 </footer>
 
 </body>
