@@ -18,14 +18,14 @@ header .htitle{font-family:'Oswald',sans-serif;font-size:17px;font-weight:700;co
 .hero h1{font-family:'Oswald',sans-serif;font-size:clamp(28px,7vw,46px);font-weight:700;text-transform:uppercase;color:#fff;line-height:1.05;}
 .hero h1 em{color:var(--tan);font-style:normal;}
 .page{max-width:680px;margin:0 auto;padding:24px 16px 48px;}
-.big-btn{background:var(--olive);border-radius:16px;text-decoration:none;color:#fff;display:flex;align-items:center;gap:18px;padding:28px 24px;margin-bottom:16px;transition:opacity .15s,transform .15s;-webkit-tap-highlight-color:transparent;border:2px solid var(--tan);}
-.big-btn:hover{opacity:.92;transform:translateY(-2px);}
-.big-btn:active{transform:translateY(0);}
-.big-icon{width:60px;height:60px;border-radius:14px;background:rgba(200,168,107,.15);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;}
-.big-label{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tan);line-height:1.1;}
-.big-sub{font-size:14px;color:rgba(255,255,255,.65);margin-top:4px;line-height:1.4;}
-.big-arrow{margin-left:auto;font-size:24px;color:var(--tan);flex-shrink:0;}
-.note{background:var(--white);border:1.5px solid var(--rule);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--muted);line-height:1.6;}
+.btn-card{background:var(--white);border:1.5px solid var(--rule);border-radius:16px;text-decoration:none;color:var(--ink);display:flex;align-items:center;gap:18px;padding:22px;margin-bottom:12px;transition:border-color .15s,box-shadow .15s,transform .15s;-webkit-tap-highlight-color:transparent;}
+.btn-card:hover{border-color:var(--tan);box-shadow:0 4px 20px rgba(46,49,32,.12);transform:translateY(-2px);}
+.btn-card:active{transform:translateY(0);}
+.btn-icon{width:52px;height:52px;border-radius:12px;background:var(--olive);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.btn-label{font-family:'Oswald',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--olive);line-height:1.1;}
+.btn-sub{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4;}
+.btn-arrow{margin-left:auto;font-size:20px;color:var(--tan);flex-shrink:0;}
+.note{background:var(--white);border:1.5px solid var(--rule);border-radius:12px;padding:18px 20px;font-size:14px;color:var(--muted);line-height:1.6;margin-top:4px;}
 .note strong{color:var(--ink);}
 footer{background:var(--olive);border-top:3px solid var(--tan);padding:24px 20px;text-align:center;}
 footer img{height:32px;margin-bottom:8px;opacity:.8;display:block;margin-left:auto;margin-right:auto;}
@@ -35,32 +35,48 @@ footer a{color:var(--tan);text-decoration:none;}
 </head>
 <body>
 <header>
-  <a class="back" href="../">← Back</a>
+  <a class="back" href="/asc/">← Back</a>
   <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
   <span class="htitle">Dues &amp; Membership</span>
 </header>
 <div class="hero"><h1>Dues &amp; <em>Membership</em></h1></div>
 <div class="page">
 
-  <a class="big-btn" href="https://aurorasc.clubexpress.com/" target="_blank" rel="noopener">
-    <div class="big-icon">💳</div>
-    <div>
-      <div class="big-label">Go to ClubExpress</div>
-      <div class="big-sub">Pay dues · Renew membership · Manage your account</div>
+  <a class="btn-card" href="https://aurorasc.clubexpress.com/" target="_blank" rel="noopener">
+    <div class="btn-icon">💳</div>
+    <div class="btn-text">
+      <div class="btn-label">Pay Dues</div>
+      <div class="btn-sub">Annual dues, renewal, and payment history</div>
     </div>
-    <div class="big-arrow">→</div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://aurorasc.clubexpress.com/" target="_blank" rel="noopener">
+    <div class="btn-icon">👤</div>
+    <div class="btn-text">
+      <div class="btn-label">Manage Account</div>
+      <div class="btn-sub">Update contact info, membership status, account history</div>
+    </div>
+    <div class="btn-arrow">→</div>
+  </a>
+
+  <a class="btn-card" href="https://aurorasc.clubexpress.com/" target="_blank" rel="noopener">
+    <div class="btn-icon">🔄</div>
+    <div class="btn-text">
+      <div class="btn-label">Renew Membership</div>
+      <div class="btn-sub">Renewal emails go out November 1 — log in to renew early</div>
+    </div>
+    <div class="btn-arrow">→</div>
   </a>
 
   <div class="note">
-    <strong>Everything membership-related lives in ClubExpress.</strong> That includes paying your annual dues, renewing, updating your contact info, checking your membership status, and viewing your account history. Log in with the email address you used when you joined.
-    <br><br>
-    Questions? Contact <a href="mailto:membership@aurorasc.org" style="color:var(--orange);">membership@aurorasc.org</a>
+    Questions about your membership? Contact <a href="mailto:membership@aurorasc.org" style="color:var(--orange);">membership@aurorasc.org</a>
   </div>
 
 </div>
 <footer>
   <img src="https://aurorasc.org/images/template_images/asc_site_logo.png" alt="ASC">
-  <p><a href="https://aurorasc.org" target="_blank">aurorasc.org</a> · <a href="../">← Member Hub</a></p>
+  <p><a href="https://aurorasc.org" target="_blank">aurorasc.org</a> · <a href="/asc/">← Member Hub</a></p>
 </footer>
 </body>
 </html>
