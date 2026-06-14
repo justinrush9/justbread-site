@@ -18,10 +18,8 @@
   .hero{background:var(--olive);background-image:url('https://aurorasc.org/images/slider/cache/b783fc4fa40718805674519ccc17c317/slider-1.jpg');background-size:cover;background-position:center 30%;position:relative;padding:48px 24px 44px;text-align:center;}
   .hero::before{content:'';position:absolute;inset:0;background:rgba(30,33,20,.78);}
   .hero-inner{position:relative;z-index:1;}
-  .hero h1{font-family:'Oswald',sans-serif;font-size:clamp(36px,9vw,64px);font-weight:700;text-transform:uppercase;line-height:1.0;letter-spacing:.01em;white-space:nowrap;}
-  .hero h1 .find{color:#fff;}
-  .hero h1 .need{color:#fff;}
-  .hero h1 .what{color:var(--tan);}
+  .hero h1{font-family:'Oswald',sans-serif;font-size:clamp(36px,9vw,64px);font-weight:700;text-transform:uppercase;line-height:1.0;letter-spacing:.01em;white-space:nowrap;color:#fff;}
+  .hero h1 .you{color:var(--tan);}
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:24px 16px 32px;max-width:680px;margin:0 auto;}
   .btn-card{background:var(--white);border:1.5px solid var(--rule);border-radius:16px;text-decoration:none;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 16px 28px;gap:14px;transition:border-color .15s,box-shadow .15s,transform .15s;min-height:160px;-webkit-tap-highlight-color:transparent;}
   .btn-card:hover{border-color:var(--tan);box-shadow:0 4px 20px rgba(46,49,32,.12);transform:translateY(-2px);}
@@ -50,42 +48,42 @@
 
 <div class="hero">
   <div class="hero-inner">
-    <h1><span class="find">Find </span><span class="what">what</span><span class="find"> you </span><span class="need">need.</span></h1>
+    <h1>Find what <span class="you">you</span> need.</h1>
   </div>
 </div>
 
 <div class="grid">
-  <a class="btn-card" href="events/">
+  <a class="btn-card" href="/asc/events/">
     <div class="btn-icon">📅</div>
     <div class="btn-label">Events &amp;<br>Calendar</div>
     <div class="btn-sub">Matches, clinics,<br>range schedule</div>
   </a>
 
-  <a class="btn-card" href="membership/">
+  <a class="btn-card" href="/asc/membership/">
     <div class="btn-icon">💳</div>
     <div class="btn-label">Dues &amp;<br>Membership</div>
     <div class="btn-sub">Pay, renew,<br>manage account</div>
   </a>
 
-  <a class="btn-card" href="rules/">
+  <a class="btn-card" href="/asc/rules/">
     <div class="btn-icon">📋</div>
     <div class="btn-label">Rules &amp;<br>Onboarding</div>
     <div class="btn-sub">Range rules,<br>constitution, new members</div>
   </a>
 
-  <a class="btn-card" href="help/">
+  <a class="btn-card" href="/asc/help/">
     <div class="btn-icon">🙋</div>
     <div class="btn-label">Help Out &amp;<br>Contact</div>
     <div class="btn-sub">Departments,<br>volunteer sign-up</div>
   </a>
 
-  <a class="btn-card" href="connect/">
+  <a class="btn-card" href="/asc/connect/">
     <div class="btn-icon">📣</div>
     <div class="btn-label">Connect</div>
     <div class="btn-sub">Facebook, forum,<br>newsletter</div>
   </a>
 
-  <a class="btn-card" href="plans/">
+  <a class="btn-card" href="/asc/plans/">
     <div class="btn-icon">🏗️</div>
     <div class="btn-label">Plans &amp;<br>Decisions</div>
     <div class="btn-sub">Projects, minutes,<br>what's coming</div>
