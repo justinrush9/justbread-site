@@ -1,1 +1,112 @@
-LyoqCiAqIEp1c3RCcmVhZCDigJQgQ3VzdG9tZXIgUG9ydGFsIEVuZHBvaW50CiAqID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KICogUE9TVCAvYXBpL3BvcnRhbAogKgogKiBMb29rcyB1cCBhIFN0cmlwZSBjdXN0b21lciBieSBlbWFpbCwgdGhlbiBjcmVhdGVzIGEgQmlsbGluZyBQb3J0YWwKICogc2Vzc2lvbiBzbyB0aGV5IGNhbiBzZWxmLXNlcnZlOiBwYXVzZSwgY2FuY2VsLCB1cGRhdGUgcGF5bWVudCBtZXRob2QuCiAqCiAqIFJlcXVlc3QgYm9keSAoSlNPTik6CiAqICAgeyBlbWFpbDogImN1c3RvbWVyQGV4YW1wbGUuY29tIiB9CiAqCiAqIFN1Y2Nlc3MgcmVzcG9uc2U6CiAqICAgeyB1cmw6ICJodHRwczovL2JpbGxpbmcuc3RyaXBlLmNvbS9zZXNzaW9uLy4uLiIgfQogKgogKiBFcnJvciByZXNwb25zZXM6CiAqICAgNDA0IHsgZXJyb3I6ICJObyBjdXN0b21lciBmb3VuZCBmb3IgdGhhdCBlbWFpbC4iIH0KICogICA0MDAgeyBlcnJvcjogImVtYWlsIGlzIHJlcXVpcmVkIiB9CiAqICAgNTAwIHsgZXJyb3I6ICIuLi4iIH0KICoKICogRGVwbG95IG5vdGVzOgogKiAtIFVzZXMgdGhlIHNhbWUgU1RSSVBFX1NFQ1JFVF9LRVkgZW52IHZhciBhcyBjaGVja291dC5qcwogKiAtIEN1c3RvbWVyIFBvcnRhbCBtdXN0IGJlIGNvbmZpZ3VyZWQgaW4gU3RyaXBlIERhc2hib2FyZCBmaXJzdDoKICogICBEYXNoYm9hcmQg4oaSIFNldHRpbmdzIOKGkiBCaWxsaW5nIOKGkiBDdXN0b21lciBwb3J0YWwKICogICBFbmFibGU6IGNhbmNlbCBzdWJzY3JpcHRpb25zLCBwYXVzZSBzdWJzY3JpcHRpb25zLCB1cGRhdGUgcGF5bWVudCBtZXRob2QKICogICBTZXQgcmV0dXJuIFVSTCB0bzogaHR0cHM6Ly9qdXN0YnJlYWQuc2hvcC9tYW5hZ2UvCiAqLwoKY29uc3Qgc3RyaXBlID0gcmVxdWlyZSgnc3RyaXBlJykocHJvY2Vzcy5lbnYuU1RSSVBFX1NFQ1JFVF9LRVkpOwoKY29uc3QgQUxMT1dFRF9PUklHSU5TID0gWwogICdodHRwczovL2p1c3RicmVhZC5zaG9wJywKICAnaHR0cHM6Ly93d3cuanVzdGJyZWFkLnNob3AnLApdOwoKZnVuY3Rpb24gc2V0Q29ycyhyZXEsIHJlcykgewogIGNvbnN0IG9yaWdpbiA9IHJlcS5oZWFkZXJzLm9yaWdpbjsKICBpZiAoQUxMT1dFRF9PUklHSU5TLmluY2x1ZGVzKG9yaWdpbikpIHsKICAgIHJlcy5zZXRIZWFkZXIoJ0FjY2Vzcy1Db250cm9sLUFsbG93LU9yaWdpbicsIG9yaWdpbik7CiAgfQogIHJlcy5zZXRIZWFkZXIoJ0FjY2Vzcy1Db250cm9sLUFsbG93LU1ldGhvZHMnLCAnUE9TVCwgT1BUSU9OUycpOwogIHJlcy5zZXRIZWFkZXIoJ0FjY2Vzcy1Db250cm9sLUFsbG93LUhlYWRlcnMnLCAnQ29udGVudC1UeXBlJyk7Cn0KCm1vZHVsZS5leHBvcnRzID0gYXN5bmMgZnVuY3Rpb24gaGFuZGxlcihyZXEsIHJlcykgewogIHNldENvcnMocmVxLCByZXMpOwoKICAvLyBQcmVmbGlnaHQKICBpZiAocmVxLm1ldGhvZCA9PT0gJ09QVElPTlMnKSB7CiAgICByZXR1cm4gcmVzLnN0YXR1cygyMDApLmVuZCgpOwogIH0KCiAgaWYgKHJlcS5tZXRob2QgIT09ICdQT1NUJykgewogICAgcmV0dXJuIHJlcy5zdGF0dXMoNDA1KS5qc29uKHsgZXJyb3I6ICdNZXRob2Qgbm90IGFsbG93ZWQnIH0pOwogIH0KCiAgY29uc3QgeyBlbWFpbCB9ID0gcmVxLmJvZHkgfHwge307CgogIGlmICghZW1haWwgfHwgdHlwZW9mIGVtYWlsICE9PSAnc3RyaW5nJyB8fCAhZW1haWwuaW5jbHVkZXMoJ0AnKSkgewogICAgcmV0dXJuIHJlcy5zdGF0dXMoNDAwKS5qc29uKHsgZXJyb3I6ICdlbWFpbCBpcyByZXF1aXJlZCcgfSk7CiAgfQoKICB0cnkgewogICAgLy8gTG9vayB1cCB0aGUgY3VzdG9tZXIgYnkgZW1haWwKICAgIGNvbnN0IGN1c3RvbWVycyA9IGF3YWl0IHN0cmlwZS5jdXN0b21lcnMubGlzdCh7CiAgICAgIGVtYWlsOiBlbWFpbC50b0xvd2VyQ2FzZSgpLnRyaW0oKSwKICAgICAgbGltaXQ6IDEsCiAgICB9KTsKCiAgICBpZiAoY3VzdG9tZXJzLmRhdGEubGVuZ3RoID09PSAwKSB7CiAgICAgIHJldHVybiByZXMuc3RhdHVzKDQwNCkuanNvbih7IGVycm9yOiAnTm8gY3VzdG9tZXIgZm91bmQgZm9yIHRoYXQgZW1haWwuJyB9KTsKICAgIH0KCiAgICBjb25zdCBjdXN0b21lciA9IGN1c3RvbWVycy5kYXRhWzBdOwoKICAgIC8vIFZlcmlmeSB0aGV5IGhhdmUgYXQgbGVhc3Qgb25lIGFjdGl2ZSBzdWJzY3JpcHRpb24KICAgIGNvbnN0IHN1YnNjcmlwdGlvbnMgPSBhd2FpdCBzdHJpcGUuc3Vic2NyaXB0aW9ucy5saXN0KHsKICAgICAgY3VzdG9tZXI6IGN1c3RvbWVyLmlkLAogICAgICBzdGF0dXM6ICdhY3RpdmUnLAogICAgICBsaW1pdDogMSwKICAgIH0pOwoKICAgIC8vIEFsc28gY2hlY2sgZm9yIHRyaWFsaW5nIG9yIHBhc3RfZHVlIChzdGlsbCBtYW5hZ2VhYmxlKQogICAgbGV0IGhhc1N1YnNjcmlwdGlvbiA9IHN1YnNjcmlwdGlvbnMuZGF0YS5sZW5ndGggPiAwOwogICAgaWYgKCFoYXNTdWJzY3JpcHRpb24pIHsKICAgICAgY29uc3Qgb3RoZXIgPSBhd2FpdCBzdHJpcGUuc3Vic2NyaXB0aW9ucy5saXN0KHsKICAgICAgICBjdXN0b21lcjogY3VzdG9tZXIuaWQsCiAgICAgICAgc3RhdHVzOiAncGFzdF9kdWUnLAogICAgICAgIGxpbWl0OiAxLAogICAgICB9KTsKICAgICAgaGFzU3Vic2NyaXB0aW9uID0gb3RoZXIuZGF0YS5sZW5ndGggPiAwOwogICAgfQoKICAgIGlmICghaGFzU3Vic2NyaXB0aW9uKSB7CiAgICAgIHJldHVybiByZXMuc3RhdHVzKDQwNCkuanNvbih7CiAgICAgICAgZXJyb3I6ICdObyBhY3RpdmUgc3Vic2NyaXB0aW9uIGZvdW5kIGZvciB0aGF0IGVtYWlsLiBJZiB5b3UgcmVjZW50bHkgY2FuY2VsbGVkLCB5b3VyIHN1YnNjcmlwdGlvbiBtYXkgbm8gbG9uZ2VyIGJlIGFjY2Vzc2libGUgaGVyZS4nLAogICAgICB9KTsKICAgIH0KCiAgICAvLyBDcmVhdGUgYSBwb3J0YWwgc2Vzc2lvbgogICAgLy8gcmV0dXJuX3VybCBpcyB3aGVyZSB0aGV5IGxhbmQgYWZ0ZXIgdGhleSdyZSBkb25lIGluIHRoZSBwb3J0YWwKICAgIGNvbnN0IHNlc3Npb24gPSBhd2FpdCBzdHJpcGUuYmlsbGluZ1BvcnRhbC5zZXNzaW9ucy5jcmVhdGUoewogICAgICBjdXN0b21lcjogY3VzdG9tZXIuaWQsCiAgICAgIHJldHVybl91cmw6ICdodHRwczovL2p1c3RicmVhZC5zaG9wL21hbmFnZS8nLAogICAgfSk7CgogICAgcmV0dXJuIHJlcy5zdGF0dXMoMjAwKS5qc29uKHsgdXJsOiBzZXNzaW9uLnVybCB9KTsKCiAgfSBjYXRjaCAoZXJyKSB7CiAgICBjb25zb2xlLmVycm9yKCdQb3J0YWwgZXJyb3I6JywgZXJyLm1lc3NhZ2UpOwogICAgcmV0dXJuIHJlcy5zdGF0dXMoNTAwKS5qc29uKHsgZXJyb3I6ICdTb21ldGhpbmcgd2VudCB3cm9uZy4gUGxlYXNlIHRyeSBhZ2Fpbi4nIH0pOwogIH0KfTsK
+/**
+ * JustBread — Customer Portal Endpoint
+ * ===========================================
+ * POST /api/portal
+ *
+ * Looks up a Stripe customer by email, then creates a Billing Portal
+ * session so they can self-serve: pause, cancel, update payment method.
+ *
+ * Request body (JSON):
+ *   { email: "customer@example.com" }
+ *
+ * Success response:
+ *   { url: "https://billing.stripe.com/session/..." }
+ *
+ * Error responses:
+ *   404 { error: "No customer found for that email." }
+ *   400 { error: "email is required" }
+ *   500 { error: "..." }
+ *
+ * Deploy notes:
+ * - Uses the same STRIPE_SECRET_KEY env var as checkout.js
+ * - Customer Portal must be configured in Stripe Dashboard first:
+ *   Dashboard → Settings → Billing → Customer portal
+ *   Enable: cancel subscriptions, pause subscriptions, update payment method
+ *   Set return URL to: https://justbread.shop/manage/
+ */
+
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+const ALLOWED_ORIGINS = [
+  'https://justbread.shop',
+  'https://www.justbread.shop',
+];
+
+function setCors(req, res) {
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+}
+
+module.exports = async function handler(req, res) {
+  setCors(req, res);
+
+  // Preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { email } = req.body || {};
+
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ error: 'email is required' });
+  }
+
+  try {
+    // Look up the customer by email
+    const customers = await stripe.customers.list({
+      email: email.toLowerCase().trim(),
+      limit: 1,
+    });
+
+    if (customers.data.length === 0) {
+      return res.status(404).json({ error: 'No customer found for that email.' });
+    }
+
+    const customer = customers.data[0];
+
+    // Verify they have at least one active subscription
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: 'active',
+      limit: 1,
+    });
+
+    // Also check for trialing or past_due (still manageable)
+    let hasSubscription = subscriptions.data.length > 0;
+    if (!hasSubscription) {
+      const other = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: 'past_due',
+        limit: 1,
+      });
+      hasSubscription = other.data.length > 0;
+    }
+
+    if (!hasSubscription) {
+      return res.status(404).json({
+        error: 'No active subscription found for that email. If you recently cancelled, your subscription may no longer be accessible here.',
+      });
+    }
+
+    // Create a portal session
+    // return_url is where they land after they're done in the portal
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customer.id,
+      return_url: 'https://justbread.shop/manage/',
+    });
+
+    return res.status(200).json({ url: session.url });
+
+  } catch (err) {
+    console.error('Portal error:', err.message);
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
+  }
+};
