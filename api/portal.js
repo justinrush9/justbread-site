@@ -107,6 +107,6 @@ module.exports = async function handler(req, res) {
 
   } catch (err) {
     console.error('Portal error:', err.message);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 };
