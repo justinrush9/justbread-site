@@ -297,6 +297,23 @@
     #form-panel { padding: 36px 24px; }
     #p2-hero-content { padding: 0 24px 28px; }
   }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 28px 40px;
+    text-align: center;
+  }
+  footer p {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  footer a { color: var(--yellow); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  @media (max-width: 600px) {
+    footer { padding: 24px 20px; }
+  }
 </style>
 </head>
 <body>
@@ -658,5 +675,10 @@ document.addEventListener('click', e => {
   }
 });
 </script>
+
+<footer>
+  <p>Questions? Email <a href="mailto:info@justbread.shop">info@justbread.shop</a></p>
+</footer>
+
 </body>
 </html>
