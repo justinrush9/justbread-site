@@ -191,10 +191,9 @@ module.exports = async function handler(req, res) {
       },
     };
 
-    // For one-time orders, use Stripe's real shipping_options (looks nicer in checkout)
-    if (isOT) {
-      sessionParams.shipping_address_collection = { allowed_countries: ['US'] };
-    }
+    // Every order — one-time or subscription, local or shipped — needs a
+    // physical delivery address, so always collect it.
+    sessionParams.shipping_address_collection = { allowed_countries: ['US'] };
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     return res.status(200).json({ url: session.url });
