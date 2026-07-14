@@ -179,6 +179,9 @@ module.exports = async function handler(req, res) {
       line_items:   lineItems,
       success_url:  process.env.SUCCESS_URL || 'https://justbread.shop/order-confirmed?session_id={CHECKOUT_SESSION_ID}',
       cancel_url:   process.env.CANCEL_URL  || 'https://justbread.shop/order',
+      // Free-loaf business-card codes are 100% off — only offer the promo
+      // code field on single-loaf orders so it can't discount a bulk cart.
+      allow_promotion_codes: loavesInt === 1,
       metadata: {
         zip,
         zone,
