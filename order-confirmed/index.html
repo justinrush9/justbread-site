@@ -67,6 +67,17 @@
 
   .note { font-size: 0.875rem; color: var(--muted); text-align: center; line-height: 1.65; margin-top: 2rem; }
   .note a { color: var(--yellow); }
+
+  /* ── FOOTER ── */
+  footer { border-top: 1px solid var(--border); padding: 28px 40px; text-align: center; }
+  footer p { font-family: Arial, sans-serif; font-size: 13px; color: var(--muted); }
+  footer a { color: var(--yellow); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .footer-social { margin-top: 10px; }
+  footer .footer-social a { display: inline-flex; color: var(--muted); }
+  footer .footer-social a:hover { color: var(--yellow); }
+  footer .footer-social svg { width: 20px; height: 20px; }
+  @media (max-width: 600px) { footer { padding: 24px 20px; } }
 </style>
 </head>
 <body>
@@ -135,8 +146,16 @@
     <a href="/manage/" class="btn btn-secondary">Manage subscription</a>
   </div>
 
-  <p class="note">Questions? Email <a href="mailto:info@justbread.shop">info@justbread.shop</a></p>
 </div>
+
+<footer>
+  <p>Questions? Email <a href="mailto:info@justbread.shop">info@justbread.shop</a></p>
+  <p class="footer-social">
+    <a href="https://www.instagram.com/justbread.shop/" target="_blank" rel="noopener noreferrer" aria-label="JustBread on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"></line></svg>
+    </a>
+  </p>
+</footer>
 
 <script>
   // Redirect home if no session_id — means someone navigated here directly
