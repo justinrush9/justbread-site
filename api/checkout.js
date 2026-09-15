@@ -29,23 +29,7 @@
  */
 
 const Stripe = require('stripe');
-
-// ── PRICE IDs (from justbread_stripe.mjs list-build, live account) ────────────
-const PRICES = {
-  loaf: {
-    onetime:  'price_1TgTWrJVnPyvSLMUoZrOGnXA',
-    weekly:   'price_1TgTWrJVnPyvSLMUG2yl50f1',
-    biweekly: 'price_1TgTWrJVnPyvSLMUyxTz6UQr',
-    monthly:  'price_1TgTWrJVnPyvSLMUaUFP0ho9',
-  },
-  // Local delivery — flat fee. Subscriber cadences = $5, one-time = $7.
-  localSub: {
-    weekly:   'price_1TgVeQJVnPyvSLMUZ2n1yLax',
-    biweekly: 'price_1TgVeRJVnPyvSLMUK0ukeVkj',
-    monthly:  'price_1TgVeRJVnPyvSLMUFuohG0SJ',
-  },
-  localOnetime: 'price_1TgVeRJVnPyvSLMUK2e4GsPX',
-};
+const { PRICES } = require('../lib/prices');
 
 // ── ZIP → ZONE (mirrors the front-end zip checker exactly) ────────────────────
 const LOCAL_ZIPS = new Set(['60134', '60174', '60175', '60510']);
@@ -190,6 +174,15 @@ module.exports = async function handler(req, res) {
         cadence: cadence || 'onetime',
       },
     };
+
+    // Subscription-mode carries metadata onto the Subscription itself (not
+    // just this Checkout Session), so every future renewal invoice can
+    // still be traced back to the original zip/zone/loaves.
+    if (!isOT) {
+      sessionParams.subscription_data = {
+        metadata: { zip, zone, loaves: String(loavesInt), cadence },
+      };
+    }
 
     // Every order — one-time or subscription, local or shipped — needs a
     // physical delivery address, so always collect it.

@@ -1,2 +1,4 @@
 .vercel
 freeloaf-codes.csv
+.env*
+node_modules

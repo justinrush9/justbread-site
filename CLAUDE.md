@@ -38,6 +38,12 @@ justbread-site/
   api/
     checkout.js       # POST /api/checkout — builds Stripe Checkout Session
     portal.js         # POST /api/portal — creates Stripe Billing Portal session
+    webhook.js        # POST /api/webhook — Stripe webhook, writes orders to Postgres
+  lib/
+    prices.js         # shared price ID catalog (checkout.js + webhook.js both use this)
+  db/
+    schema.sql        # orders + bakes tables
+    client.js          # shared pg Pool, reads DATABASE_URL
   package.json
   vercel.json
 ```
@@ -140,6 +146,31 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 
 ## Known Issues / Watch Out For
 - **Base64 corruption**: faq/index.html and manage/index.html have been corrupted to raw base64 text at least twice. Root cause unknown — possibly a tool writing base64 instead of decoded content. fix-base64.py in repo root decodes them. Run it if either page shows raw text instead of rendering. After running, always check the nav links are correct and push.
+
+## Order Management (started Sep 2026)
+- Problem: manually tracking weekly orders in a spreadsheet, missed orders happen.
+- New Postgres-backed `orders` table, populated automatically by `api/webhook.js`
+  on every `checkout.session.completed` (one-time) and `invoice.paid` (subscription,
+  including first payment) event.
+- Fulfillment type (`local` vs `shipped`) is derived from which price IDs were
+  actually purchased (see `lib/prices.js`), not from metadata alone — more robust
+  since metadata can go missing on older subscriptions.
+- `checkout.js` now also sets `subscription_data.metadata` so zip/zone/loaves
+  survive onto the Subscription object, not just the one-time Checkout Session.
+- STILL TO DO before this is live:
+  1. Provision a Postgres database (Vercel Postgres, Neon, or Supabase all work —
+     whichever you pick, set `DATABASE_URL` in Vercel env vars for justbread-site).
+  2. Run `db/schema.sql` against it once.
+  3. Set `STRIPE_WEBHOOK_SECRET` in Vercel env vars (comes from step 4).
+  4. In Stripe Dashboard -> Developers -> Webhooks, add an endpoint at
+     `https://justbread.shop/api/webhook` listening for `checkout.session.completed`
+     and `invoice.paid`. (Claude can also create this via the Stripe API directly
+     once the site is deployed with the new code — ask if you want that done instead
+     of doing it by hand.)
+  5. Deploy, then place a test order to confirm a row lands in `orders`.
+- NOT built yet: production sheet view, bake-to-order linking, customer emails,
+  customer status page. All read from this same `orders` table once it's live —
+  see chat history for the full architecture.
 
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)

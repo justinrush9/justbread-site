@@ -5,6 +5,7 @@
   "private": true,
   "engines": { "node": ">=20" },
   "dependencies": {
-    "stripe": "^16.0.0"
+    "stripe": "^16.0.0",
+    "pg": "^8.11.0"
   }
 }
