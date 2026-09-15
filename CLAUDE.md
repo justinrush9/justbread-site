@@ -157,25 +157,43 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
   since metadata can go missing on older subscriptions.
 - `checkout.js` now also sets `subscription_data.metadata` so zip/zone/loaves
   survive onto the Subscription object, not just the one-time Checkout Session.
-- DONE (Sep 15, 2026): Postgres provisioned — Neon via Vercel Marketplace,
+- LIVE as of Sep 15, 2026. Postgres provisioned — Neon via Vercel Marketplace,
   connected to the justbread-site project. `DATABASE_URL` (and related Neon
   vars) auto-set for Production/Preview/Development. `db/schema.sql` applied —
-  `orders` and `bakes` tables exist. Stripe webhook endpoint
-  `we_1UG1lvJVnPyvSLMURSeFbrKg` created (listening for `checkout.session.completed`
-  and `invoice.paid`) and `STRIPE_WEBHOOK_SECRET` set in Vercel Production.
-  Deployed to production.
-  - Note: an earlier webhook endpoint (`we_1UFz0fJVnPyvSLMUwnPggTzB`) existed
-    from a prior session but its signing secret was never captured, so real
-    events had been failing signature verification (400) — it's now disabled
-    in the Stripe dashboard rather than deleted (this Stripe MCP connection
-    only exposes create/update, not delete, for webhook endpoints).
-- STILL TO DO:
-  1. Place one real test order to confirm a row lands in `orders` — this is a
-     live Stripe account, so it takes a real card; hasn't been done yet, do
-     it whenever convenient and check the `orders` table.
-  2. NOT built yet: production sheet view, bake-to-order linking, customer
-     emails, customer status page. All read from this same `orders` table
-     once verified — see chat history for the full architecture.
+  `orders` and `bakes` tables exist. To browse the data: `vercel integration
+  open neon neon-violet-dog` opens an SSO'd Neon SQL console.
+- Stripe webhook endpoint `we_1UG1lvJVnPyvSLMURSeFbrKg`, listening for
+  `checkout.session.completed` and `invoice.paid`, URL
+  `https://www.justbread.shop/api/webhook` (see gotcha below re: www).
+  `STRIPE_WEBHOOK_SECRET` set in Vercel Production.
+  - An earlier endpoint (`we_1UFz0fJVnPyvSLMUwnPggTzB`) existed from a prior
+    session but its signing secret was never captured, so events were
+    failing signature verification — it's now disabled (this Stripe
+    connection only exposes create/update via API, not delete).
+- **Gotcha found Sep 15: `justbread.shop` (apex) 308-redirects to
+  `www.justbread.shop`.** Stripe does not follow redirects when delivering
+  webhooks, so the webhook endpoint URL MUST be the `www.` form or every
+  delivery silently fails (this cost us one real subscriber's order before
+  being caught). If you add any other server-to-server integration
+  (email service, another webhook consumer, etc.), point it at `www.` too.
+  Whether to flip the redirect direction so apex is canonical (matching
+  every other URL in this codebase — success_url, cancel_url, manage
+  return URL, this doc) is still an open question; that's a Vercel
+  dashboard-only setting (Project → Domains), not CLI-scriptable — ask
+  before changing it since it affects every existing link out there.
+- Loaf counting in `lib/prices.js` covers the current price catalog plus 5
+  grandfathered legacy subscription prices (see `LEGACY_LOAF_PRICES` in that
+  file) — confirmed against Stripe product descriptions, with the one
+  genuinely ambiguous case ($35/mo "Every-Other-Week Subscription", 7
+  subscribers) confirmed directly with Jay: 2 loaves/invoice, local delivery.
+  Note that price represents an ongoing alternating-week schedule that
+  varies per subscriber — a single invoice can't tell you which week is
+  whose "on" week, so per-week delivery scheduling is still unsolved (see
+  bake-to-order linking below).
+- NOT built yet: `/admin` order-viewing page (or similar), production sheet
+  view, bake-to-order linking (including the alternating-week scheduling
+  problem above), customer emails, customer status page. All would read
+  from this same `orders` table — see chat history for the full architecture.
 
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)
