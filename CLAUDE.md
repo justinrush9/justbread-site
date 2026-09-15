@@ -157,20 +157,25 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
   since metadata can go missing on older subscriptions.
 - `checkout.js` now also sets `subscription_data.metadata` so zip/zone/loaves
   survive onto the Subscription object, not just the one-time Checkout Session.
-- STILL TO DO before this is live:
-  1. Provision a Postgres database (Vercel Postgres, Neon, or Supabase all work —
-     whichever you pick, set `DATABASE_URL` in Vercel env vars for justbread-site).
-  2. Run `db/schema.sql` against it once.
-  3. Set `STRIPE_WEBHOOK_SECRET` in Vercel env vars (comes from step 4).
-  4. In Stripe Dashboard -> Developers -> Webhooks, add an endpoint at
-     `https://justbread.shop/api/webhook` listening for `checkout.session.completed`
-     and `invoice.paid`. (Claude can also create this via the Stripe API directly
-     once the site is deployed with the new code — ask if you want that done instead
-     of doing it by hand.)
-  5. Deploy, then place a test order to confirm a row lands in `orders`.
-- NOT built yet: production sheet view, bake-to-order linking, customer emails,
-  customer status page. All read from this same `orders` table once it's live —
-  see chat history for the full architecture.
+- DONE (Sep 15, 2026): Postgres provisioned — Neon via Vercel Marketplace,
+  connected to the justbread-site project. `DATABASE_URL` (and related Neon
+  vars) auto-set for Production/Preview/Development. `db/schema.sql` applied —
+  `orders` and `bakes` tables exist. Stripe webhook endpoint
+  `we_1UG1lvJVnPyvSLMURSeFbrKg` created (listening for `checkout.session.completed`
+  and `invoice.paid`) and `STRIPE_WEBHOOK_SECRET` set in Vercel Production.
+  Deployed to production.
+  - Note: an earlier webhook endpoint (`we_1UFz0fJVnPyvSLMUwnPggTzB`) existed
+    from a prior session but its signing secret was never captured, so real
+    events had been failing signature verification (400) — it's now disabled
+    in the Stripe dashboard rather than deleted (this Stripe MCP connection
+    only exposes create/update, not delete, for webhook endpoints).
+- STILL TO DO:
+  1. Place one real test order to confirm a row lands in `orders` — this is a
+     live Stripe account, so it takes a real card; hasn't been done yet, do
+     it whenever convenient and check the `orders` table.
+  2. NOT built yet: production sheet view, bake-to-order linking, customer
+     emails, customer status page. All read from this same `orders` table
+     once verified — see chat history for the full architecture.
 
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)
