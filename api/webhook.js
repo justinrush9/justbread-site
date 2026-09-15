@@ -57,8 +57,9 @@ function classifyLineItems(lineItems) {
 
   for (const item of lineItems) {
     const priceId = item.price?.id;
-    if (priceId && LOAF_PRICE_IDS.has(priceId)) {
-      loaves += item.quantity || 0;
+    const loavesPerUnit = priceId && LOAF_PRICE_IDS.get(priceId);
+    if (loavesPerUnit) {
+      loaves += loavesPerUnit * (item.quantity || 0);
     }
     if (priceId && LOCAL_DELIVERY_PRICE_IDS.has(priceId)) {
       fulfillmentType = 'local';
