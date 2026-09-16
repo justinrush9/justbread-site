@@ -414,6 +414,13 @@
       <div class="jb-summary-line total"><span id="sum-total-lbl">Total per week</span><span id="sum-total-prc">$15.00</span></div>
     </div>
 
+    <div class="jb-row" style="margin-bottom: 16px;">
+      <button type="button" id="code-toggle-btn" style="background:none;border:none;color:var(--muted);font-family:Arial,sans-serif;font-size:12px;text-decoration:underline;cursor:pointer;padding:0;">Have a code?</button>
+      <div id="code-input-row" class="jb-hidden" style="margin-top:8px;display:flex;gap:8px;">
+        <input type="text" id="delivery-code-input" placeholder="Code" autocomplete="off" style="flex:1;background:var(--near);border:1.5px solid var(--mid);border-radius:3px;color:var(--white);font-family:Arial,sans-serif;font-size:14px;padding:9px 12px;outline:none;">
+      </div>
+    </div>
+
     <button class="jb-cta" id="checkout-btn" type="button">Checkout →</button>
     <div class="jb-error" id="order-error" role="alert" aria-live="polite"></div>
     <div id="delivery-info" class="jb-delivery-info"></div>
@@ -543,6 +550,14 @@
     });
   });
 
+  var codeToggleBtn = document.getElementById('code-toggle-btn');
+  var codeInputRow  = document.getElementById('code-input-row');
+  var codeInput     = document.getElementById('delivery-code-input');
+  codeToggleBtn.addEventListener('click', function() {
+    var showing = codeInputRow.classList.toggle('jb-hidden') === false;
+    if (showing) codeInput.focus();
+  });
+
   checkoutBtn.addEventListener('click', function() {
     errorEl.textContent = '';
     if (!customerZip) {
@@ -553,6 +568,8 @@
     checkoutBtn.disabled = true;
     var payload = { zip: customerZip, loaves: qty, mode: isOT ? 'ot' : 'sub' };
     if (!isOT) payload.cadence = getActiveCadence();
+    var codeVal = codeInput.value.trim();
+    if (codeVal) payload.deliveryCode = codeVal;
     fetch(CHECKOUT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

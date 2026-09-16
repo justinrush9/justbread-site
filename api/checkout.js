@@ -30,6 +30,7 @@
 
 const Stripe = require('stripe');
 const { PRICES } = require('../lib/prices');
+const { lookupDeliveryCode } = require('../lib/deliveryCodes');
 
 // ── ZIP → ZONE (mirrors the front-end zip checker exactly) ────────────────────
 const LOCAL_ZIPS = new Set(['60134', '60174', '60175', '60510']);
@@ -68,7 +69,8 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
   // ── Parse & validate ────────────────────────────────────────────
-  const { zip, loaves, mode, cadence, addons = [] } = req.body || {};
+  const { zip, loaves, mode, cadence, addons = [], deliveryCode } = req.body || {};
+  const deliveryOverride = lookupDeliveryCode(deliveryCode);
 
   if (!zip || !loaves || !mode) {
     return res.status(400).json({ error: 'Missing required fields: zip, loaves, mode' });
@@ -89,7 +91,10 @@ module.exports = async function handler(req, res) {
   }
 
   // ── Server-side zone validation (prevents zone-spoofing) ────────
-  const zone = getZone(zip);
+  // A valid delivery code overrides the customer's own ZIP entirely — the
+  // order goes to a fixed local drop point, not their address, so the
+  // normal zip-lock doesn't apply.
+  const zone = deliveryOverride ? 'local' : getZone(zip);
   if (!zone) {
     return res.status(400).json({ error: 'Sorry, we don\'t deliver to that ZIP code yet.' });
   }
@@ -108,7 +113,10 @@ module.exports = async function handler(req, res) {
   });
 
   // 2) Delivery
-  if (zone === 'local') {
+  if (deliveryOverride) {
+    // Delivery fee waived entirely — loaves stay $10 each, no separate
+    // delivery line item.
+  } else if (zone === 'local') {
     // Flat local fee: one-time uses the single $7 price, subs use the
     // cadence-matched $5 recurring price.
     lineItems.push({
@@ -172,6 +180,10 @@ module.exports = async function handler(req, res) {
         loaves:  String(loavesInt),
         mode,
         cadence: cadence || 'onetime',
+        ...(deliveryOverride && {
+          delivery_code: deliveryOverride.code,
+          delivery_override: deliveryOverride.label,
+        }),
       },
     };
 
@@ -180,7 +192,13 @@ module.exports = async function handler(req, res) {
     // still be traced back to the original zip/zone/loaves.
     if (!isOT) {
       sessionParams.subscription_data = {
-        metadata: { zip, zone, loaves: String(loavesInt), cadence },
+        metadata: {
+          zip, zone, loaves: String(loavesInt), cadence,
+          ...(deliveryOverride && {
+            delivery_code: deliveryOverride.code,
+            delivery_override: deliveryOverride.label,
+          }),
+        },
       };
     }
 

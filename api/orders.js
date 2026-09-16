@@ -30,7 +30,8 @@ module.exports = async function handler(req, res) {
   try {
     const result = await query(
       `SELECT id, customer_email, customer_name, loaves, fulfillment_type,
-              order_type, cadence, status, created_at
+              order_type, cadence, status, created_at,
+              raw_metadata->>'delivery_override' AS delivery_override
        FROM orders
        ORDER BY created_at DESC
        LIMIT 200`,

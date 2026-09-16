@@ -52,6 +52,7 @@
     .pill { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .pill-local { background: rgba(109,255,154,0.12); color: var(--green); }
     .pill-shipped { background: rgba(255,255,255,0.08); color: var(--sub); }
+    .delivery-override { margin-top: 4px; font-size: 11px; color: var(--yellow, #f5e600); max-width: 220px; }
     .empty, .loading, .error { text-align: center; padding: 3rem 1rem; color: var(--sub); }
     .error { color: var(--red); }
   </style>
@@ -146,7 +147,7 @@
         <td>${o.customer_name || '—'}</td>
         <td>${o.customer_email || '—'}</td>
         <td class="num">${o.loaves}</td>
-        <td><span class="pill ${o.fulfillment_type === 'local' ? 'pill-local' : 'pill-shipped'}">${o.fulfillment_type}</span></td>
+        <td><span class="pill ${o.fulfillment_type === 'local' ? 'pill-local' : 'pill-shipped'}">${o.fulfillment_type}</span>${o.delivery_override ? `<div class="delivery-override">⚠ ${o.delivery_override}</div>` : ''}</td>
         <td>${o.order_type}</td>
         <td>${o.cadence || '—'}</td>
         <td>${o.status}</td>
