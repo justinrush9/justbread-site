@@ -163,6 +163,20 @@
   .jb-toggle button.active { background: var(--yellow); color: #000; }
   .jb-toggle button:not(.active):hover { background: #1a1a1a; color: #aaa; }
 
+  .jb-mode-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 14px;
+    border-radius: 3px;
+    margin-bottom: 26px;
+  }
+  .jb-mode-banner.mode-sub { background: rgba(245,230,0,0.08); border: 1px solid rgba(245,230,0,0.35); color: var(--yellow); }
+  .jb-mode-banner.mode-ot { background: rgba(255,255,255,0.05); border: 1px solid var(--mid); color: #ddd; }
+
   .jb-row { margin-bottom: 26px; }
 
   /* Qty stepper */
@@ -389,6 +403,7 @@
       <button type="button" class="active" id="btn-sub">Subscribe</button>
       <button type="button" id="btn-ot">One-Time Order</button>
     </div>
+    <div id="mode-banner" class="jb-mode-banner"></div>
 
     <div class="jb-row">
       <div class="jb-label">How many loaves?</div>
@@ -467,6 +482,7 @@
   var sumDelPrc   = document.getElementById('sum-del-prc');
   var sumTotLbl   = document.getElementById('sum-total-lbl');
   var sumTotPrc   = document.getElementById('sum-total-prc');
+  var modeBanner  = document.getElementById('mode-banner');
   var checkoutBtn = document.getElementById('checkout-btn');
   var errorEl     = document.getElementById('order-error');
   var noteEl      = document.getElementById('delivery-note');
@@ -526,6 +542,13 @@
     qtyDown.disabled = qty <= 1;
   }
 
+  function updateModeBanner() {
+    modeBanner.className = 'jb-mode-banner ' + (isOT ? 'mode-ot' : 'mode-sub');
+    modeBanner.innerHTML = isOT
+      ? '● You’ve selected <strong>One-Time Order</strong> — this will NOT repeat.'
+      : '● You’ve selected <strong>Subscribe &amp; Save</strong> — this will repeat ' + cadenceLabel(getActiveCadence()) + ' until you cancel.';
+  }
+
   function setMode(ot) {
     isOT = ot;
     btnSub.classList.toggle('active', !ot);
@@ -534,6 +557,7 @@
     updateSummary();
     updateFacts();
     updateNote();
+    updateModeBanner();
   }
 
   btnSub.addEventListener('click', function() { setMode(false); });
@@ -547,6 +571,7 @@
       cadenceBtns.forEach(function(x){x.classList.remove('active');});
       b.classList.add('active');
       updateSummary();
+      updateModeBanner();
     });
   });
 
@@ -628,6 +653,7 @@
     updateSummary();
     updateDeliveryInfo();
     updateToggleLabel();
+    updateModeBanner();
   }
 
   changeZipBtn.addEventListener('click', function() {
@@ -668,6 +694,7 @@
     updateSummary();
     updateDeliveryInfo();
     updateToggleLabel();
+    updateModeBanner();
   }
 
   // Reset button if user hits Back from Stripe checkout
