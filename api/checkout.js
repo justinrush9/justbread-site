@@ -211,7 +211,7 @@ module.exports = async function handler(req, res) {
       // tells them so instead of silently swallowing it.
       sessionParams.custom_text = {
         submit: {
-          message: `This order delivers to ${deliveryOverride.label} — not your own address.`,
+          message: `⚠️ **This order delivers to ${deliveryOverride.label} — not your own address.**`,
         },
       };
     } else {
