@@ -173,7 +173,10 @@ module.exports = async function handler(req, res) {
       cancel_url:   process.env.CANCEL_URL  || 'https://justbread.shop/order',
       // Free-loaf business-card codes are 100% off — only offer the promo
       // code field on single-loaf orders so it can't discount a bulk cart.
-      allow_promotion_codes: loavesInt === 1,
+      // Suppressed entirely on a delivery-code order: it's a separate,
+      // unrelated Stripe feature and just invites someone to type RGD/HHS/
+      // etc. into a box where it does nothing.
+      allow_promotion_codes: loavesInt === 1 && !deliveryOverride,
       metadata: {
         zip,
         zone,
@@ -202,9 +205,20 @@ module.exports = async function handler(req, res) {
       };
     }
 
-    // Every order — one-time or subscription, local or shipped — needs a
-    // physical delivery address, so always collect it.
-    sessionParams.shipping_address_collection = { allowed_countries: ['US'] };
+    if (deliveryOverride) {
+      // Delivery goes to a fixed drop point, not the customer's own
+      // address, so there's nothing to collect — and a visible message
+      // tells them so instead of silently swallowing it.
+      sessionParams.custom_text = {
+        submit: {
+          message: `This order delivers to ${deliveryOverride.label} — not your own address.`,
+        },
+      };
+    } else {
+      // Every other order — one-time or subscription, local or shipped —
+      // needs a physical delivery address, so always collect it.
+      sessionParams.shipping_address_collection = { allowed_countries: ['US'] };
+    }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
     return res.status(200).json({ url: session.url });
