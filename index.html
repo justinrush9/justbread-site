@@ -29,6 +29,20 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* ── OUTAGE BANNER ── */
+  #outage-banner {
+    background: var(--red);
+    color: #1a0000;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  #outage-banner a { color: #1a0000; text-decoration: underline; }
+  @media (max-width: 600px) { #outage-banner { padding: 10px 16px; font-size: 12px; } }
+
   /* ── NAV ── */
   nav {
     background: var(--black);
@@ -413,6 +427,10 @@
 </style>
 </head>
 <body>
+
+<div id="outage-banner">
+  ⚠ <strong>Temporarily closed</strong> — a catastrophic oven failure has taken us offline. We are not able to take new orders right now. Existing subscribers can <a href="/manage/">manage or pause your subscription here</a>. Questions: <a href="mailto:info@justbread.shop">info@justbread.shop</a>.
+</div>
 
 <nav>
   <a class="nav-logo" href="/">Just<span>Bread</span></a>

@@ -55,6 +55,11 @@ function computeShippingCents(loaves) {
   return full * FULL_BOX + (rem ? PARTIAL[rem] : 0);
 }
 
+// Set to false to reopen ordering. Blocks new checkouts server-side so the
+// order page being visually disabled can't be bypassed by posting directly
+// to this endpoint.
+const SITE_CLOSED = true;
+
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
   // CORS — accept both www and non-www origins
@@ -67,6 +72,10 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
+
+  if (SITE_CLOSED) {
+    return res.status(503).json({ error: 'JustBread is temporarily closed due to an oven failure. We are not able to take new orders right now.' });
+  }
 
   // ── Parse & validate ────────────────────────────────────────────
   const { zip, loaves, mode, cadence, addons = [], deliveryCode } = req.body || {};

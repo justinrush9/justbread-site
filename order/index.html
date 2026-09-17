@@ -332,9 +332,47 @@
   @media (max-width: 600px) {
     footer { padding: 24px 20px; }
   }
+
+  #outage-banner {
+    background: var(--red);
+    color: #1a0000;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-align: center;
+    padding: 12px 20px;
+  }
+  #outage-banner a { color: #1a0000; text-decoration: underline; }
+  @media (max-width: 600px) { #outage-banner { padding: 10px 16px; font-size: 12px; } }
+
+  #closed-notice {
+    grid-column: 1 / -1;
+    padding: 64px 48px;
+    text-align: center;
+  }
+  #closed-notice h2 {
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  #closed-notice p {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    color: var(--sub);
+    line-height: 1.7;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  #closed-notice a { color: var(--yellow); }
 </style>
 </head>
 <body>
+
+<div id="outage-banner">
+  ⚠ <strong>Temporarily closed</strong> — a catastrophic oven failure has taken us offline. We are not able to take new orders right now. Existing subscribers can <a href="/manage/">manage or pause your subscription here</a>. Questions: <a href="mailto:info@justbread.shop">info@justbread.shop</a>.
+</div>
 
 <nav>
   <a class="nav-logo" href="/">Just<span>Bread</span></a>
@@ -446,6 +484,18 @@
 
 <script>
 (function() {
+  // Set to false to reopen ordering — this swaps the whole form for a
+  // closed notice and skips wiring up the rest of the page's JS entirely.
+  var SITE_CLOSED = true;
+  if (SITE_CLOSED) {
+    document.getElementById('layout').innerHTML =
+      '<div id="closed-notice"><h2>Temporarily Closed</h2>' +
+      '<p>A catastrophic oven failure has taken us offline and we\'re not able to bake or take new orders right now.<br><br>' +
+      'Already subscribed? You can <a href="/manage/">manage or pause your subscription here</a>.<br><br>' +
+      'Questions: <a href="mailto:info@justbread.shop">info@justbread.shop</a></p></div>';
+    return;
+  }
+
   var CHECKOUT_URL  = '/api/checkout';
   var LOCAL_ZIPS    = new Set(['60134','60174','60175','60510']);
   var LOAF          = 1000;
