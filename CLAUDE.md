@@ -37,12 +37,15 @@ justbread-site/
   images/             # hero.jpg and other assets (NOT base64 embedded)
   admin/
     index.html        # /admin — password-gated order dashboard + "Sync from Stripe" button
+    bake-sheet/
+      index.html       # /admin/bake-sheet — production view: what to bake, grouped by fulfillment date + delivery method
   api/
     checkout.js       # POST /api/checkout — builds Stripe Checkout Session
     portal.js         # POST /api/portal — creates Stripe Billing Portal session
     webhook.js        # POST /api/webhook — Stripe webhook, dispatches to lib/orderProcessing.js
     orders.js         # GET /api/orders — backs /admin, password- or cron-secret-gated
     reconcile.js       # GET /api/reconcile — re-walks Stripe events, fills in anything the webhook missed
+    bake-sheet.js      # GET /api/bake-sheet — backs /admin/bake-sheet, grouped by fulfillment_date
   lib/
     prices.js         # shared price ID catalog (checkout.js + orderProcessing.js both use this)
     deliveryCodes.js  # RGD/ECB/etc. pickup-point codes (checkout.js + orderProcessing.js)
@@ -256,17 +259,37 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
   there's exactly one implementation of "what happens when this Stripe
   event is seen," whether it arrives live or gets found later.
 
+### Bake sheet (Sep 28 2026)
+- `/admin` is a payment log ordered by when Stripe charged someone; it never
+  answered "what do I actually bake, and where does it all go." That's what
+  this is.
+- `GET /api/bake-sheet` (no `date`) returns upcoming/recent `fulfillment_date`s
+  with order/loaf counts, for quick-pick chips. `GET
+  /api/bake-sheet?date=YYYY-MM-DD` returns full production detail for that
+  date: every order with `delivery_method`, `pickup_location`,
+  `shipping_address`, sorted by delivery method then zip/pickup location then
+  customer name, plus totals per delivery method. Same `isAdminRequest` auth
+  as `/api/orders`.
+- `/admin/bake-sheet/` is the page: date picker (chips + manual date input,
+  auto-selects the earliest upcoming date with orders), grouped/sub-grouped
+  by delivery method (Local Delivery and Shipped sorted by zip; Pickup
+  sub-grouped by drop point with subtotals), a print button, and print CSS
+  for a clean bake-day printout. Both admin pages now cross-link via a nav
+  bar (Orders / Bake Sheet).
+- Orders with `fulfillment_date IS NULL` (pre-migration, before the Sep 28
+  backfill) won't show up here — only in `/admin`.
+
 ### What's built vs. not (corrects a stale note below from the initial
 Sep 15 build — `/admin` and `/api/orders` exist and have for a while)
 - Built: webhook ingestion, `/admin` dashboard + password auth, reconciliation
-  sweep + daily cron, delivery-method/address/fulfillment-date capture.
-- NOT built yet: production sheet view (loaves-by-SKU per bake day),
-  bake-to-order linking (`orders.bake_id` / the `bakes` table is still
-  unused), the alternating-week legacy-subscriber scheduling problem,
-  customer emails, customer-facing status page, subscription payment-day
-  anchoring, and migrating legacy subscribers off grandfathered prices.
-  All still read from the same `orders` table — see chat history for the
-  full architecture discussion.
+  sweep + daily cron, delivery-method/address/fulfillment-date capture,
+  bake sheet production view (`/admin/bake-sheet/`).
+- NOT built yet: bake-to-order linking (`orders.bake_id` / the `bakes` table
+  is still unused), the alternating-week legacy-subscriber scheduling
+  problem, customer emails, customer-facing status page, subscription
+  payment-day anchoring, and migrating legacy subscribers off grandfathered
+  prices. All still read from the same `orders` table — see chat history for
+  the full architecture discussion.
 
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)
