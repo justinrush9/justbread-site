@@ -58,7 +58,7 @@ function computeShippingCents(loaves) {
 // Set to false to reopen ordering. Blocks new checkouts server-side so the
 // order page being visually disabled can't be bypassed by posting directly
 // to this endpoint.
-const SITE_CLOSED = true;
+const SITE_CLOSED = false;
 
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {

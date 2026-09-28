@@ -486,7 +486,7 @@
 (function() {
   // Set to false to reopen ordering — this swaps the whole form for a
   // closed notice and skips wiring up the rest of the page's JS entirely.
-  var SITE_CLOSED = true;
+  var SITE_CLOSED = false;
   if (SITE_CLOSED) {
     document.getElementById('layout').innerHTML =
       '<div id="closed-notice"><h2>Temporarily Closed</h2>' +
