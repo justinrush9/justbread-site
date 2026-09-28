@@ -98,7 +98,8 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 
 ## Delivery & Logistics
 - Local delivery: Fridays, Geneva/Batavia/St. Charles area
-- IL shipping: ships Wednesday via UPS Ground, arrives Thursday
+- IL shipping: ships Thursday via UPS Ground, arrives Friday (changed from
+  Wed/Thu on Sep 28 2026)
 - Subscription cadences: weekly, biweekly (every 2 weeks), monthly
 
 ---
@@ -228,8 +229,9 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
   clearly provided one, check the field name first.
 - `fulfillment_date` cutoff rule (`lib/fulfillment.js`): orders at or before
   Tuesday 12:00 PM America/Chicago target that week; later orders roll to
-  next week. Within the target week: shipped -> Wednesday, local delivery
-  -> Friday, pickup -> Friday. **The pickup day is an ASSUMPTION** (that
+  next week. Within the target week: shipped -> Thursday (changed from
+  Wednesday Sep 28 2026), local delivery -> Friday, pickup -> Friday.
+  **The pickup day is an ASSUMPTION** (that
   drop-point deliveries happen on the same run as local delivery) — confirm
   with Jay and adjust `OFFSET_FROM_TUESDAY.pickup` in `lib/fulfillment.js`
   if any drop point actually runs on a different day.

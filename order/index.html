@@ -557,7 +557,7 @@
     var lines = [
       '<strong>Cancel anytime</strong> · no commitment, no questions',
       isIL
-        ? '<strong>Ships Wednesday</strong> via UPS Ground · arrives Thursday'
+        ? '<strong>Ships Thursday</strong> via UPS Ground · arrives Friday'
         : '<strong>Delivered Fridays</strong> · Geneva, Batavia &amp; St. Charles',
       '<strong>9-day cold ferment</strong> · no commercial yeast · ever',
       '<strong>Flour, water, salt.</strong> The entire ingredient list.'
@@ -569,7 +569,7 @@
 
   function updateNote() {
     if (isIL) {
-      noteEl.textContent = 'Ships Wednesday via UPS Ground · most customers receive Thursday.';
+      noteEl.textContent = 'Ships Thursday via UPS Ground · most customers receive Friday.';
     } else {
       noteEl.textContent = isOT
         ? 'Delivered Friday · Geneva, Batavia & St. Charles.'
@@ -682,7 +682,7 @@
   function updateDeliveryInfo() {
     if (!customerZip) { deliveryInfo.innerHTML = ''; return; }
     if (isIL) {
-      deliveryInfo.innerHTML = '<strong>Illinois shipping</strong>Baked Wednesday morning, ships same day via UPS Ground. Most customers receive Thursday. Tracking number sent by email.';
+      deliveryInfo.innerHTML = '<strong>Illinois shipping</strong>Baked Thursday morning, ships same day via UPS Ground. Most customers receive Friday. Tracking number sent by email.';
     } else {
       deliveryInfo.innerHTML = '<strong>Local delivery · Geneva, Batavia &amp; St. Charles</strong>Delivered Friday. Baked fresh that morning, typically within hours of coming out of the oven.';
     }
