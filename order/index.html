@@ -417,7 +417,7 @@
     </p>
     <div class="facts" id="facts">
       <div class="fact"><div class="fact-dot"></div><span><strong>Cancel anytime</strong> · no commitment, no questions</span></div>
-      <div class="fact"><div class="fact-dot"></div><span><strong>Delivered Fridays</strong> · Geneva, Batavia &amp; St. Charles</span></div>
+      <div class="fact"><div class="fact-dot"></div><span><strong>Delivered Thursdays</strong> · Geneva, Batavia &amp; St. Charles</span></div>
       <div class="fact"><div class="fact-dot"></div><span><strong>9-day cold ferment</strong> · no commercial yeast · ever</span></div>
       <div class="fact"><div class="fact-dot"></div><span><strong>Flour, water, salt.</strong> The entire ingredient list.</span></div>
     </div>
@@ -477,7 +477,7 @@
     <button class="jb-cta" id="checkout-btn" type="button">Checkout →</button>
     <div class="jb-error" id="order-error" role="alert" aria-live="polite"></div>
     <div id="delivery-info" class="jb-delivery-info"></div>
-    <div class="jb-note" id="delivery-note">Delivered Friday · Geneva, Batavia &amp; St. Charles · cancel anytime.</div>
+    <div class="jb-note" id="delivery-note">Delivered Thursday · Geneva, Batavia &amp; St. Charles · cancel anytime.</div>
 
   </div>
 </div>
@@ -558,7 +558,7 @@
       '<strong>Cancel anytime</strong> · no commitment, no questions',
       isIL
         ? '<strong>Ships Thursday</strong> via UPS Ground · arrives Friday'
-        : '<strong>Delivered Fridays</strong> · Geneva, Batavia &amp; St. Charles',
+        : '<strong>Delivered Thursdays</strong> · Geneva, Batavia &amp; St. Charles',
       '<strong>9-day cold ferment</strong> · no commercial yeast · ever',
       '<strong>Flour, water, salt.</strong> The entire ingredient list.'
     ];
@@ -572,8 +572,8 @@
       noteEl.textContent = 'Ships Thursday via UPS Ground · most customers receive Friday.';
     } else {
       noteEl.textContent = isOT
-        ? 'Delivered Friday · Geneva, Batavia & St. Charles.'
-        : 'Delivered Friday · Geneva, Batavia & St. Charles · cancel anytime.';
+        ? 'Delivered Thursday · Geneva, Batavia & St. Charles.'
+        : 'Delivered Thursday · Geneva, Batavia & St. Charles · cancel anytime.';
     }
   }
 
@@ -684,7 +684,7 @@
     if (isIL) {
       deliveryInfo.innerHTML = '<strong>Illinois shipping</strong>Baked Thursday morning, ships same day via UPS Ground. Most customers receive Friday. Tracking number sent by email.';
     } else {
-      deliveryInfo.innerHTML = '<strong>Local delivery · Geneva, Batavia &amp; St. Charles</strong>Delivered Friday. Baked fresh that morning, typically within hours of coming out of the oven.';
+      deliveryInfo.innerHTML = '<strong>Local delivery · Geneva, Batavia &amp; St. Charles</strong>Delivered Thursday. Baked fresh that morning, typically within hours of coming out of the oven.';
     }
   }
 
