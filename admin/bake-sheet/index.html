@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Bake Sheet — JustBread Admin</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a; --near: #111; --border: #222; --mid: #2a2a2a;
+      --muted: #666; --sub: #999; --white: #fff; --yellow: #f5e600;
+      --red: #ff6b6b; --green: #6dff9a;
+    }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+    nav { background: var(--black); border-bottom: 1px solid var(--border); padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { font-size: 18px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--white); text-decoration: none; font-family: 'Arial Black', Arial, sans-serif; }
+    .nav-logo span { color: var(--yellow); }
+    .nav-links a { color: var(--sub); text-decoration: none; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 1.5rem; }
+    .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
+    @media (max-width: 600px) { nav { padding: 0 20px; } }
+
+    .page { max-width: 1000px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .page-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.5rem; }
+    .page-title { font-family: 'Arial Black', Arial, sans-serif; font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem; color: var(--white); text-transform: uppercase; }
+
+    /* ── password gate ── */
+    .gate { max-width: 360px; margin: 4rem auto; }
+    .gate .card { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1.5rem; }
+    label { display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem; }
+    input[type="password"], input[type="date"] { width: 100%; border: 1.5px solid var(--mid); border-radius: 3px; padding: 0.65rem 0.9rem; font-size: 1rem; background: var(--black); color: var(--white); outline: none; transition: border-color 0.15s; font-family: Arial, sans-serif; margin-bottom: 1rem; }
+    input[type="password"]:focus, input[type="date"]:focus { border-color: var(--yellow); }
+    .btn { background: var(--yellow); color: #000; border: none; border-radius: 3px; padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; width: 100%; transition: opacity 0.15s; }
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    #gate-msg { margin-top: 0.75rem; font-size: 0.875rem; color: var(--red); min-height: 1.4rem; }
+
+    /* ── date picker ── */
+    .date-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .chip { background: var(--near); border: 1.5px solid var(--border); color: var(--sub); border-radius: 20px; padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .chip:hover { border-color: var(--yellow); color: var(--yellow); }
+    .chip.active { background: var(--yellow); border-color: var(--yellow); color: #000; }
+    .date-picker-inline { display: flex; align-items: center; gap: 0.5rem; }
+    .date-picker-inline input { width: auto; margin-bottom: 0; }
+    .toolbar-btn { background: none; border: 1.5px solid var(--mid); color: var(--sub); border-radius: 3px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; font-family: Arial, sans-serif; }
+    .toolbar-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+
+    /* ── totals banner ── */
+    .banner { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .stat { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; min-width: 130px; }
+    .stat-num { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.8rem; color: var(--yellow); }
+    .stat.total .stat-num { font-size: 2.4rem; }
+    .stat-label { font-size: 0.75rem; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+
+    /* ── groups ── */
+    .group { margin-bottom: 2rem; }
+    .group-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--yellow); }
+    .group-title { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    .group-sub { font-size: 0.85rem; color: var(--sub); }
+    .subgroup-title { font-size: 0.8rem; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.5px; margin: 1rem 0 0.4rem; }
+    .table-wrap { background: var(--near); border: 1px solid var(--border); border-radius: 3px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { text-align: left; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
+    th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); font-weight: 700; }
+    tbody tr:last-child td { border-bottom: none; }
+    td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+    td.addr { color: var(--sub); }
+    .empty, .loading, .error { text-align: center; padding: 3rem 1rem; color: var(--sub); }
+    .error { color: var(--red); }
+
+    @media print {
+      body { background: #fff; color: #000; }
+      nav, .date-row, .toolbar-btn, #print-btn { display: none !important; }
+      .page { max-width: none; padding: 0; }
+      .page-eyebrow { color: #000; }
+      .stat, .table-wrap { background: #fff; border: 1px solid #999; }
+      .stat-num { color: #000; }
+      th { color: #333; }
+      td.addr { color: #333; }
+      .group-header { border-bottom-color: #000; }
+      .subgroup-title { color: #000; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Just<span>Bread</span></a>
+  <div class="nav-links">
+    <a href="/admin/">Orders</a>
+    <a href="/admin/bake-sheet/" class="active">Bake Sheet</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div id="gate" class="gate">
+    <div class="page-eyebrow">Admin</div>
+    <h1 class="page-title" style="font-size:1.6rem;">Bake Sheet</h1>
+    <div class="card">
+      <label for="pw">Password</label>
+      <input type="password" id="pw" autocomplete="current-password">
+      <button class="btn" id="pw-submit">View</button>
+      <div id="gate-msg"></div>
+    </div>
+  </div>
+
+  <div id="dashboard" style="display:none;">
+    <div class="page-eyebrow">Admin</div>
+    <h1 class="page-title">Bake Sheet</h1>
+
+    <div class="date-row">
+      <div id="date-chips"></div>
+      <div class="date-picker-inline">
+        <input type="date" id="date-input">
+      </div>
+      <button class="toolbar-btn" id="print-btn">Print</button>
+    </div>
+
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'jb_admin_pw';
+  const gate = document.getElementById('gate');
+  const dashboard = document.getElementById('dashboard');
+  const gateMsg = document.getElementById('gate-msg');
+  const pwInput = document.getElementById('pw');
+  const pwSubmit = document.getElementById('pw-submit');
+  const dateChips = document.getElementById('date-chips');
+  const dateInput = document.getElementById('date-input');
+  const printBtn = document.getElementById('print-btn');
+  const content = document.getElementById('content');
+
+  let currentPassword = null;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function fmtDateStr(dateStr) {
+    // dateStr is YYYY-MM-DD — parse as local to avoid a timezone day-shift.
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function fmtAddress(addr) {
+    if (!addr) return '—';
+    const parts = [addr.line1, addr.line2, [addr.city, addr.state].filter(Boolean).join(', '), addr.postal_code].filter(Boolean);
+    return parts.join(', ') || '—';
+  }
+
+  function todayLocalISO() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  async function loadDateList() {
+    const res = await fetch('/api/bake-sheet', { headers: { 'x-admin-password': currentPassword } });
+    if (res.status === 401) return handleUnauthorized();
+    if (!res.ok) { dateChips.textContent = 'Failed to load dates.'; return null; }
+    const { dates } = await res.json();
+    return dates;
+  }
+
+  function renderChips(dates, selected) {
+    if (!dates.length) {
+      dateChips.innerHTML = '<span style="color:var(--sub);font-size:0.85rem;">No fulfillment dates yet</span>';
+      return;
+    }
+    dateChips.innerHTML = dates.map((d) => {
+      const label = fmtDateStr(d.fulfillment_date).replace(/, \d{4}$/, ''); // drop year for chip brevity
+      const active = d.fulfillment_date === selected ? 'active' : '';
+      return `<button class="chip ${active}" data-date="${d.fulfillment_date}">${escapeHtml(label)} · ${d.loaves}🍞</button>`;
+    }).join('');
+    dateChips.querySelectorAll('.chip').forEach((el) => {
+      el.addEventListener('click', () => loadDate(el.dataset.date));
+    });
+  }
+
+  function renderContent(data) {
+    if (!data.orders.length) {
+      content.innerHTML = '<div class="empty">No orders assigned to this date.</div>';
+      return;
+    }
+
+    const byMethod = { pickup: [], local_delivery: [], shipped: [] };
+    for (const o of data.orders) {
+      (byMethod[o.delivery_method] || (byMethod[o.delivery_method] = [])).push(o);
+    }
+    const totalsByMethod = Object.fromEntries(data.totalsByMethod.map((t) => [t.delivery_method, t]));
+
+    let html = `
+      <div class="banner">
+        <div class="stat total"><div class="stat-num">${data.totalLoaves}</div><div class="stat-label">Total Loaves</div></div>
+        <div class="stat"><div class="stat-num">${totalsByMethod.local_delivery?.loaves || 0}</div><div class="stat-label">Local Delivery</div></div>
+        <div class="stat"><div class="stat-num">${totalsByMethod.pickup?.loaves || 0}</div><div class="stat-label">Pickup</div></div>
+        <div class="stat"><div class="stat-num">${totalsByMethod.shipped?.loaves || 0}</div><div class="stat-label">Shipped</div></div>
+      </div>
+    `;
+
+    // Local delivery — sorted by zip already, ready to route.
+    if (byMethod.local_delivery?.length) {
+      html += renderGroup('Local Delivery', byMethod.local_delivery, totalsByMethod.local_delivery, (o) => `
+        <tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="addr">${escapeHtml(fmtAddress(o.shipping_address))}</td><td class="num">${o.loaves}</td></tr>
+      `, ['Customer', 'Address', 'Loaves']);
+    }
+
+    // Pickup — grouped by drop point.
+    if (byMethod.pickup?.length) {
+      const byLocation = {};
+      for (const o of byMethod.pickup) {
+        const key = o.pickup_location || 'Unspecified pickup point';
+        (byLocation[key] || (byLocation[key] = [])).push(o);
+      }
+      let inner = '';
+      for (const [location, orders] of Object.entries(byLocation)) {
+        const subtotal = orders.reduce((s, o) => s + o.loaves, 0);
+        inner += `<div class="subgroup-title">${escapeHtml(location)} — ${subtotal} loaves</div>`;
+        inner += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th class="num">Loaves</th></tr></thead><tbody>`;
+        inner += orders.map((o) => `<tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="num">${o.loaves}</td></tr>`).join('');
+        inner += `</tbody></table></div>`;
+      }
+      html += `<div class="group"><div class="group-header"><div class="group-title">Pickup</div><div class="group-sub">${totalsByMethod.pickup.order_count} orders · ${totalsByMethod.pickup.loaves} loaves</div></div>${inner}</div>`;
+    }
+
+    // Shipped — sorted by zip, ready for label creation.
+    if (byMethod.shipped?.length) {
+      html += renderGroup('Shipped (UPS)', byMethod.shipped, totalsByMethod.shipped, (o) => `
+        <tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="addr">${escapeHtml(fmtAddress(o.shipping_address))}</td><td class="num">${o.loaves}</td></tr>
+      `, ['Customer', 'Address', 'Loaves']);
+    }
+
+    content.innerHTML = html;
+  }
+
+  function renderGroup(title, orders, totals, rowFn, headers) {
+    return `
+      <div class="group">
+        <div class="group-header">
+          <div class="group-title">${escapeHtml(title)}</div>
+          <div class="group-sub">${totals.order_count} orders · ${totals.loaves} loaves</div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>${headers.map((h) => `<th${h === 'Loaves' ? ' class="num"' : ''}>${h}</th>`).join('')}</tr></thead>
+            <tbody>${orders.map(rowFn).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  async function loadDate(dateStr) {
+    dateInput.value = dateStr;
+    content.innerHTML = '<div class="loading">Loading…</div>';
+    const res = await fetch(`/api/bake-sheet?date=${dateStr}`, { headers: { 'x-admin-password': currentPassword } });
+    if (res.status === 401) return handleUnauthorized();
+    if (!res.ok) { content.innerHTML = '<div class="error">Failed to load.</div>'; return; }
+    const data = await res.json();
+    renderContent(data);
+
+    const dates = await loadDateList();
+    if (dates) renderChips(dates, dateStr);
+  }
+
+  function handleUnauthorized() {
+    sessionStorage.removeItem(STORAGE_KEY);
+    dashboard.style.display = 'none';
+    gate.style.display = 'block';
+    gateMsg.textContent = 'Wrong password.';
+  }
+
+  async function init(password) {
+    currentPassword = password;
+    gate.style.display = 'none';
+    dashboard.style.display = 'block';
+
+    const dates = await loadDateList();
+    if (!dates) return;
+
+    const today = todayLocalISO();
+    // Default to the earliest upcoming date with orders; fall back to the
+    // most recent past one if everything on the list is already behind.
+    const upcoming = dates.filter((d) => d.fulfillment_date >= today);
+    const initial = (upcoming[0] || dates[dates.length - 1])?.fulfillment_date || today;
+
+    renderChips(dates, initial);
+    await loadDate(initial);
+  }
+
+  function attemptLogin() {
+    const password = pwInput.value;
+    if (!password) return;
+    sessionStorage.setItem(STORAGE_KEY, password);
+    init(password);
+  }
+
+  pwSubmit.addEventListener('click', attemptLogin);
+  pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptLogin(); });
+  dateInput.addEventListener('change', () => { if (dateInput.value) loadDate(dateInput.value); });
+  printBtn.addEventListener('click', () => window.print());
+
+  const stored = sessionStorage.getItem(STORAGE_KEY);
+  if (stored) init(stored);
+</script>
+</body>
+</html>
