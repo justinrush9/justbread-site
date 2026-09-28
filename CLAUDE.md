@@ -35,17 +35,25 @@ justbread-site/
   order-confirmed/    # Post-checkout confirmation page
   faq/index.html      # FAQ page
   images/             # hero.jpg and other assets (NOT base64 embedded)
+  admin/
+    index.html        # /admin — password-gated order dashboard + "Sync from Stripe" button
   api/
     checkout.js       # POST /api/checkout — builds Stripe Checkout Session
     portal.js         # POST /api/portal — creates Stripe Billing Portal session
-    webhook.js        # POST /api/webhook — Stripe webhook, writes orders to Postgres
+    webhook.js        # POST /api/webhook — Stripe webhook, dispatches to lib/orderProcessing.js
+    orders.js         # GET /api/orders — backs /admin, password- or cron-secret-gated
+    reconcile.js       # GET /api/reconcile — re-walks Stripe events, fills in anything the webhook missed
   lib/
-    prices.js         # shared price ID catalog (checkout.js + webhook.js both use this)
+    prices.js         # shared price ID catalog (checkout.js + orderProcessing.js both use this)
+    deliveryCodes.js  # RGD/ECB/etc. pickup-point codes (checkout.js + orderProcessing.js)
+    fulfillment.js    # Tuesday-noon cutoff rule -> which bake week an order lands on
+    orderProcessing.js # shared order-ingestion logic — webhook.js and reconcile.js both call into this
+    adminAuth.js       # shared auth for orders.js/reconcile.js (admin password or CRON_SECRET)
   db/
-    schema.sql        # orders + bakes tables
+    schema.sql        # orders + bakes tables — idempotent, safe to re-run after a migration is added
     client.js          # shared pg Pool, reads DATABASE_URL
   package.json
-  vercel.json
+  vercel.json          # includes the daily reconcile cron
 ```
 
 ---
@@ -190,10 +198,75 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
   varies per subscriber — a single invoice can't tell you which week is
   whose "on" week, so per-week delivery scheduling is still unsolved (see
   bake-to-order linking below).
-- NOT built yet: `/admin` order-viewing page (or similar), production sheet
-  view, bake-to-order linking (including the alternating-week scheduling
-  problem above), customer emails, customer status page. All would read
-  from this same `orders` table — see chat history for the full architecture.
+### Delivery mechanic, address, and fulfillment-date fields (Sep 28 2026)
+- `orders` now has `delivery_method` ('pickup' | 'local_delivery' | 'shipped'),
+  `pickup_location` (drop-point label), `shipping_address` (JSONB), and
+  `fulfillment_date` (DATE — which bake week the order is assigned to).
+  Migration is in `db/schema.sql`, idempotent, backfills existing rows from
+  what was already sitting in `raw_metadata`. **Still needs to actually be
+  run against the live Neon DB** — psql the DATABASE_URL from `vercel env
+  pull`, or paste it into the Neon SQL console (`vercel integration open
+  neon neon-violet-dog`).
+- `delivery_method` is derived in `lib/orderProcessing.js` classifyDelivery():
+  a `delivery_code` in metadata always means `pickup` (label comes from
+  `lib/deliveryCodes.js`); otherwise `fulfillment_type === 'local'` means
+  `local_delivery`; otherwise `shipped`.
+- `shipping_address` is captured for `local_delivery` and `shipped` (never
+  `pickup` — that goes to a fixed drop point, not the customer's own
+  address). For one-time orders it reads `session.shipping_details` (falling
+  back to `customer_details`) directly off the Checkout Session. For
+  subscriptions, `invoice.paid` doesn't carry the address itself, so it's
+  read off the Customer object (`customer.shipping`), which Stripe
+  populates from what was collected at the original Checkout.
+  **UNVERIFIED — confirm against a real test order**: exact field naming on
+  Checkout Session/Customer objects can shift between Stripe API versions;
+  this was written from documented behavior, not tested against a live
+  session. If `shipping_address` is coming back null on an order that
+  clearly provided one, check the field name first.
+- `fulfillment_date` cutoff rule (`lib/fulfillment.js`): orders at or before
+  Tuesday 12:00 PM America/Chicago target that week; later orders roll to
+  next week. Within the target week: shipped -> Wednesday, local delivery
+  -> Friday, pickup -> Friday. **The pickup day is an ASSUMPTION** (that
+  drop-point deliveries happen on the same run as local delivery) — confirm
+  with Jay and adjust `OFFSET_FROM_TUESDAY.pickup` in `lib/fulfillment.js`
+  if any drop point actually runs on a different day.
+  Jay is handling capacity edge cases (e.g. a huge order right at the
+  cutoff) manually rather than this being automated.
+  fulfillment_date is NOT backfilled onto pre-migration orders — computing
+  it retroactively from `created_at` would misrepresent orders that were
+  already fulfilled under no formal rule at all.
+
+### Reconciliation (Sep 28 2026)
+- `GET /api/reconcile?days=N` re-walks Stripe's Events API for the lookback
+  window (default 3 days, max 30) and replays any `checkout.session.completed`
+  / `invoice.paid` event not already in `orders`. Idempotent on
+  `stripe_event_id`, so safe to run anytime, including manually after fixing
+  something that was broken for a while (bump `days`).
+- Runs automatically once a day via the cron in `vercel.json`
+  (`0 13 * * *`, roughly 7-8am Central depending on DST — a daily catch-up
+  sweep, so the DST drift doesn't matter). **Requires `CRON_SECRET` to be
+  set in Vercel env vars** — Vercel sends it as `Authorization: Bearer
+  <CRON_SECRET>` automatically on cron-triggered requests once the var
+  exists, no other config needed. Not yet set — do this before relying on
+  the cron.
+- The `/admin` page has a "Sync from Stripe" button that hits the same
+  endpoint with the admin password instead.
+- `api/webhook.js` and `api/reconcile.js` share all their event-processing
+  logic via `lib/orderProcessing.js`, so the two paths can't drift apart —
+  there's exactly one implementation of "what happens when this Stripe
+  event is seen," whether it arrives live or gets found later.
+
+### What's built vs. not (corrects a stale note below from the initial
+Sep 15 build — `/admin` and `/api/orders` exist and have for a while)
+- Built: webhook ingestion, `/admin` dashboard + password auth, reconciliation
+  sweep + daily cron, delivery-method/address/fulfillment-date capture.
+- NOT built yet: production sheet view (loaves-by-SKU per bake day),
+  bake-to-order linking (`orders.bake_id` / the `bakes` table is still
+  unused), the alternating-week legacy-subscriber scheduling problem,
+  customer emails, customer-facing status page, subscription payment-day
+  anchoring, and migrating legacy subscribers off grandfathered prices.
+  All still read from the same `orders` table — see chat history for the
+  full architecture discussion.
 
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)

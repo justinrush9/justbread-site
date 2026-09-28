@@ -18,7 +18,7 @@
     .nav-logo span { color: var(--yellow); }
     @media (max-width: 600px) { nav { padding: 0 20px; } }
 
-    .page { max-width: 1100px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .page { max-width: 1300px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
     .page-eyebrow { font-family: Arial, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.5rem; }
     .page-title { font-family: 'Arial Black', Arial, sans-serif; font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem; color: var(--white); text-transform: uppercase; }
 
@@ -34,11 +34,17 @@
     #gate-msg { margin-top: 0.75rem; font-size: 0.875rem; color: var(--red); min-height: 1.4rem; }
 
     /* ── dashboard ── */
-    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem; flex-wrap: wrap; }
+    .toolbar-actions { display: flex; gap: 0.6rem; align-items: center; }
     .toolbar-btn { background: none; border: 1.5px solid var(--mid); color: var(--sub); border-radius: 3px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; font-family: Arial, sans-serif; }
     .toolbar-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .toolbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .toolbar-btn.primary { border-color: var(--yellow); color: var(--yellow); }
+    #sync-msg { font-size: 0.8rem; color: var(--sub); margin-bottom: 1.5rem; min-height: 1.2rem; }
+    #sync-msg.error { color: var(--red); }
+    #sync-msg.ok { color: var(--green); }
     .stats { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .stat { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; min-width: 120px; }
+    .stat { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; min-width: 110px; }
     .stat-num { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.6rem; color: var(--yellow); }
     .stat-label { font-size: 0.75rem; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
 
@@ -49,10 +55,12 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover { background: rgba(255,255,255,0.02); }
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.addr { white-space: normal; max-width: 220px; font-size: 0.82rem; color: var(--sub); }
     .pill { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-    .pill-local { background: rgba(109,255,154,0.12); color: var(--green); }
+    .pill-local_delivery { background: rgba(109,255,154,0.12); color: var(--green); }
     .pill-shipped { background: rgba(255,255,255,0.08); color: var(--sub); }
-    .delivery-override { margin-top: 4px; font-size: 11px; color: var(--yellow, #f5e600); max-width: 220px; }
+    .pill-pickup { background: rgba(245,230,0,0.12); color: var(--yellow); }
+    .pickup-label { margin-top: 4px; font-size: 11px; color: var(--yellow); max-width: 200px; white-space: normal; }
     .empty, .loading, .error { text-align: center; padding: 3rem 1rem; color: var(--sub); }
     .error { color: var(--red); }
   </style>
@@ -79,17 +87,22 @@
     <h1 class="page-title">Orders</h1>
     <div class="toolbar">
       <div class="stats" id="stats"></div>
-      <button class="toolbar-btn" id="refresh-btn">Refresh</button>
+      <div class="toolbar-actions">
+        <button class="toolbar-btn primary" id="sync-btn">Sync from Stripe</button>
+        <button class="toolbar-btn" id="refresh-btn">Refresh</button>
+      </div>
     </div>
+    <div id="sync-msg"></div>
     <div class="table-wrap">
       <table id="orders-table">
         <thead>
           <tr>
             <th>Date</th>
+            <th>Bake Week</th>
             <th>Customer</th>
             <th>Email</th>
             <th class="num">Loaves</th>
-            <th>Fulfillment</th>
+            <th>Delivery</th>
             <th>Type</th>
             <th>Cadence</th>
             <th>Status</th>
@@ -113,6 +126,8 @@
   const ordersStatus = document.getElementById('orders-status');
   const statsEl = document.getElementById('stats');
   const refreshBtn = document.getElementById('refresh-btn');
+  const syncBtn = document.getElementById('sync-btn');
+  const syncMsg = document.getElementById('sync-msg');
 
   function fmtDate(iso) {
     const d = new Date(iso);
@@ -120,16 +135,48 @@
       ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
   }
 
+  function fmtFulfillmentDate(dateStr) {
+    if (!dateStr) return '—';
+    // dateStr is a plain YYYY-MM-DD — parse as local, not UTC midnight,
+    // so it doesn't shift a day depending on the viewer's timezone.
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  function fmtAddress(addr) {
+    if (!addr) return '';
+    const parts = [addr.line1, addr.line2, [addr.city, addr.state].filter(Boolean).join(', '), addr.postal_code]
+      .filter(Boolean);
+    return parts.join(', ');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
   function renderStats(orders) {
     const totalLoaves = orders.reduce((sum, o) => sum + (o.loaves || 0), 0);
-    const local = orders.filter((o) => o.fulfillment_type === 'local').length;
-    const shipped = orders.filter((o) => o.fulfillment_type === 'shipped').length;
+    const counts = { local_delivery: 0, pickup: 0, shipped: 0 };
+    for (const o of orders) {
+      if (counts[o.delivery_method] !== undefined) counts[o.delivery_method] += 1;
+    }
     statsEl.innerHTML = `
       <div class="stat"><div class="stat-num">${orders.length}</div><div class="stat-label">Orders</div></div>
       <div class="stat"><div class="stat-num">${totalLoaves}</div><div class="stat-label">Loaves</div></div>
-      <div class="stat"><div class="stat-num">${local}</div><div class="stat-label">Local</div></div>
-      <div class="stat"><div class="stat-num">${shipped}</div><div class="stat-label">Shipped</div></div>
+      <div class="stat"><div class="stat-num">${counts.local_delivery}</div><div class="stat-label">Local</div></div>
+      <div class="stat"><div class="stat-num">${counts.pickup}</div><div class="stat-label">Pickup</div></div>
+      <div class="stat"><div class="stat-num">${counts.shipped}</div><div class="stat-label">Shipped</div></div>
     `;
+  }
+
+  function deliveryCellHtml(o) {
+    const method = o.delivery_method || 'shipped';
+    const label = method === 'local_delivery' ? 'local delivery' : method;
+    const pill = `<span class="pill pill-${method}">${escapeHtml(label)}</span>`;
+    if (method === 'pickup') {
+      return pill + (o.pickup_location ? `<div class="pickup-label">${escapeHtml(o.pickup_location)}</div>` : '');
+    }
+    return pill;
   }
 
   function renderOrders(orders) {
@@ -144,13 +191,14 @@
     ordersBody.innerHTML = orders.map((o) => `
       <tr>
         <td>${fmtDate(o.created_at)}</td>
-        <td>${o.customer_name || '—'}</td>
-        <td>${o.customer_email || '—'}</td>
+        <td>${fmtFulfillmentDate(o.fulfillment_date)}</td>
+        <td>${escapeHtml(o.customer_name || '—')}</td>
+        <td>${escapeHtml(o.customer_email || '—')}</td>
         <td class="num">${o.loaves}</td>
-        <td><span class="pill ${o.fulfillment_type === 'local' ? 'pill-local' : 'pill-shipped'}">${o.fulfillment_type}</span>${o.delivery_override ? `<div class="delivery-override">⚠ ${o.delivery_override}</div>` : ''}</td>
-        <td>${o.order_type}</td>
-        <td>${o.cadence || '—'}</td>
-        <td>${o.status}</td>
+        <td>${deliveryCellHtml(o)}<div class="addr" title="${escapeHtml(fmtAddress(o.shipping_address))}">${escapeHtml(fmtAddress(o.shipping_address))}</div></td>
+        <td>${escapeHtml(o.order_type)}</td>
+        <td>${escapeHtml(o.cadence || '—')}</td>
+        <td>${escapeHtml(o.status)}</td>
       </tr>
     `).join('');
   }
@@ -184,6 +232,38 @@
     renderOrders(orders);
   }
 
+  async function syncFromStripe() {
+    const password = sessionStorage.getItem(STORAGE_KEY);
+    if (!password) return;
+    syncBtn.disabled = true;
+    syncMsg.className = '';
+    syncMsg.textContent = 'Checking Stripe for anything missed…';
+
+    try {
+      const res = await fetch('/api/reconcile?days=3', { headers: { 'x-admin-password': password } });
+      if (res.status === 401) {
+        syncMsg.className = 'error';
+        syncMsg.textContent = 'Wrong password — refresh and log in again.';
+        return;
+      }
+      if (!res.ok) {
+        syncMsg.className = 'error';
+        syncMsg.textContent = 'Sync failed. Try again in a moment.';
+        return;
+      }
+      const s = await res.json();
+      const errNote = s.errors && s.errors.length ? ` (${s.errors.length} error${s.errors.length > 1 ? 's' : ''} — check logs)` : '';
+      syncMsg.className = s.errors && s.errors.length ? 'error' : 'ok';
+      syncMsg.textContent = `Checked ${s.checked} recent Stripe event${s.checked === 1 ? '' : 's'}, added ${s.inserted} missing order${s.inserted === 1 ? '' : 's'}.${errNote}`;
+      await loadOrders(password);
+    } catch (err) {
+      syncMsg.className = 'error';
+      syncMsg.textContent = 'Sync failed — network error.';
+    } finally {
+      syncBtn.disabled = false;
+    }
+  }
+
   function attemptLogin() {
     const password = pwInput.value;
     if (!password) return;
@@ -197,6 +277,7 @@
     const password = sessionStorage.getItem(STORAGE_KEY);
     if (password) loadOrders(password);
   });
+  syncBtn.addEventListener('click', syncFromStripe);
 
   const stored = sessionStorage.getItem(STORAGE_KEY);
   if (stored) loadOrders(stored);

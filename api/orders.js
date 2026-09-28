@@ -8,22 +8,13 @@
  * shared password is proportionate.
  */
 
-const crypto = require('crypto');
 const { query } = require('../db/client');
-
-function passwordMatches(candidate) {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected || typeof candidate !== 'string') return false;
-  const a = Buffer.from(candidate);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length) return false;
-  return crypto.timingSafeEqual(a, b);
-}
+const { isAdminRequest } = require('../lib/adminAuth');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  if (!passwordMatches(req.headers['x-admin-password'])) {
+  if (!isAdminRequest(req)) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
@@ -31,7 +22,8 @@ module.exports = async function handler(req, res) {
     const result = await query(
       `SELECT id, customer_email, customer_name, loaves, fulfillment_type,
               order_type, cadence, status, created_at,
-              raw_metadata->>'delivery_override' AS delivery_override
+              delivery_method, pickup_location, shipping_address,
+              fulfillment_date
        FROM orders
        ORDER BY created_at DESC
        LIMIT 200`,

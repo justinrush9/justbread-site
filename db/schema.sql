@@ -1,5 +1,8 @@
 -- JustBread order management schema
--- Postgres. Run once against whatever DATABASE_URL points to.
+-- Postgres. Safe to run against a fresh DB or an existing one — every
+-- statement is idempotent (CREATE ... IF NOT EXISTS / ADD COLUMN IF NOT
+-- EXISTS), so re-running this file after a migration is added is the normal
+-- way to bring a database up to date.
 
 CREATE TABLE IF NOT EXISTS bakes (
   id             SERIAL PRIMARY KEY,
@@ -30,3 +33,36 @@ CREATE TABLE IF NOT EXISTS orders (
 
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_bake_id ON orders(bake_id);
+
+-- ── Migration: delivery mechanic + fulfillment date (Sep 2026) ─────────────
+-- fulfillment_type ('local'/'shipped') only ever said whether a delivery fee
+-- was charged — it couldn't distinguish a driveway drop from a business
+-- pickup point, and it carried no address or bake-week assignment. These
+-- columns make that queryable instead of living only in raw_metadata.
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS delivery_method TEXT NOT NULL DEFAULT 'shipped';
+  -- 'pickup' | 'local_delivery' | 'shipped' — see lib/orderProcessing.js classifyDelivery()
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS pickup_location TEXT;
+  -- drop-point label (e.g. "Energy City Brewing — Batavia"), set only when delivery_method = 'pickup'
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_address JSONB;
+  -- set for 'local_delivery' and 'shipped'; null for 'pickup' (goes to a fixed drop point, not the customer's address)
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_date DATE;
+  -- which bake week this order is assigned to — see lib/fulfillment.js for the Tuesday-noon cutoff rule
+
+CREATE INDEX IF NOT EXISTS idx_orders_fulfillment_date ON orders(fulfillment_date);
+
+-- Backfill existing rows from what's already sitting in raw_metadata, so
+-- history isn't lost. Safe to re-run: only touches rows still at the
+-- 'shipped' default that the backfill itself would actually change.
+-- fulfillment_date is intentionally NOT backfilled here — computing it
+-- retroactively from `created_at` would misrepresent orders that were
+-- placed, and fulfilled, before this cutoff rule existed.
+UPDATE orders
+SET delivery_method = CASE
+      WHEN raw_metadata->>'delivery_code' IS NOT NULL THEN 'pickup'
+      WHEN fulfillment_type = 'local' THEN 'local_delivery'
+      ELSE 'shipped'
+    END,
+    pickup_location = raw_metadata->>'delivery_override'
+WHERE delivery_method = 'shipped'
+  AND (raw_metadata->>'delivery_code' IS NOT NULL OR fulfillment_type = 'local');
