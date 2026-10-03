@@ -216,8 +216,13 @@ module.exports = async function handler(req, res) {
 
     if (deliveryOverride) {
       // Delivery goes to a fixed drop point, not the customer's own
-      // address, so there's nothing to collect — and a visible message
-      // tells them so instead of silently swallowing it.
+      // address, so there's no shipping address to collect — and a visible
+      // message tells them so instead of silently swallowing it.
+      // Billing details are still required so we get the customer's name:
+      // without shipping collection, Checkout otherwise only asks for email.
+      // Checkout writes this name onto the Customer, so subscription
+      // renewal invoices (invoice.customer_name) carry it too.
+      sessionParams.billing_address_collection = 'required';
       sessionParams.custom_text = {
         submit: {
           message: `⚠️ **This order delivers to ${deliveryOverride.label} — not your own address.**`,
