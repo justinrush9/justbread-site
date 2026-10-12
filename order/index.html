@@ -369,6 +369,7 @@
 </style>
 </head>
 <body>
+<div id="outage-banner">JustBread is temporarily closed. Our baker is recovering from a hand injury, so we are not baking or taking new orders right now. We'll be back soon. Questions: <a href="mailto:info@justbread.shop">info@justbread.shop</a></div>
 
 
 <nav>
@@ -483,12 +484,11 @@
 (function() {
   // Set to false to reopen ordering — this swaps the whole form for a
   // closed notice and skips wiring up the rest of the page's JS entirely.
-  var SITE_CLOSED = false;
+  var SITE_CLOSED = true;
   if (SITE_CLOSED) {
     document.getElementById('layout').innerHTML =
       '<div id="closed-notice"><h2>Temporarily Closed</h2>' +
-      '<p>A catastrophic oven failure has taken us offline and we\'re not able to bake or take new orders right now.<br><br>' +
-      'All subscriptions have been paused — no charges will go through while we\'re down. Any prepaid loaves not yet delivered will be refunded shortly.<br><br>' +
+      '<p>Our baker is recovering from a hand injury, so we\'re not able to bake or take new orders right now. We\'ll reopen as soon as he\'s back on his feet.<br><br>' +
       'Questions: <a href="mailto:info@justbread.shop">info@justbread.shop</a></p></div>';
     return;
   }

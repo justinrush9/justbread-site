@@ -58,7 +58,7 @@ function computeShippingCents(loaves) {
 // Set to false to reopen ordering. Blocks new checkouts server-side so the
 // order page being visually disabled can't be bypassed by posting directly
 // to this endpoint.
-const SITE_CLOSED = false;
+const SITE_CLOSED = true;
 
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
@@ -74,7 +74,7 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
   if (SITE_CLOSED) {
-    return res.status(503).json({ error: 'JustBread is temporarily closed due to an oven failure. We are not able to take new orders right now.' });
+    return res.status(503).json({ error: 'JustBread is temporarily closed while our baker recovers from a hand injury. We are not able to take new orders right now.' });
   }
 
   // ── Parse & validate ────────────────────────────────────────────
