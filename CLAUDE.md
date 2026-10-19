@@ -295,6 +295,47 @@ Sep 15 build — `/admin` and `/api/orders` exist and have for a while)
   prices. All still read from the same `orders` table — see chat history for
   the full architecture discussion.
 
+## PENDING: Legacy every-other-week subscription migration (added Oct 19 2026)
+Jay emailed the legacy $35/mo "Every-Other-Week" subscribers on Oct 19 telling
+them they're moving to $15 every other week, taking effect "with your next
+charge," and that paused subscriptions stay paused. Jay explicitly approved
+modifying these existing subscriptions (a deliberate exception to the
+additive-only Stripe rule above).
+
+**Why it isn't done yet:** changing monthly -> every-2-weeks changes the billing
+interval, which forces Stripe to reset the cycle and invoice immediately, and
+Stripe refuses to invoice a paused subscription ("You cannot create a new
+invoice for a paused subscription"). So the price swap MUST happen in the
+same update as the unpause. Attempted Oct 19 on Scott; rejected, nothing changed.
+
+**Do NOT unpause anyone without Jay saying so.** He planned to unpause
+Tuesday Oct 20.
+
+**Per subscription, one update** (POST /v1/subscriptions/{id}):
+- `items`: `{id: <legacy item>, deleted: true}` (and any other old items),
+  plus new every-other-week items below
+- `proration_behavior: none`
+- `pause_collection: ""` (clears the pause)
+Result: first new charge invoices immediately; before Tue noon = that Thursday's bake.
+
+New prices (verified in Stripe Oct 19, both interval = 2 weeks):
+- loaf every other week: `price_1TgTWrJVnPyvSLMUyxTz6UQr` ($10/loaf)
+- local delivery every other week: `price_1TgVeRJVnPyvSLMUK0ukeVkj` ($5)
+
+| Customer | Subscription | Remove item(s) | Add | When |
+|---|---|---|---|---|
+| Scott Williams | sub_1Rq15UJVnPyvSLMUNe8MQnUQ | si_SlYBQSjsWxrwwv | loaf x1 + delivery x1 ($15) | when Jay unpauses |
+| Lindsay Mackey | sub_1R44IvJVnPyvSLMUpBgOSIVf | si_Ry0JaeAixgW34R | loaf x1 + delivery x1 ($15) | when Jay unpauses |
+| Kelli Schremp | sub_1OLFWIJVnPyvSLMUBbSppsVk | si_Tnr9NgRO8v9QgN | loaf x1 + delivery x1 ($15) | when Jay unpauses |
+| Heidi Files | sub_1OunjLJVnPyvSLMUjJQcxDcp | si_PkIJPlZuyPHI44 ($35 legacy) AND si_VGgimmhnLmSi6r ($10 monthly x4) | loaf x3 + delivery x1 ($35) | Jay emails her separately first; confirm before switching |
+| Jessica Rush | sub_1SuN5BJVnPyvSLMUSkTUtKGI | si_Ts7JiMrtyCrzuW | loaf x1 + delivery x1 ($15) | stays paused through end of 2026; switch when she resumes |
+| Toni Roesslein | sub_1Q38ucJVnPyvSLMUtMyfxKcX | si_So0qt3kz6DZHvz | loaf x1 + delivery x1 ($15) | paused until sometime in Nov (moving); switch when she resumes |
+
+Sara (saraglimm21@yahoo.com) was on this price but cancelled Sep 29; ignore.
+Before acting, re-read each subscription to confirm item IDs haven't changed.
+Once all six are done, delete this section and remove `price_1OtXyoJVnPyvSLMUK1jhbHqU`
+handling from LEGACY_LOAF_PRICES only after confirming no active subs remain on it.
+
 ## Outstanding / Future Work
 - **REMIND JAY: Fix OneDrive Documents redirection.** OneDrive is hijacking the Documents folder. The repo lives at the literal `C:\Users\justi\Documents\justbread-site`, but File Explorer's "Documents" shortcut may point to `C:\Users\justi\OneDrive\Documents`, so the folder appears missing in the file browser. Jay wants to stop OneDrive from taking over Documents. (Raised June 15, 2026.)
 - **Scheduler FORKED into two projects (June 15, 2026):**
