@@ -156,6 +156,8 @@
     gap: 0;
   }
   .nav-mobile-menu.open { display: flex; }
+  /* menu is a <nav>, so it inherits nav{height:56px}; let it grow so the solid background covers every link */
+  .nav-mobile-menu { height: auto; }
   .nav-mobile-menu a {
     font-family: Arial, sans-serif;
     font-size: 13px;
