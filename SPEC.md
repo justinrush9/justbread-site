@@ -1,0 +1,236 @@
+# JustBread Order System: Spec
+
+> **This file is the source of truth for the order and delivery system.**
+> Change this spec first, then the code. If code and spec disagree, the spec
+> wins until Jay says otherwise. Every feature below has acceptance criteria;
+> a feature is done only when all of them pass.
+>
+> Status legend: **[DONE]** built and live, **[BUILT]** code exists but not
+> switched on, **[TODO]** not built, **[OPEN]** waiting on a decision.
+
+Last updated: 2026-10-27
+
+---
+
+## 1. Purpose
+
+Replace the hand-kept weekly spreadsheet. Every Thursday, Jay should be able to
+open one screen and see exactly what to bake, where every loaf goes, and who
+needs attention, without cross-checking Stripe or his email.
+
+## 2. Core rules
+
+These are decided. Everything else in this spec follows from them.
+
+1. **The payment is primary.** A payment creates the order; the order
+   determines the delivery. Nothing is scheduled that hasn't been paid for,
+   except manual and standing orders (section 6), which Jay enters himself.
+2. **One payment = one delivery.** Billing cadence and delivery cadence always
+   match: weekly pays weekly, every-other-week pays every two weeks, monthly
+   pays monthly (one delivery per month), one-time pays once. No plan bills on
+   one cadence and delivers on another.
+3. **Everything is delivered Thursday.** Local delivery, pickup points, and
+   shipping (ships Thursday via UPS Ground, arrives Friday).
+4. **Cutoff: Tuesday 12:00 PM Central.** A payment at or before the cutoff goes
+   on that week's Thursday; after it, the next Thursday. Jay handles capacity
+   edge cases by hand. (Implemented in `lib/fulfillment.js`.)
+5. **Subscription renewals bill Monday morning.** So every renewal lands before
+   the cutoff and pays for that same week's Thursday. See section 4.
+6. **A declined payment still appears on the sheet, flagged.** Jay decides
+   whether to deliver, retry, or contact the customer.
+
+## 3. Prerequisites (infrastructure)
+
+| Item | Status | Notes |
+|---|---|---|
+| Postgres (Neon via Vercel), `orders` table, Stripe webhook | [DONE] | Live since Sep 15 2026 |
+| Delivery method / address / fulfillment date migration | [BUILT] | In `db/schema.sql`; never run against the live DB |
+| `CRON_SECRET` env var for the daily Stripe reconcile | [TODO] | Without it the daily catch-up sweep doesn't run |
+| Legacy $35/mo every-other-week subs moved to current prices | Partly done | Jessica and Toni still pending; see CLAUDE.md |
+
+**Acceptance:** after the migration and backfill, every paid order since Oct 21
+2026 has a `delivery_method` and a `fulfillment_date`, and a manual "Sync from
+Stripe" adds nothing new (meaning the webhook missed nothing).
+
+## 4. Billing timing [TODO]
+
+**Problem:** renewals currently fall on whatever weekday the subscription was
+last reset (all existing subs: Wednesday, after the Oct 21 restart). A
+Wednesday renewal pays for the next day's loaf, but the cutoff rule files it a
+week later, so the sheet runs a week behind.
+
+**Rule:** every subscription renews Monday early morning (Central).
+
+- **Existing subscriptions:** after their current paid period, move each one's
+  next renewal to the Monday before its next delivery (weekly: the next
+  Monday; every-other-week: the Monday of their next delivery week). No double
+  charge, no skipped week. Done once, by hand, through Stripe.
+- **New subscriptions:** checkout sets the billing anchor to the next Monday
+  morning. The first charge happens that Monday and pays for that Thursday.
+  Every later charge is also Monday. [OPEN: confirm whether a new subscriber
+  is charged at signup or on the first Monday; see section 10.]
+- **Monthly:** renews monthly on a Monday-anchored date, one delivery per
+  charge.
+
+**Acceptance:** for every active subscription, Stripe's next renewal date is a
+Monday, and that renewal's order lands on the Thursday of the same week.
+
+## 5. Payment events
+
+The webhook (`api/webhook.js`) and the daily reconcile (`api/reconcile.js`)
+share one implementation in `lib/orderProcessing.js`. They handle:
+
+| Stripe event | Effect | Status |
+|---|---|---|
+| `checkout.session.completed` | One-time order row, `payment_status = paid` | [DONE] |
+| `invoice.paid` | Subscription order row, `payment_status = paid` | [DONE] |
+| `invoice.payment_failed` | Order row for that delivery, `payment_status = declined` | [TODO] |
+| `invoice.paid` after a decline (retry succeeds) | Same row flips to `paid`; the flag clears automatically | [TODO] |
+
+One invoice produces at most one order row, whether it first arrives as failed
+or paid. The webhook endpoint must be subscribed to `invoice.payment_failed`
+(uses the `www.` URL; see CLAUDE.md gotcha).
+
+**Acceptance:** a renewal with a declined card shows on that Thursday's sheet
+with a red Declined tag; if Stripe's retry later succeeds, the same entry turns
+paid without creating a second row.
+
+## 6. Orders Jay enters himself [TODO]
+
+Both kinds are entered from the admin app, are $0 in the system, never touch
+Stripe, and are excluded from sales totals.
+
+### 6a. One-time manual order
+For people who contact Jay directly.
+
+Fields: name, loaves, delivery method (local delivery, pickup point, or
+shipped), address (required for local delivery and shipped), pickup point
+(required for pickup), email (optional), phone (optional), Thursday it goes
+on, paid/unpaid, note.
+
+### 6b. Standing order (barter)
+Recurring arrangements, e.g. "2 loaves to the coffee shop every week."
+
+Fields: everything in 6a, plus frequency (every week or every other week),
+start date, optional end date.
+
+Behavior:
+- Appears automatically on every matching Thursday from the start date until
+  the end date or until Jay ends it.
+- Jay can **skip a single week** without ending it.
+- Jay can **pause** and **resume** it.
+- Every-other-week standing orders alternate from their start date.
+
+**Acceptance:** a weekly standing order created today appears on every
+Thursday sheet from its start date on; skipping one week removes it from only
+that Thursday; ending it removes it from all later Thursdays and none earlier.
+
+## 7. Bake sheet [Partly DONE]
+
+One screen per Thursday. Jay picks the Thursday (defaults to the next upcoming
+one with orders).
+
+### 7a. Summary (top of screen)
+- **Total loaves**
+- Loaves for **local delivery**, **pickup**, and **shipping**
+- **Delivery stops:** one per unique local delivery address, plus one per
+  pickup point that has orders, plus **one** for all shipping combined (all
+  shipped loaves go out at a single UPS stop). Two orders to the same address
+  are one stop.
+- Count of **declined** orders, and count of **manual / standing** orders
+
+### 7b. Each order entry shows
+- Customer name and loaf count
+- Source tag: **Subscription**, **One-time**, **Manual**, or **Barter**
+- **Declined** tag when the payment failed, with a "resolved" action that
+  clears the flag once Jay has handled it
+- 📍 **Map** link: opens the delivery address in Google Maps. The address
+  itself is **not** displayed. (Local delivery only. Pickup entries show the
+  pickup point name; shipped entries show city/zip only, since they're packed
+  at home and the full address is on the label.)
+- ✉️ **Email** link: opens a new email to the customer (when an email exists)
+- 📞 **Call / Text** links (only when a phone number exists)
+- Note, if one was entered
+- [OPEN] ✓ **Delivered** checkbox; see section 10
+
+### 7c. Grouping and order
+Grouped by delivery method: Local Delivery, Pickup (sub-grouped by pickup
+point with subtotals), Shipped. Local delivery entries are listed in route
+order (section 8).
+
+### 7d. Print
+A print button producing a clean one-page bake-day sheet. [DONE, to be
+updated for the new fields]
+
+**Acceptance:** for a Thursday with known orders, the summary numbers match a
+hand count; every local delivery entry's Map link opens the right address;
+no full street address is visible on screen.
+
+## 8. Delivery route [TODO]
+
+- A **Start route** button opens Google Maps with all of that Thursday's local
+  delivery and pickup-point stops loaded in order.
+- If the stops exceed what one Google Maps link can hold, the route is split
+  into consecutive legs, each its own button.
+- [OPEN] Starting point and stop ordering method; see section 10.
+
+**Acceptance:** tapping Start route on a phone opens Google Maps navigation
+with every local stop for the day, in the order shown on the sheet.
+
+## 9. App form [TODO]
+
+The admin pages (orders, bake sheet, add order, standing orders) become an
+**installable web app** (PWA): added to the phone home screen once, then opens
+full screen with its own icon. Same code and hosting as the site; no app
+store. Must be usable one-handed on a phone at the delivery stops (large tap
+targets, no horizontal scrolling).
+
+Not needed: offline mode, a native iOS/Android app.
+
+**Acceptance:** on Jay's phone, "Add to Home Screen" produces a JustBread icon
+that opens the bake sheet full screen, still behind the admin password.
+
+## 10. Open decisions
+
+| # | Question | Options | Default if undecided |
+|---|---|---|---|
+| D1 | Route starting point | Fixed (home), or wherever Jay is | Fixed home, start and end |
+| D2 | Delivered checkbox on each entry | Yes / No | No |
+| D3 | Stop ordering for the route | Free: sort by zip and street. Paid (small): Google route optimization with an API key | Free |
+| D4 | New subscriber's first charge | At signup (then Mondays), or first Monday after signup | First Monday |
+
+## 11. Later (not in this phase)
+
+- Customer emails: order confirmation with delivery date, day-before reminder
+- Customer-facing view in `/manage`: next delivery and next charge date
+- Calendar feed (.ics) of delivery days for Jay's own calendar
+- Bake-to-order linking (`bakes` table, still unused)
+
+## 12. Data model changes (for the build)
+
+`orders` table additions:
+- `source` TEXT: `stripe` | `manual` | `standing`
+- `payment_status` TEXT: `paid` | `declined` | `unpaid` (manual) | `n/a` (barter)
+- `declined_resolved_at` TIMESTAMPTZ
+- `customer_phone` TEXT
+- `note` TEXT
+- `standing_order_id` INTEGER, references `standing_orders`
+- `stripe_invoice_id` TEXT, unique when present (one row per invoice; how a
+  failed-then-paid invoice updates its own row)
+- `stripe_event_id` and `stripe_customer_id` become nullable (manual and
+  standing orders have neither)
+
+New `standing_orders` table: name, contact fields, loaves, delivery method,
+address / pickup point, frequency, start date, end date, paused flag, note.
+
+New `standing_order_skips` table: standing order id + skipped Thursday.
+
+Standing order entries are generated for a Thursday when that sheet is viewed
+or by the daily cron, whichever comes first; generation is idempotent (one
+entry per standing order per Thursday).
+
+## 13. Change log
+
+- 2026-10-27: Spec created from design discussion (core rules, declined
+  handling, manual and standing orders, bake sheet summary and entries, route,
+  PWA, open decisions D1 to D4).

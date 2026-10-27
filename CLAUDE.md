@@ -1,5 +1,6 @@
 # CLAUDE.md — JustBread Project Notes
 > Read this at the start of every session. Update it when anything significant changes.
+> **Order/delivery system work is spec-driven: `SPEC.md` is the source of truth.** Update SPEC.md first (including its change log), then the code. Don't build anything marked [OPEN] until Jay decides it.
 
 ---
 
