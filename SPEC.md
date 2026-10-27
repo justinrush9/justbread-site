@@ -194,8 +194,23 @@ entries show a copyable full address.
 **Cost guardrails (required):**
 - The Google API key lives only on the server (Vercel env var), never in the
   browser, and is restricted to the Routes API.
-- A hard **daily request quota** set in Google Cloud (e.g. 50 requests/day),
-  so a bug or leaked key cannot run up a bill.
+- A hard **daily request quota** of **150 requests/day** set in Google Cloud.
+  Sized so the absolute worst case (a bug hitting the cap every day for a
+  month = 4,500) still stays inside Google's 5,000 free requests/month.
+  Normal use is a few requests a week. One request optimizes a whole route,
+  so request volume does not grow with the number of customers.
+- **The app counts its own Google calls** and stops itself at 150/day, as a
+  second layer under Google's quota.
+- **If optimization is unavailable** (daily cap reached, Google error, or more
+  stops than one request can optimize), the sheet shows a clear red notice
+  saying why, and falls back to ordering stops by zip and street so the route
+  still works. It never fails silently.
+- The bake sheet shows a small usage line (e.g. "Route optimizations this
+  month: 6 of 5,000 free").
+- **Stop limit:** Google caps how many stops one optimization request can
+  handle. Confirm the exact number at build time. If a Thursday ever exceeds
+  it, the sheet says so in advance (when the stop count passes the limit, not
+  on the morning of delivery), and the route is optimized in two halves.
 - A Google Cloud **budget alert** at $5/month.
 - Expected cost at Jay's volume: $0 (well inside Google's monthly free
   usage; see change log for the pricing checked).
@@ -260,6 +275,10 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Route guardrails: daily cap 150 (worst case stays free),
+  app-side counter, visible notice + zip/street fallback when optimization is
+  unavailable, monthly usage line, advance warning if stops exceed Google's
+  per-request limit.
 - 2026-10-27: Decided D1 (route starts and ends at home), D2 (delivered
   checkbox: yes), D3 (stops ordered by Google route optimization). Shipped
   entries show the full, copyable address for Pirate Ship. Pricing checked:
