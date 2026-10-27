@@ -151,12 +151,15 @@ one with orders).
   clears the flag once Jay has handled it
 - 📍 **Map** link: opens the delivery address in Google Maps. The address
   itself is **not** displayed. (Local delivery only. Pickup entries show the
-  pickup point name; shipped entries show city/zip only, since they're packed
-  at home and the full address is on the label.)
+  pickup point name.)
+- **Shipped entries show the full address**, laid out so it can be copied
+  straight into Pirate Ship (with a one-tap copy button), until shipping is
+  automated.
 - ✉️ **Email** link: opens a new email to the customer (when an email exists)
 - 📞 **Call / Text** links (only when a phone number exists)
 - Note, if one was entered
-- [OPEN] ✓ **Delivered** checkbox; see section 10
+- ✓ **Delivered** checkbox, tapped as each stop is completed; saved, so it
+  survives closing the app. The summary shows stops done vs. total.
 
 ### 7c. Grouping and order
 Grouped by delivery method: Local Delivery, Pickup (sub-grouped by pickup
@@ -169,15 +172,33 @@ updated for the new fields]
 
 **Acceptance:** for a Thursday with known orders, the summary numbers match a
 hand count; every local delivery entry's Map link opens the right address;
-no full street address is visible on screen.
+no full street address is visible for local delivery entries; shipped
+entries show a copyable full address.
 
 ## 8. Delivery route [TODO]
 
-- A **Start route** button opens Google Maps with all of that Thursday's local
-  delivery and pickup-point stops loaded in order.
-- If the stops exceed what one Google Maps link can hold, the route is split
-  into consecutive legs, each its own button.
-- [OPEN] Starting point and stop ordering method; see section 10.
+- **Start and end at home**, every time. Home address is stored as a setting
+  (not hard-coded).
+- **Stops are ordered by Google route optimization** (Routes API,
+  `optimizeWaypointOrder`), from home, through every local delivery address
+  and pickup point for that Thursday, back home. The local delivery list on
+  the sheet is shown in that optimized order.
+- The optimized order is computed **once per Thursday** and stored; it is only
+  recomputed when Jay taps "Re-optimize" or the stop list changes. Opening the
+  sheet does not call Google.
+- A **Start route** button opens Google Maps navigation with the stops loaded
+  in the optimized order. If the stops exceed what one Google Maps link can
+  hold, the route is split into consecutive legs, each its own button.
+- The UPS shipping stop is not part of the drive route unless Jay adds it.
+
+**Cost guardrails (required):**
+- The Google API key lives only on the server (Vercel env var), never in the
+  browser, and is restricted to the Routes API.
+- A hard **daily request quota** set in Google Cloud (e.g. 50 requests/day),
+  so a bug or leaked key cannot run up a bill.
+- A Google Cloud **budget alert** at $5/month.
+- Expected cost at Jay's volume: $0 (well inside Google's monthly free
+  usage; see change log for the pricing checked).
 
 **Acceptance:** tapping Start route on a phone opens Google Maps navigation
 with every local stop for the day, in the order shown on the sheet.
@@ -199,9 +220,7 @@ that opens the bake sheet full screen, still behind the admin password.
 
 | # | Question | Options | Default if undecided |
 |---|---|---|---|
-| D1 | Route starting point | Fixed (home), or wherever Jay is | Fixed home, start and end |
-| D2 | Delivered checkbox on each entry | Yes / No | No |
-| D3 | Stop ordering for the route | Free: sort by zip and street. Paid (small): Google route optimization with an API key | Free |
+| (none open) | | | |
 
 ## 11. Later (not in this phase)
 
@@ -241,6 +260,12 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Decided D1 (route starts and ends at home), D2 (delivered
+  checkbox: yes), D3 (stops ordered by Google route optimization). Shipped
+  entries show the full, copyable address for Pirate Ship. Pricing checked:
+  Google's optimized route requests bill under Compute Routes Pro, $10 per
+  1,000 requests with 5,000 free per month, so ~1 to 5 requests a week costs
+  nothing.
 - 2026-10-27: D4 decided: new subscribers are charged at signup; first
   renewal is the Monday of the next delivery week. Shipping automation
   (Pirate Ship, UPS Ground, preset box sizes) added to Later.
