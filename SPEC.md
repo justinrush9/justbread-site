@@ -254,8 +254,25 @@ The weekly production scheduler (today a separate desktop app,
 orders**, instead of Jay typing loaf counts in by hand.
 
 - **Input:** total loaves for each Thursday, taken from the bake sheet
-  (all paid, declined-but-delivering, manual, and standing orders), plus any
-  extra loaves Jay adds (see D6), plus the "done by" time.
+  (all paid, declined-but-delivering, manual, and standing orders), plus
+  extras (below), plus the bake **start time**.
+- **Extras, baker's dozen:** 1 extra loaf for every 12 ordered, i.e.
+  `floor(ordered / 12)` (12 ordered -> 13 baked, 25 ordered -> 27 baked,
+  11 ordered -> 11 baked). Shown separately from orders on the schedule and
+  bake sheet ("24 ordered + 2 extra = 26 to bake"). Jay can override the
+  extra count for a given week.
+- **Start time:** the schedule is built **forward from when Jay starts on
+  bake day** (Thursday), not backward from a finish time. Default **7:00 AM**
+  (oven on), stored as a setting; Jay can change it for any single week
+  without changing the default. Packaging and "done" times are calculated
+  from it and shown on the schedule.
+- **Starter feed before the cutoff (D5 decided: buffer):** the Tuesday
+  early-morning starter work is sized for the loaves known at that moment
+  (orders + baker's dozen extras) **plus a buffer** of 2 loaves (a setting,
+  editable). At the Tuesday PM feed, after the noon cutoff, the schedule
+  recalculates for the final count and tells Jay the exact amounts to use.
+  Any buffer starter left unused is just shown as surplus; if late orders
+  exceed the buffer, the schedule flags it in red.
 - **Output (same as the desktop app today):** a day-by-day schedule for the
   week: starter pull and feeds, dough timeline (mix, salt, folds, laminations,
   rest, preshape, shape, into fridge), bake timeline (oven on, each batch of
@@ -272,18 +289,16 @@ orders**, instead of Jay typing loaf counts in by hand.
 - Printable, like the desktop app's PDF.
 - The desktop app stays as the fallback until this one is proven.
 
-**Acceptance:** for the same loaf count and done-by time, the in-app schedule
-matches the desktop app's output to the minute and gram.
-
-[OPEN] D5, D6, D7 below must be decided before this is built.
+**Acceptance:** for the same loaf count, with the desktop app's done-by time
+set to the done time this schedule calculates from its start time, the two
+match to the minute and gram. The extras and buffer math matches the
+examples above.
 
 ## 10. Open decisions
 
 | # | Question | Options | Default if undecided |
 |---|---|---|---|
-| D5 | The count isn't final until the Tuesday-noon cutoff, but the starter work for a Thursday bake starts Tuesday early morning (per the current scheduler). Which wins? | (a) Move the cutoff earlier (e.g. Monday night) so the count is final before the first feed. (b) Keep Tuesday noon; feed for the known count plus a buffer, and adjust at the PM feed. (c) Starter timing actually allows Tuesday noon; correct the scheduler. | None yet: Jay to decide |
-| D6 | Extra loaves beyond orders (spares, CFFEM donation, walk-up sales) | A fixed weekly extra, a per-week number Jay types in, or a standing order for CFFEM | None yet |
-| D7 | Done-by time | One fixed default (e.g. Thursday 10:00 AM) editable per week, or entered every week | Fixed default, editable per week |
+| (none open) | | | |
 
 ## 11. Later (not in this phase)
 
@@ -323,6 +338,10 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Decided D5 (keep Tuesday-noon cutoff; size the early starter
+  work with a 2-loaf buffer, recalculate at the PM feed), D6 (baker's dozen:
+  floor(ordered/12) extras, overridable per week), D7 (schedule built forward
+  from a bake-day start time, default 7:00 AM, editable per week).
 - 2026-10-27: Added 9b, production schedule fed by orders (port of the
   desktop scheduler). Open: D5 (cutoff vs. starter timing), D6 (extra
   loaves), D7 (done-by time).
