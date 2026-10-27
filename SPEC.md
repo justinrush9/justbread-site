@@ -136,8 +136,10 @@ One screen per Thursday. Jay picks the Thursday (defaults to the next upcoming
 one with orders).
 
 ### 7a. Summary (top of screen)
-- **Total loaves**
-- Loaves for **local delivery**, **pickup**, and **shipping**
+- **Total loaves to bake**, broken out as **ordered + extras** (baker's dozen,
+  see 9b), e.g. "26 to bake: 24 ordered + 2 extra"
+- Loaves for **local delivery**, **pickup**, and **shipping** (ordered loaves
+  only; extras are not assigned to a stop)
 - **Delivery stops:** one per unique local delivery address, plus one per
   pickup point that has orders, plus **one** for all shipping combined (all
   shipped loaves go out at a single UPS stop). Two orders to the same address
@@ -294,11 +296,37 @@ set to the done time this schedule calculates from its start time, the two
 match to the minute and gram. The extras and buffer math matches the
 examples above.
 
+## 9c. Notifications [TODO]
+
+Runs entirely on the server from Stripe webhooks. No Claude session and no
+per-event approval is involved: once set up, Stripe notifies the site and the
+site notifies Jay.
+
+Jay is notified when:
+| Event | Stripe signal | Notification says |
+|---|---|---|
+| Subscriber schedules a cancellation (in the portal) | `customer.subscription.updated` with `cancel_at_period_end` turning true | Name, plan, loaves, the date it ends, last delivery date, reason/comment if they gave one |
+| Subscription actually ends | `customer.subscription.deleted` | Name, plan, loaves, "removed from future sheets" |
+| Subscriber undoes a scheduled cancellation | `customer.subscription.updated`, `cancel_at_period_end` back to false | Name, "staying" |
+| Subscriber pauses / resumes (portal) | `customer.subscription.updated`, `pause_collection` set / cleared | Name, resume date if any |
+| Payment declined | `invoice.payment_failed` | Name, amount, which Thursday it affects (same event as section 5) |
+
+- Every notification is also kept in an **Alerts** list in the app, so nothing
+  is lost if a notification is missed. Jay can mark alerts read.
+- Notifications must not repeat for the same event (Stripe may resend).
+- The webhook endpoint must be subscribed to the events above (uses the
+  `www.` URL; see CLAUDE.md).
+- [OPEN] Delivery channel; see D8.
+
+**Acceptance:** cancelling a test subscription in the portal produces one
+notification within a minute and one entry in the Alerts list; Stripe
+resending the same event produces no duplicate.
+
 ## 10. Open decisions
 
 | # | Question | Options | Default if undecided |
 |---|---|---|---|
-| (none open) | | | |
+| D8 | How notifications reach Jay | (a) Phone push notification from the installed app. (b) Email to Jay (needs a transactional email service). (c) Both. | None yet |
 
 ## 11. Later (not in this phase)
 
@@ -338,6 +366,9 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Added 9c, notifications (cancel scheduled / ended / undone,
+  pause/resume, declined) plus an in-app Alerts list. Bake sheet summary now
+  shows ordered + extras. Open: D8 (push vs. email vs. both).
 - 2026-10-27: Decided D5 (keep Tuesday-noon cutoff; size the early starter
   work with a 2-loaf buffer, recalculate at the PM feed), D6 (baker's dozen:
   floor(ordered/12) extras, overridable per week), D7 (schedule built forward
