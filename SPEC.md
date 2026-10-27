@@ -316,7 +316,14 @@ Jay is notified when:
 - Notifications must not repeat for the same event (Stripe may resend).
 - The webhook endpoint must be subscribed to the events above (uses the
   `www.` URL; see CLAUDE.md).
-- [OPEN] Delivery channel; see D8.
+- **Delivery: both (D8 decided).** Every alert goes out as (1) a **push
+  notification** to Jay's phone from the installed app (requires the app on
+  the home screen; on iPhone push only works for installed web apps), and
+  (2) an **email** to Jay via a transactional email service, which will be
+  reused for the customer emails in "Later". If push fails or isn't set up
+  on a device, email still goes out; neither depends on the other.
+- Setup Jay does once: allow notifications when the app asks; create the
+  email service account and add its key to Vercel (steps provided at build).
 
 **Acceptance:** cancelling a test subscription in the portal produces one
 notification within a minute and one entry in the Alerts list; Stripe
@@ -326,7 +333,7 @@ resending the same event produces no duplicate.
 
 | # | Question | Options | Default if undecided |
 |---|---|---|---|
-| D8 | How notifications reach Jay | (a) Phone push notification from the installed app. (b) Email to Jay (needs a transactional email service). (c) Both. | None yet |
+| (none open) | | | |
 
 ## 11. Later (not in this phase)
 
@@ -366,6 +373,7 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: D8 decided: notifications go out by both push and email.
 - 2026-10-27: Added 9c, notifications (cancel scheduled / ended / undone,
   pause/resume, declined) plus an in-app Alerts list. Bake sheet summary now
   shows ordered + extras. Open: D8 (push vs. email vs. both).
