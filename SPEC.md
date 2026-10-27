@@ -247,11 +247,43 @@ Not needed: offline mode, a native iOS/Android app.
 **Acceptance:** on Jay's phone, "Add to Home Screen" produces a JustBread icon
 that opens the bake sheet full screen, still behind the admin password.
 
+## 9b. Production schedule [TODO]
+
+The weekly production scheduler (today a separate desktop app,
+`scheduler/justbread_scheduler.py`) moves into this app and is **fed by the
+orders**, instead of Jay typing loaf counts in by hand.
+
+- **Input:** total loaves for each Thursday, taken from the bake sheet
+  (all paid, declined-but-delivering, manual, and standing orders), plus any
+  extra loaves Jay adds (see D6), plus the "done by" time.
+- **Output (same as the desktop app today):** a day-by-day schedule for the
+  week: starter pull and feeds, dough timeline (mix, salt, folds, laminations,
+  rest, preshape, shape, into fridge), bake timeline (oven on, each batch of
+  4 in, packaging, done), and a shopping/supply list (flour bags, water
+  gallons, salt boxes, starter grams).
+- **All recipe and timing math is ported unchanged** from the desktop app:
+  125g starter, 350g flour, 243g water, 12g salt per loaf; batches of 4;
+  dough steps and oven timings as in the current constants; dough into the
+  fridge by 2:00 PM the day before bake. These constants live in one
+  settings place, editable by Jay, not scattered through code.
+- The schedule **updates automatically** when orders change. Once a
+  production step has started, the schedule shows the count it started with
+  and flags any later change (e.g. "2 orders arrived after the starter feed").
+- Printable, like the desktop app's PDF.
+- The desktop app stays as the fallback until this one is proven.
+
+**Acceptance:** for the same loaf count and done-by time, the in-app schedule
+matches the desktop app's output to the minute and gram.
+
+[OPEN] D5, D6, D7 below must be decided before this is built.
+
 ## 10. Open decisions
 
 | # | Question | Options | Default if undecided |
 |---|---|---|---|
-| (none open) | | | |
+| D5 | The count isn't final until the Tuesday-noon cutoff, but the starter work for a Thursday bake starts Tuesday early morning (per the current scheduler). Which wins? | (a) Move the cutoff earlier (e.g. Monday night) so the count is final before the first feed. (b) Keep Tuesday noon; feed for the known count plus a buffer, and adjust at the PM feed. (c) Starter timing actually allows Tuesday noon; correct the scheduler. | None yet: Jay to decide |
+| D6 | Extra loaves beyond orders (spares, CFFEM donation, walk-up sales) | A fixed weekly extra, a per-week number Jay types in, or a standing order for CFFEM | None yet |
+| D7 | Done-by time | One fixed default (e.g. Thursday 10:00 AM) editable per week, or entered every week | Fixed default, editable per week |
 
 ## 11. Later (not in this phase)
 
@@ -291,6 +323,9 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Added 9b, production schedule fed by orders (port of the
+  desktop scheduler). Open: D5 (cutoff vs. starter timing), D6 (extra
+  loaves), D7 (done-by time).
 - 2026-10-27: Route flow decided: stop by stop (Navigate per stop, "Delivered,
   next stop" one-tap), with "View whole route" as a secondary overview.
 - 2026-10-27: Route guardrails: daily cap 150 (worst case stays free),
