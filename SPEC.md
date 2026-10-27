@@ -65,10 +65,15 @@ week later, so the sheet runs a week behind.
   next renewal to the Monday before its next delivery (weekly: the next
   Monday; every-other-week: the Monday of their next delivery week). No double
   charge, no skipped week. Done once, by hand, through Stripe.
-- **New subscriptions:** checkout sets the billing anchor to the next Monday
-  morning. The first charge happens that Monday and pays for that Thursday.
-  Every later charge is also Monday. [OPEN: confirm whether a new subscriber
-  is charged at signup or on the first Monday; see section 10.]
+- **New subscriptions: charged at signup.** The signup payment pays for the
+  first delivery (that week's Thursday if before the cutoff, otherwise the
+  next). Charging up front means nobody can subscribe and cancel before
+  paying. The **first renewal** is the Monday of the *next* delivery week
+  (one week after the first delivery for weekly, two for every-other-week),
+  and every renewal after that is a Monday. This must never charge twice for
+  the same Thursday (e.g. a Saturday signup must not also be charged two days
+  later on Monday). Exact Stripe mechanism (billing anchor vs. trial period)
+  to be confirmed against Stripe's docs at build time. (Decided 2026-10-27.)
 - **Monthly:** renews monthly on a Monday-anchored date, one delivery per
   charge.
 
@@ -197,7 +202,6 @@ that opens the bake sheet full screen, still behind the admin password.
 | D1 | Route starting point | Fixed (home), or wherever Jay is | Fixed home, start and end |
 | D2 | Delivered checkbox on each entry | Yes / No | No |
 | D3 | Stop ordering for the route | Free: sort by zip and street. Paid (small): Google route optimization with an API key | Free |
-| D4 | New subscriber's first charge | At signup (then Mondays), or first Monday after signup | First Monday |
 
 ## 11. Later (not in this phase)
 
@@ -205,6 +209,12 @@ that opens the bake sheet full screen, still behind the admin password.
 - Customer-facing view in `/manage`: next delivery and next charge date
 - Calendar feed (.ics) of delivery days for Jay's own calendar
 - Bake-to-order linking (`bakes` table, still unused)
+- **Shipping automation.** Jay ships with **Pirate Ship**, always **UPS
+  Ground**, with preset package dimensions and weights for each order size.
+  Goal: shipped orders on a Thursday produce ready-to-buy labels in Pirate
+  Ship without retyping addresses. Needs: Jay's preset table (loaves ->
+  box dimensions + weight), and research into what Pirate Ship accepts
+  (API vs. spreadsheet import).
 
 ## 12. Data model changes (for the build)
 
@@ -231,6 +241,9 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: D4 decided: new subscribers are charged at signup; first
+  renewal is the Monday of the next delivery week. Shipping automation
+  (Pirate Ship, UPS Ground, preset box sizes) added to Later.
 - 2026-10-27: Spec created from design discussion (core rules, declined
   handling, manual and standing orders, bake sheet summary and entries, route,
   PWA, open decisions D1 to D4).
