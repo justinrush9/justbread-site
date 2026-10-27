@@ -186,9 +186,21 @@ entries show a copyable full address.
 - The optimized order is computed **once per Thursday** and stored; it is only
   recomputed when Jay taps "Re-optimize" or the stop list changes. Opening the
   sheet does not call Google.
-- A **Start route** button opens Google Maps navigation with the stops loaded
-  in the optimized order. If the stops exceed what one Google Maps link can
-  hold, the route is split into consecutive legs, each its own button.
+- **Primary flow: stop by stop.** Stops are listed numbered (1, 2, 3, ...) in
+  the optimized order. Each stop has a **Navigate** button that opens the
+  Google Maps app directly (not a browser page) with driving directions from
+  wherever Jay is to that stop.
+- **One tap per stop:** a **"Delivered, next stop"** button ticks ✓ on the
+  current stop and immediately opens Maps to the next one. The next
+  undelivered stop is highlighted and scrolled into view whenever Jay returns
+  to the app.
+- Returning from Maps must land exactly where Jay left off (same Thursday,
+  same scroll position, checkboxes intact), with no reload or re-login.
+- After the last stop, Navigate goes home.
+- **Secondary: "View whole route"** opens Google Maps with every stop loaded
+  in the optimized order, for an overview before leaving or for following the
+  whole loop in Maps. If the stops exceed what one Google Maps link can hold,
+  it is split into consecutive legs, each its own button.
 - The UPS shipping stop is not part of the drive route unless Jay adds it.
 
 **Cost guardrails (required):**
@@ -215,8 +227,12 @@ entries show a copyable full address.
 - Expected cost at Jay's volume: $0 (well inside Google's monthly free
   usage; see change log for the pricing checked).
 
-**Acceptance:** tapping Start route on a phone opens Google Maps navigation
-with every local stop for the day, in the order shown on the sheet.
+**Acceptance:** on Jay's phone, with the app installed: stops appear in the
+order Google's optimization returned; Navigate opens the Maps app with
+directions to that stop; "Delivered, next stop" checks the stop off and opens
+Maps to the next one; switching back to the app shows the next stop
+highlighted with all checkmarks kept; "View whole route" shows the full loop
+from home back to home.
 
 ## 9. App form [TODO]
 
@@ -275,6 +291,8 @@ entry per standing order per Thursday).
 
 ## 13. Change log
 
+- 2026-10-27: Route flow decided: stop by stop (Navigate per stop, "Delivered,
+  next stop" one-tap), with "View whole route" as a secondary overview.
 - 2026-10-27: Route guardrails: daily cap 150 (worst case stays free),
   app-side counter, visible notice + zip/street fallback when optimization is
   unavailable, monthly usage line, advance warning if stops exceed Google's
