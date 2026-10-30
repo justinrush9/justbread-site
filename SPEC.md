@@ -75,7 +75,9 @@ These are decided. Everything else in this spec follows from them.
 | Schema in section 12 applied | [TODO] | Run once at go-live |
 | `CRON_SECRET` env var | [TODO] | Without it the daily cron (reconcile, standing-order freeze, renewal sync) doesn't run |
 | Webhook endpoint enabled and subscribed to every event in sections 5 and 9c | [TODO] | `www.` URL (see CLAUDE.md). The endpoint currently receives events but its inserts fail on missing columns; Stripe may disable it after repeated failures, so check it's enabled at go-live |
-| Stripe failed-payment setting: subscription status **"If a recurring payment is incomplete for 5 days: cancel the subscription"**, with retries set to finish inside 5 days | [TODO] | Jay, in Dashboard → Settings → Billing → failed payments. 5 days (not 7) so a weekly sub declined Monday is cancelled Saturday, before the next Monday renewal can create a second invoice |
+| Stripe failed payments: **Manage failed payments → Card payments → Manage**: custom retry schedule finishing within 5 days (e.g. retry 1, 3, and 5 days after the first failure); **"If all retries for a payment fail: cancel the subscription"** | [TODO] | Jay, in Dashboard → Settings → Billing → Subscriptions and emails. A weekly sub declined Monday is cancelled by Saturday, before the next Monday renewal can create a second invoice |
+| Stripe customer emails | [TODO] | ON: expiring cards, card payment failures, hosted link for payments needing confirmation. OFF: trial-ending reminder and "trial over" statement message (`trial_end` is only used to set renewal dates, rule 9), upcoming-renewal emails (weekly subscribers would get one every week; section 9d covers this) |
+| Stripe billing mode | Decided | Classic. The site's Stripe library pins an API version older than 2025-09-30, so API-created subscriptions are classic. Test clocks (rule 10) run in classic mode; changing modes or upgrading the Stripe library means re-running them |
 | Legacy $35/mo every-other-week subs moved to current prices | Partly done | Jessica and Toni still pending; see CLAUDE.md |
 
 **Go-live date:** a Monday Jay picks. Payments before it are not imported.
@@ -577,8 +579,9 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
-- 2026-10-30: Failed-payment setting: cancel after 5 days incomplete (was 1
-  week), so a weekly decline is resolved before the next Monday renewal.
+- 2026-10-30: Stripe settings from Jay's dashboard: retries finish within 5
+  days then cancel (the "incomplete for N days" setting is for 3D Secure
+  confirmations, not declines); customer email toggles; billing mode classic.
 - 2026-10-30: Spec review. Reframed as a new build: database goes live on a
   chosen Monday and starts empty (section 3). Monthly keeps calendar billing;
   renewals are predicted and placed by a new rule (charge by Thursday noon ->
