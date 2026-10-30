@@ -75,7 +75,7 @@ These are decided. Everything else in this spec follows from them.
 | Schema in section 12 applied | [TODO] | Run once at go-live |
 | `CRON_SECRET` env var | [TODO] | Without it the daily cron (reconcile, standing-order freeze, renewal sync) doesn't run |
 | Webhook endpoint enabled and subscribed to every event in sections 5 and 9c | [TODO] | `www.` URL (see CLAUDE.md). The endpoint currently receives events but its inserts fail on missing columns; Stripe may disable it after repeated failures, so check it's enabled at go-live |
-| Stripe retry setting: retry for **1 week**, then **cancel the subscription** | [TODO] | Jay, in Dashboard → Settings → Billing → retries. Longer windows let a second weekly renewal decline while the first is still retrying |
+| Stripe failed-payment setting: subscription status **"If a recurring payment is incomplete for 5 days: cancel the subscription"**, with retries set to finish inside 5 days | [TODO] | Jay, in Dashboard → Settings → Billing → failed payments. 5 days (not 7) so a weekly sub declined Monday is cancelled Saturday, before the next Monday renewal can create a second invoice |
 | Legacy $35/mo every-other-week subs moved to current prices | Partly done | Jessica and Toni still pending; see CLAUDE.md |
 
 **Go-live date:** a Monday Jay picks. Payments before it are not imported.
@@ -577,6 +577,8 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-10-30: Failed-payment setting: cancel after 5 days incomplete (was 1
+  week), so a weekly decline is resolved before the next Monday renewal.
 - 2026-10-30: Spec review. Reframed as a new build: database goes live on a
   chosen Monday and starts empty (section 3). Monthly keeps calendar billing;
   renewals are predicted and placed by a new rule (charge by Thursday noon ->
@@ -587,7 +589,7 @@ the app's own 150/day cap and the monthly usage line.
   scope as an explicit exception to the safety contract (rule 9) and the
   test-clock requirement (rule 10). Added refunds, out-of-order replay rules,
   and handling when Stripe gives up on retries (section 5); Stripe retry
-  setting of 1 week then cancel (section 3). Added single-order edits (6c)
+  setting (section 3). Added single-order edits (6c)
   and skip / skip until / resume subscription controls (6d). Standing orders
   are calculated for future Thursdays, not stored (6b), with required
   automated tests. Delivered moved from the order to the stop (7c). Android:
