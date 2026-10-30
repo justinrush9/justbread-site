@@ -150,7 +150,7 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 ---
 
 ## Things to NOT Do
-- Never modify or delete existing Stripe prices, products, customers, or subscriptions
+- Never modify or delete existing Stripe prices, products, customers, or subscriptions. Sole exception: the subscription changes listed in SPEC.md core rule 9 (`trial_end` to move a renewal date, `pause_collection` to skip/resume), tested on Stripe test clocks first
 - Never embed images as base64 in HTML
 - Never use `&&` in PowerShell (use separate commands)
 - Don't touch the `paX6` original secret key unless explicitly confirmed safe
