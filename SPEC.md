@@ -483,6 +483,46 @@ Jay is notified when:
 notification within a minute, one entry in Alerts, and one row in
 Cancellations; Stripe resending the same event produces no duplicate.
 
+## 9d. Customer emails [TODO]
+
+Sent by the site through the same transactional email service as Jay's
+alerts (9c). Plain, short, written in Jay's voice (no em dashes). Every email
+names the Thursday and where the bread is going. Stripe's own receipts stay
+on and are unchanged; these are in addition.
+
+| Email | Sent when | Says | Can opt out? |
+|---|---|---|---|
+| **Order confirmation** | A new order is paid: a one-time order, or a subscription's first payment. **Not** on renewals (Stripe's receipt covers those). | Which Thursday it arrives; where (their address, the pickup point name, or "ships Thursday, arrives Friday"); loaves; for subscribers, the cadence, that renewals charge Monday mornings (monthly: on their date), and the link to manage | No |
+| **Delivered** | Jay ticks Delivered on their stop (7c). | Local: "Your bread is at your door." Pickup: "Your bread is at [pickup point]." | **Yes** |
+| **Shipped** | Jay ticks the shipping stop. | Shipped today via UPS Ground, arrives Friday. (Tracking number added with shipping automation, section 11.) | **Yes** (same switch as Delivered) |
+| **Change confirmation** | A skip, skip-until, pause, resume, scheduled cancellation, or ended subscription, whether made by Jay in the app (6d) or by the customer in the portal. Also when Jay moves or cancels a single delivery (6c). | What changed and the next delivery date (or the last one, for a cancellation) | No |
+| **Notice to all subscribers** | Jay writes one from the app. | Jay's message. For closures and schedule changes. Optional on the same screen: pause every active subscription until a date (uses 6d), so the notice and the pause go out together. | No |
+
+Rules:
+- **One opt-out, for Delivered and Shipped only**, on by default. Every
+  Delivered and Shipped email has a one-click "stop these emails" link in the
+  footer, with no login (a signed link per customer). The same switch is on
+  `/manage`. The other emails only go out when something actually happened,
+  so they always send.
+- **Never twice:** each email is sent at most once per order and type
+  (unticking and re-ticking Delivered does not resend). Webhook resends never
+  resend an email.
+- **No email** for manual or standing orders unless the order has an email
+  address; Barter entries never get emails.
+- A failed send never blocks anything else (ticking Delivered still saves);
+  it shows as a small warning on that entry and is retried by the daily cron.
+- Customers reply to Jay's own address (reply-to), not a no-reply address.
+- Sending address on `justbread.shop`, with the domain records (SPF/DKIM)
+  the email service requires, so emails don't land in spam. Jay adds them
+  once in Vercel's DNS (steps provided at build).
+- Before going live, Jay approves the final wording of each email.
+
+**Acceptance:** a test one-time order produces one confirmation with the
+right Thursday; ticking its stop produces one Delivered email, and
+re-ticking produces none; clicking "stop these emails" stops the next
+Delivered email and nothing else; a test portal cancellation produces one
+change confirmation with the last delivery date.
+
 ## 10. Open decisions
 
 | # | Question | Options | Default if undecided |
@@ -495,7 +535,7 @@ subscriber notice email and switchover dates (4a), the Stripe retry setting
 
 ## 11. Later (not in this phase)
 
-- Customer emails: order confirmation with delivery date, day-before reminder
+- Day-before delivery reminder email (not in 9d; revisit once 9d is live)
 - Customer-facing view in `/manage`: next delivery and next charge date
 - Calendar feed (.ics) of delivery days for Jay's own calendar
 - Bake-to-order linking (`bakes` table, still unused)
@@ -573,12 +613,29 @@ message, `created_at`, `read_at`.
 ### `push_subscriptions` (new)
 Push endpoint (unique), keys, device label, `created_at`.
 
+### `customer_email_prefs` (new)
+`stripe_customer_id` or email (unique), `delivery_emails` BOOLEAN default
+true, `updated_at`. Backs the 9d opt-out.
+
+### `emails_sent` (new)
+Order id (or subscription id for change confirmations, or broadcast id),
+email type, recipient, `sent_at`, `status` (`sent` | `failed`), provider
+message id. Unique on (order or subscription id, type, event) so nothing
+sends twice; failed rows are what the daily cron retries.
+
+### `broadcasts` (new)
+Subject, body, recipients count, optional pause-until date, `sent_at`.
+
 ### `api_usage` (new)
 Date, service (`google_routes`), count. Unique on (date, service). Backs
 the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-10-30: Added 9d, customer emails: order confirmation (new orders
+  only), Delivered / Shipped notices with a one-click opt-out, change
+  confirmations, and a notice to all subscribers with optional pause. Moved
+  from Later. Data model: email prefs, sent log, broadcasts.
 - 2026-10-30: Stripe settings from Jay's dashboard: retries finish within 5
   days then cancel (the "incomplete for N days" setting is for 3D Secure
   confirmations, not declines); customer email toggles; billing mode classic.
