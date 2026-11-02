@@ -187,7 +187,7 @@ red Declined tag; if Stripe's retry later succeeds, the same entry turns paid
 without creating a second row. A full refund removes the order from the
 sheet and totals.
 
-## 6. Orders and subscriptions Jay manages [TODO]
+## 6. Orders and subscriptions Jay manages [BUILT]
 
 Manual and standing orders are entered from the admin app, are $0 in the
 system, never touch Stripe, and are excluded from sales totals and from the
@@ -635,6 +635,10 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-02: Phase 3 built: manual orders, standing orders calculated per
+  Thursday (frozen by the daily cron), single-order edits with history. A
+  single-order edit on a standing entry changes loaves or note for that one
+  Thursday; to move one, skip it and add a manual order.
 - 2026-11-02: Phase 2 verified on Stripe test clocks (13 scenarios: weekly and
   every-other-week signups Mon 9 AM / Tue 11:59 / Tue 12:01 / Sat, skip one
   week, skip until, resume early, monthly skip, Wednesday-to-Monday move):

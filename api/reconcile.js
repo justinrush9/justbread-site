@@ -24,6 +24,7 @@ const Stripe = require('stripe');
 const { isAdminRequest } = require('../lib/adminAuth');
 const { processEvent, EVENT_TYPES } = require('../lib/stripeEvents');
 const { refreshAllSubscriptions } = require('../lib/subscriptions');
+const { freezePast } = require('../lib/standingOrders');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -71,6 +72,13 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error('Reconcile: subscription refresh failed:', err.message);
     summary.errors.push({ type: 'subscription_refresh', message: err.message });
+  }
+
+  try {
+    summary.standingOrders = await freezePast();
+  } catch (err) {
+    console.error('Reconcile: standing-order freeze failed:', err.message);
+    summary.errors.push({ type: 'standing_freeze', message: err.message });
   }
 
   return res.status(200).json(summary);

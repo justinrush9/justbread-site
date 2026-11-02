@@ -11,6 +11,7 @@
 
 const { query } = require('../db/client');
 const { expectedFor } = require('../lib/expected');
+const { entriesFor: standingFor } = require('../lib/standingOrders');
 const { isAdminRequest } = require('../lib/adminAuth');
 
 module.exports = async function handler(req, res) {
@@ -70,15 +71,20 @@ module.exports = async function handler(req, res) {
     // (SPEC.md 4c). Skipped ones are listed but not counted.
     const expected = await expectedFor(date);
     const expectedLoaves = expected.filter((e) => !e.skipped).reduce((sum, e) => sum + (e.loaves || 0), 0);
-    const totalLoaves = totals.rows.reduce((sum, r) => sum + r.loaves, 0) + expectedLoaves;
+    // Standing (barter) orders, calculated for this Thursday (SPEC.md 6b).
+    const standing = await standingFor(date);
+    const standingLoaves = standing.filter((e) => !e.skipped).reduce((sum, e) => sum + (e.loaves || 0), 0);
+    const totalLoaves = totals.rows.reduce((sum, r) => sum + r.loaves, 0) + expectedLoaves + standingLoaves;
 
     return res.status(200).json({
       date,
       totalLoaves,
       expectedLoaves,
+      standingLoaves,
       totalsByMethod: totals.rows,
       orders: orders.rows,
       expected,
+      standing,
     });
   } catch (err) {
     console.error('Bake sheet fetch error:', err.message);

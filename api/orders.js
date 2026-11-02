@@ -23,8 +23,9 @@ module.exports = async function handler(req, res) {
       `SELECT id, customer_email, customer_name, loaves, fulfillment_type,
               order_type, cadence, status, created_at,
               delivery_method, pickup_location, shipping_address,
-              fulfillment_date
+              fulfillment_date, payment_status, amount_cents, refunded_cents
        FROM orders
+       WHERE source = 'stripe'  -- payment log only; manual and standing orders aren't payments (6)
        ORDER BY created_at DESC
        LIMIT 200`,
     );
