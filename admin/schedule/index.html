@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="icon" href="/admin/icons/icon-192.png">
+  <title>Production Schedule</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black: #0a0a0a; --near: #141414; --card: #1a1a1a; --border: #2a2a2a; --muted: #8a8a8a; --white: #fff; --yellow: #f5e600; --red: #ff6b6b; --green: #6dff9a; }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.45; min-height: 100vh; }
+    button, input { font: inherit; color: inherit; }
+    header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; }
+    .logo span { color: var(--yellow); }
+    header nav { margin-left: auto; display: flex; gap: 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    header nav a { text-decoration: none; color: var(--muted); }
+    header nav a.active { color: var(--yellow); }
+    main { max-width: 760px; margin: 0 auto; padding: 14px 16px 60px; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+    .chip { flex: 0 0 auto; border: 1.5px solid var(--border); background: var(--near); border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .chip.on { border-color: var(--yellow); color: var(--yellow); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin: 12px 0; }
+    .big { font-family: 'Arial Black', Arial, sans-serif; font-size: 26px; line-height: 1.1; }
+    .muted { color: var(--muted); }
+    h2 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 20px 0 6px; }
+    h3 { font-size: 16px; margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; }
+    td { padding: 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+    td:last-child { text-align: right; font-weight: 700; white-space: nowrap; padding-left: 10px; }
+    tr.hi td { color: var(--yellow); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; cursor: pointer; margin-top: 10px; }
+    .btn.primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .done { color: var(--green); font-weight: 700; margin-top: 8px; }
+    .warn { border-color: var(--red); }
+    .warn b, .red { color: var(--red); }
+    .row { display: flex; gap: 8px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .row input { background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px 10px; min-height: 44px; }
+    .settings label { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .settings input { width: 7em; background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px; text-align: right; }
+    @media print {
+      header, .chips, .btn, .row, .no-print { display: none !important; }
+      body { background: #fff; color: #000; }
+      .card { background: #fff; border-color: #999; break-inside: avoid; }
+      h2, tr.hi td { color: #000; }
+      td { border-color: #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">J<span>B</span></div>
+    <nav><a href="/admin/bake-sheet/">Sheet</a><a href="/admin/schedule/" class="active">Schedule</a><a href="/admin/standing/">Standing</a><a href="/admin/">Pay</a></nav>
+  </header>
+  <main>
+    <div class="chips" id="chips"></div>
+    <div id="out"></div>
+  </main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (v !== false && v != null) n.setAttribute(k, v);
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+    return n;
+  };
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+  const fmtDate = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
+  const fmtDay = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
+  const addDays = (d, n) => { const t = new Date(`${d}T12:00:00Z`); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+  const to12 = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
+  let thursday = null;
+
+  async function api(q, body) {
+    const res = await fetch(`/api/production${q || ''}`, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {});
+    if (res.status === 401) { location.href = '/admin/bake-sheet/'; throw new Error('Log in'); }
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(d.error || `Error ${res.status}`);
+    return d;
+  }
+
+  async function chips() {
+    const r = await fetch('/api/bake-sheet'); if (r.status === 401) { location.href = '/admin/bake-sheet/'; return; }
+    const { today, thursdays } = await r.json();
+    let next = today; while (new Date(`${next}T12:00:00Z`).getUTCDay() !== 4) next = addDays(next, 1);
+    const days = [...new Set([next, addDays(next, 7), ...thursdays])].filter((d) => d >= addDays(today, -7)).sort();
+    const saved = store.get('jb.thursday');
+    thursday = thursday || (saved && days.includes(saved) ? saved : next);
+    $('#chips').replaceChildren(...days.map((d) => el('button', { class: `chip${d === thursday ? ' on' : ''}`, onclick: () => { thursday = d; store.set('jb.thursday', d); chips(); load(); } }, fmtDay(d))));
+  }
+
+  const table = (rows) => el('table', {}, rows.map(([a, b, hi]) => el('tr', { class: hi ? 'hi' : '' }, el('td', {}, a), el('td', {}, b))));
+
+  function stepButton(p, step, label) {
+    const s = p.started[step];
+    if (s) return el('div', { class: 'done' }, `✓ Started with ${s.loaves} loaves `, el('button', { class: 'btn', onclick: () => act({ action: 'undo', step }) }, 'Undo'));
+    return el('button', { class: 'btn primary', onclick: () => act({ action: 'start', step }) }, label);
+  }
+
+  async function act(body) {
+    try { render(await api('', { date: thursday, ...body })); } catch (e) { alert(e.message); }
+  }
+
+  async function load() {
+    try { render(await api(`?date=${thursday}`)); } catch (e) { $('#out').replaceChildren(el('p', { class: 'muted' }, e.message)); }
+  }
+
+  function render(p) {
+    const out = [];
+    out.push(el('div', { class: 'card' },
+      el('div', { class: 'big' }, `${p.loaves} loaves`),
+      el('div', { class: 'muted' }, `${p.ordered} ordered + ${p.extras} extra · bake ${fmtDay(thursday)}`),
+      el('div', { class: 'row no-print' },
+        el('span', {}, 'Start (oven on):'),
+        el('input', { type: 'time', value: p.start_time, onchange: (e) => act({ action: 'start_time', value: e.target.value }) }),
+        p.start_time_overridden ? el('button', { class: 'btn', style: 'margin-top:0', onclick: () => act({ action: 'start_time', value: null }) }, 'Use default') : el('span', { class: 'muted' }, 'default')),
+      el('button', { class: 'btn', onclick: () => window.print() }, 'Print')));
+
+    for (const c of p.changes) {
+      out.push(el('div', { class: 'card warn' }, el('b', {}, `${c.diff > 0 ? `${c.diff} more` : `${-c.diff} fewer`} loaf${Math.abs(c.diff) === 1 ? '' : 'ves'} since the ${c.label}`),
+        el('div', { class: 'muted' }, `It started with ${c.started_with}${c.step === 'starter_am' ? ` (incl. ${p.buffer} buffer)` : ''}.`)));
+    }
+
+    if (!p.schedule) { out.push(el('p', { class: 'muted' }, 'No loaves on this Thursday yet.')); $('#out').replaceChildren(...out); return; }
+    const s = p.schedule;
+
+    out.push(el('h2', {}, 'Supplies for the week'));
+    out.push(el('div', { class: 'card' }, table([
+      ['Starter to pull from the fridge (Tue AM)', s.totals.fridge_starter, true],
+      ['Flour', s.totals.flour], ['Water', s.totals.water], ['Salt', s.totals.salt],
+    ])));
+
+    const tue = s.tuesday;
+    out.push(el('h2', {}, `Tuesday, ${fmtDate(addDays(thursday, -2))} · starter`));
+    out.push(el('div', { class: 'card' },
+      el('h3', {}, 'AM feed'),
+      table([['Pull from fridge', tue.am_pull, true], ['Sized for', `${tue.am_sized_for} loaves (${p.loaves} + ${p.buffer} buffer)`]]),
+      stepButton(p, 'starter_am', 'I did the AM feed')));
+    out.push(el('div', { class: `card${tue.short_loaves ? ' warn' : ''}` },
+      el('h3', {}, 'PM feed (after the noon cutoff)'),
+      tue.short_loaves ? el('p', {}, el('b', {}, `Short: ${tue.short_loaves} loaves over what the AM feed was sized for.`)) : null,
+      table([
+        ['Use AM starter', tue.pm_use], ['Feed flour and water, each', tue.pm_feed_each],
+        ['After PM feed: use for dough', tue.after_pm, true],
+        ...(tue.surplus ? [['Left over (surplus)', tue.surplus]] : []),
+      ]),
+      stepButton(p, 'starter_pm', 'I did the PM feed')));
+
+    const wed = s.wednesday;
+    out.push(el('h2', {}, `Wednesday, ${fmtDate(addDays(thursday, -1))} · dough`));
+    out.push(el('div', { class: 'card' },
+      el('h3', {}, `Start ${wed.start}`),
+      table([['Flour', wed.flour], ['Water', wed.water], ['Salt', wed.salt], ['Starter', wed.starter]]),
+      el('div', { style: 'height:8px' }),
+      table(wed.steps.map(([n, t]) => [n, t, n === '-> Fridge'])),
+      stepButton(p, 'mix', 'I started the mix')));
+
+    const thu = s.thursday;
+    out.push(el('h2', {}, `Thursday, ${fmtDate(thursday)} · bake`));
+    out.push(el('div', { class: 'card' },
+      el('h3', {}, `${thu.batches} batches · done by ${thu.done_by}`),
+      table(thu.events.map(([n, t]) => [n, t, n === 'DONE'])),
+      stepButton(p, 'bake', 'I started the bake')));
+
+    out.push(el('div', { class: 'no-print', style: 'margin-top:20px' }, el('button', { class: 'btn', onclick: settings }, 'Recipe and default settings')));
+    $('#out').replaceChildren(...out);
+  }
+
+  async function settings() {
+    const { constants, editable } = await api('?settings=1');
+    const labels = { start_time: 'Default start (oven on)', starter_buffer: 'Starter buffer (loaves)', fridge_by: 'Dough in fridge by (Wed)', starter_g: 'Starter per loaf (g)', flour_g: 'Flour per loaf (g)', water_g: 'Water per loaf (g)', salt_g: 'Salt per loaf (g)', batch: 'Loaves per oven batch' };
+    const inputs = {};
+    const box = el('div', { class: 'card settings' }, el('h3', {}, 'Defaults'),
+      editable.map((k) => el('label', {}, labels[k] || k, inputs[k] = el('input', { type: ['start_time', 'fridge_by'].includes(k) ? 'time' : 'number', value: constants[k] }))),
+      el('button', { class: 'btn primary', onclick: async () => {
+        const values = Object.fromEntries(editable.map((k) => [k, ['start_time', 'fridge_by'].includes(k) ? inputs[k].value : Number(inputs[k].value)]));
+        try { await api('', { action: 'settings', values }); load(); } catch (e) { alert(e.message); }
+      } }, 'Save defaults'));
+    $('#out').append(box);
+    box.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  chips().then(load).catch((e) => { $('#out').textContent = e.message; });
+})();
+</script>
+</body>
+</html>

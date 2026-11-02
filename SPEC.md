@@ -395,7 +395,7 @@ Not needed: offline mode, a native Android app.
 **Acceptance:** on Jay's phone, "Add to Home screen" produces a JustBread icon
 that opens the bake sheet full screen, still behind the admin password.
 
-## 9b. Production schedule [TODO]
+## 9b. Production schedule [BUILT, verified against the desktop app]
 
 The weekly production scheduler (today a separate desktop app,
 `scheduler/justbread_scheduler.py`) moves into this app and is **fed by the
@@ -635,6 +635,13 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-02: Phase 6 built: production schedule ported from the desktop
+  app and fed by the bake sheet. Verified by running the desktop app's own
+  calculation for 1 to 60 loaves at three start times: identical to the
+  minute and gram (tests/unit/production.test.js). Tuesday AM feed sized
+  with the buffer and recorded when tapped; PM feed recalculated; red flag
+  when late orders exceed the buffer. Defaults editable on the Schedule
+  screen.
 - 2026-11-02: Phase 4 built: new bake sheet (summary, stops with one
   Delivered tick each, tags, Map / copy address / email / call / text,
   single-order and subscriber actions, add order, print), Standing orders
