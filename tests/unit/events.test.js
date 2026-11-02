@@ -179,3 +179,27 @@ test('daily refresh fills the mirror without alerts, and a later stale event is 
   }), stripe);
   assert.equal((await db.query("SELECT cancel_at_period_end FROM subscriptions WHERE stripe_subscription_id='sub_A'")).rows[0].cancel_at_period_end, false);
 });
+
+test('first payment moves the next charge to a Monday; replays and renewals do not', async () => {
+  await freshDb();
+  const { invoiceEvent: inv } = require('../helpers/fixtures');
+  const updates = [];
+  const s = {
+    ...stripe,
+    subscriptions: {
+      retrieve: async () => ({ id: 'sub_A', status: 'active', latest_invoice: 'in_first', current_period_end: secs('2026-11-16T15:00:00Z'), items: { data: [] }, metadata: {} }),
+      update: async (subId, params) => { updates.push([subId, params]); return {}; },
+    },
+  };
+  // Monday Nov 9 9:00 AM Central signup. Future relative to the fake "now"? anchorFirstRenewal
+  // compares to the real clock, so use a date safely in the future.
+  const created = '2030-11-04T15:00:00Z'; // Monday 9 AM Central, Nov 4 2030
+  await processEvent(inv('invoice.paid', { invoiceId: 'in_first', created, billingReason: 'subscription_create' }), s);
+  assert.equal(updates.length, 1);
+  assert.equal(updates[0][1].proration_behavior, 'none');
+  assert.equal(new Date(updates[0][1].trial_end * 1000).toISOString(), '2030-11-11T12:00:00.000Z', 'Mon Nov 11 2030 6 AM CST');
+
+  // Renewal invoices never move anything.
+  await processEvent(inv('invoice.paid', { invoiceId: 'in_next', created: '2030-11-11T12:00:00Z' }), s);
+  assert.equal(updates.length, 1);
+});

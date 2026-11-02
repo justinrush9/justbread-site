@@ -10,6 +10,7 @@
  */
 
 const { query } = require('../db/client');
+const { expectedFor } = require('../lib/expected');
 const { isAdminRequest } = require('../lib/adminAuth');
 
 module.exports = async function handler(req, res) {
@@ -65,13 +66,19 @@ module.exports = async function handler(req, res) {
       ),
     ]);
 
-    const totalLoaves = totals.rows.reduce((sum, r) => sum + r.loaves, 0);
+    // Renewals known to be coming for this Thursday but not charged yet
+    // (SPEC.md 4c). Skipped ones are listed but not counted.
+    const expected = await expectedFor(date);
+    const expectedLoaves = expected.filter((e) => !e.skipped).reduce((sum, e) => sum + (e.loaves || 0), 0);
+    const totalLoaves = totals.rows.reduce((sum, r) => sum + r.loaves, 0) + expectedLoaves;
 
     return res.status(200).json({
       date,
       totalLoaves,
+      expectedLoaves,
       totalsByMethod: totals.rows,
       orders: orders.rows,
+      expected,
     });
   } catch (err) {
     console.error('Bake sheet fetch error:', err.message);
