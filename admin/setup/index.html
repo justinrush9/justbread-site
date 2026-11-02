@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Database setup</title>
+  <style>
+    body { background: #0a0a0a; color: #fff; font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 16px; line-height: 1.5; }
+    button { font: inherit; font-weight: 700; background: #f5e600; color: #0a0a0a; border: 0; border-radius: 8px; min-height: 48px; padding: 0 20px; cursor: pointer; }
+    pre { background: #141414; border-radius: 6px; padding: 12px; white-space: pre-wrap; margin-top: 16px; }
+    p { color: #aaa; }
+  </style>
+</head>
+<body>
+  <h1>Database setup</h1>
+  <p>Creates or updates every table this app needs. Safe to press more than once: it only adds what's missing and never deletes data.</p>
+  <button id="go">Set up database</button>
+  <pre id="out" hidden></pre>
+<script>
+  document.getElementById('go').addEventListener('click', async () => {
+    const out = document.getElementById('out');
+    out.hidden = false; out.textContent = 'Working…';
+    try {
+      const r = await fetch('/api/migrate', { method: 'POST' });
+      if (r.status === 401) { out.textContent = 'Log in on the Bake Sheet first, then come back.'; return; }
+      const d = await r.json();
+      out.textContent = d.ok ? `Done. ${d.tables.length} tables:\n${d.tables.join('\n')}` : `Failed: ${d.error}`;
+    } catch (e) { out.textContent = `Failed: ${e.message}`; }
+  });
+</script>
+</body>
+</html>

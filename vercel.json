@@ -1,6 +1,14 @@
 {
   "version": 2,
   "crons": [
-    { "path": "/api/reconcile?days=2", "schedule": "0 13 * * *" }
-  ]
+    {
+      "path": "/api/reconcile?days=2",
+      "schedule": "0 13 * * *"
+    }
+  ],
+  "functions": {
+    "api/migrate.js": {
+      "includeFiles": "db/schema.sql"
+    }
+  }
 }
