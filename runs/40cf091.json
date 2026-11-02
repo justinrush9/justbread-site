@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "created": "clock_1UXSokJVnPyvSLMUoOjCI8Bs",
+      "frozen_time": 1793620800
+    },
+    {
+      "advanced_to": "2026-11-09T12:00:00.000Z",
+      "status": "ready"
+    }
+  ]
+}
