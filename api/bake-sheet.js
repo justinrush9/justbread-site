@@ -1,93 +1,23 @@
 /**
- * JustBread — Bake Sheet API
- * GET /api/bake-sheet                 -> upcoming/recent fulfillment dates with counts
- * GET /api/bake-sheet?date=YYYY-MM-DD -> full production detail for that date
- *
- * This is the actual "what do I bake, and where does it go" view.
- * /api/orders is a payment log ordered by when Stripe charged someone;
- * this groups by fulfillment_date (see lib/fulfillment.js) and delivery
- * mechanic instead, which is what a bake day is organized around.
+ * GET /api/bake-sheet               -> { thursdays: [...] } upcoming dates with orders
+ * GET /api/bake-sheet?date=YYYY-MM-DD -> the full sheet for that Thursday (lib/sheet.js)
+ * Admin only (cookie, password header, or cron secret).
  */
 
-const { query } = require('../db/client');
-const { expectedFor } = require('../lib/expected');
-const { entriesFor: standingFor } = require('../lib/standingOrders');
 const { isAdminRequest } = require('../lib/adminAuth');
+const { buildSheet, upcomingThursdays } = require('../lib/sheet');
+const { todayCentral, isThursday } = require('../lib/dates');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
   if (!isAdminRequest(req)) return res.status(401).json({ error: 'Unauthorized' });
-
   const date = req.query?.date;
-
-  // No date -> list fulfillment dates that have orders, so the admin page
-  // can offer them as quick picks instead of the person guessing a date.
-  if (!date) {
-    try {
-      const result = await query(
-        `SELECT fulfillment_date, COUNT(*)::int AS order_count, COALESCE(SUM(loaves), 0)::int AS loaves
-         FROM orders
-         WHERE fulfillment_date IS NOT NULL
-           AND payment_status <> 'refunded' AND cancelled_at IS NULL
-           AND fulfillment_date >= CURRENT_DATE - INTERVAL '7 days'
-         GROUP BY fulfillment_date
-         ORDER BY fulfillment_date`,
-      );
-      return res.status(200).json({ dates: result.rows });
-    } catch (err) {
-      console.error('Bake sheet dates fetch error:', err.message);
-      return res.status(500).json({ error: 'Internal error' });
-    }
-  }
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ error: 'date must be YYYY-MM-DD' });
-  }
-
   try {
-    const [orders, totals] = await Promise.all([
-      query(
-        `SELECT id, customer_name, customer_email, loaves, delivery_method,
-                pickup_location, shipping_address, order_type, cadence, status,
-                payment_status, refunded_cents
-         FROM orders
-         WHERE fulfillment_date = $1 AND payment_status <> 'refunded' AND cancelled_at IS NULL
-         ORDER BY delivery_method,
-                  pickup_location NULLS LAST,
-                  shipping_address->>'postal_code' NULLS LAST,
-                  customer_name`,
-        [date],
-      ),
-      query(
-        `SELECT delivery_method, COUNT(*)::int AS order_count, COALESCE(SUM(loaves), 0)::int AS loaves
-         FROM orders
-         WHERE fulfillment_date = $1 AND payment_status <> 'refunded' AND cancelled_at IS NULL
-         GROUP BY delivery_method`,
-        [date],
-      ),
-    ]);
-
-    // Renewals known to be coming for this Thursday but not charged yet
-    // (SPEC.md 4c). Skipped ones are listed but not counted.
-    const expected = await expectedFor(date);
-    const expectedLoaves = expected.filter((e) => !e.skipped).reduce((sum, e) => sum + (e.loaves || 0), 0);
-    // Standing (barter) orders, calculated for this Thursday (SPEC.md 6b).
-    const standing = await standingFor(date);
-    const standingLoaves = standing.filter((e) => !e.skipped).reduce((sum, e) => sum + (e.loaves || 0), 0);
-    const totalLoaves = totals.rows.reduce((sum, r) => sum + r.loaves, 0) + expectedLoaves + standingLoaves;
-
-    return res.status(200).json({
-      date,
-      totalLoaves,
-      expectedLoaves,
-      standingLoaves,
-      totalsByMethod: totals.rows,
-      orders: orders.rows,
-      expected,
-      standing,
-    });
+    if (!date) return res.status(200).json({ today: todayCentral(), thursdays: await upcomingThursdays(todayCentral()) });
+    if (!isThursday(date)) return res.status(400).json({ error: 'date must be a Thursday, YYYY-MM-DD' });
+    return res.status(200).json(await buildSheet(date));
   } catch (err) {
-    console.error('Bake sheet fetch error:', err.message);
+    console.error('Bake sheet error:', err.message);
     return res.status(500).json({ error: 'Internal error' });
   }
 };

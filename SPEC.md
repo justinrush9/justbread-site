@@ -265,7 +265,7 @@ skip until a date three weeks out; resume early; a monthly skip.
 charge that Monday, shows Skipped on that Thursday, and the next Monday
 charges normally.
 
-## 7. Bake sheet [Partly BUILT]
+## 7. Bake sheet [BUILT, needs Jay's phone check]
 
 One screen per Thursday. Jay picks the Thursday (defaults to the next upcoming
 one with orders).
@@ -381,7 +381,7 @@ off and opens Maps to the next one; force-closing and reopening the app shows
 the next stop highlighted with all checkmarks kept and no login prompt;
 "View whole route" shows the full loop from home back to home.
 
-## 9. App form [TODO]
+## 9. App form [BUILT, needs Jay's phone check]
 
 The admin pages (orders, bake sheet, add order, standing orders,
 subscribers, alerts, cancellations) become an **installable web app** (PWA):
@@ -635,6 +635,12 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-02: Phase 4 built: new bake sheet (summary, stops with one
+  Delivered tick each, tags, Map / copy address / email / call / text,
+  single-order and subscriber actions, add order, print), Standing orders
+  screen, installable app (manifest, icon, service worker), 30-day login
+  cookie. Checked at phone size in a test browser; Jay's Android check
+  pending.
 - 2026-11-02: Phase 3 built: manual orders, standing orders calculated per
   Thursday (frozen by the daily cron), single-order edits with history. A
   single-order edit on a standing entry changes loaves or note for that one

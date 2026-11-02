@@ -2,306 +2,446 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <title>Bake Sheet — JustBread Admin</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="icon" href="/admin/icons/icon-192.png">
+  <title>Bake Sheet</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --black: #0a0a0a; --near: #111; --border: #222; --mid: #2a2a2a;
-      --muted: #666; --sub: #999; --white: #fff; --yellow: #f5e600;
-      --red: #ff6b6b; --green: #6dff9a;
+      --black: #0a0a0a; --near: #141414; --card: #1a1a1a; --border: #2a2a2a;
+      --muted: #8a8a8a; --white: #fff; --yellow: #f5e600; --red: #ff6b6b; --green: #6dff9a; --blue: #8ab4ff;
     }
-    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
-    nav { background: var(--black); border-bottom: 1px solid var(--border); padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
-    .nav-logo { font-size: 18px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; color: var(--white); text-decoration: none; font-family: 'Arial Black', Arial, sans-serif; }
-    .nav-logo span { color: var(--yellow); }
-    .nav-links a { color: var(--sub); text-decoration: none; font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 1.5rem; }
-    .nav-links a:hover, .nav-links a.active { color: var(--yellow); }
-    @media (max-width: 600px) { nav { padding: 0 20px; } }
+    html { -webkit-text-size-adjust: 100%; }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.45; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    a { color: inherit; }
 
-    .page { max-width: 1000px; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
-    .page-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 5px; text-transform: uppercase; color: var(--yellow); margin-bottom: 0.5rem; }
-    .page-title { font-family: 'Arial Black', Arial, sans-serif; font-size: clamp(1.8rem, 4vw, 2.4rem); font-weight: 900; line-height: 1.1; margin-bottom: 1rem; color: var(--white); text-transform: uppercase; }
+    header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+    .logo span { color: var(--yellow); }
+    header nav { margin-left: auto; display: flex; gap: 14px; font-size: 14px; font-weight: 700; text-transform: uppercase; }
+    header nav a { text-decoration: none; color: var(--muted); }
+    header nav a.active { color: var(--yellow); }
 
-    /* ── password gate ── */
-    .gate { max-width: 360px; margin: 4rem auto; }
-    .gate .card { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1.5rem; }
-    label { display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem; }
-    input[type="password"], input[type="date"] { width: 100%; border: 1.5px solid var(--mid); border-radius: 3px; padding: 0.65rem 0.9rem; font-size: 1rem; background: var(--black); color: var(--white); outline: none; transition: border-color 0.15s; font-family: Arial, sans-serif; margin-bottom: 1rem; }
-    input[type="password"]:focus, input[type="date"]:focus { border-color: var(--yellow); }
-    .btn { background: var(--yellow); color: #000; border: none; border-radius: 3px; padding: 0.7rem 1.4rem; font-size: 0.95rem; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; width: 100%; transition: opacity 0.15s; }
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    #gate-msg { margin-top: 0.75rem; font-size: 0.875rem; color: var(--red); min-height: 1.4rem; }
+    main { max-width: 760px; margin: 0 auto; padding: 14px 16px 90px; }
+    .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+    .chip { flex: 0 0 auto; border: 1.5px solid var(--border); background: var(--near); border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .chip.on { border-color: var(--yellow); color: var(--yellow); }
+    .chip input { background: none; border: 0; width: 8.5em; }
 
-    /* ── date picker ── */
-    .date-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-    .chip { background: var(--near); border: 1.5px solid var(--border); color: var(--sub); border-radius: 20px; padding: 0.45rem 1rem; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .chip:hover { border-color: var(--yellow); color: var(--yellow); }
-    .chip.active { background: var(--yellow); border-color: var(--yellow); color: #000; }
-    .date-picker-inline { display: flex; align-items: center; gap: 0.5rem; }
-    .date-picker-inline input { width: auto; margin-bottom: 0; }
-    .toolbar-btn { background: none; border: 1.5px solid var(--mid); color: var(--sub); border-radius: 3px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; font-family: Arial, sans-serif; }
-    .toolbar-btn:hover { border-color: var(--yellow); color: var(--yellow); }
+    .summary { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 14px; margin: 12px 0 18px; }
+    .bake { font-family: 'Arial Black', Arial, sans-serif; font-size: 28px; line-height: 1.1; }
+    .bake small { display: block; font-family: Arial, sans-serif; font-size: 15px; color: var(--muted); margin-top: 4px; font-weight: 400; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+    .stat { background: var(--near); border-radius: 4px; padding: 8px; }
+    .stat b { display: block; font-size: 20px; }
+    .stat span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .stat.warn b { color: var(--red); }
+    .linkbtn { background: none; border: 0; color: var(--yellow); text-decoration: underline; cursor: pointer; font-size: 14px; padding: 0; }
 
-    /* ── totals banner ── */
-    .banner { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
-    .stat { background: var(--near); border: 1px solid var(--border); border-radius: 3px; padding: 1rem 1.25rem; min-width: 130px; }
-    .stat-num { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.8rem; color: var(--yellow); }
-    .stat.total .stat-num { font-size: 2.4rem; }
-    .stat-label { font-size: 0.75rem; color: var(--sub); text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+    h2 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 22px 0 8px; display: flex; justify-content: space-between; }
+    h2 span { color: var(--muted); letter-spacing: 0; }
 
-    /* ── groups ── */
-    .group { margin-bottom: 2rem; }
-    .group-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--yellow); }
-    .group-title { font-family: 'Arial Black', Arial, sans-serif; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .group-sub { font-size: 0.85rem; color: var(--sub); }
-    .subgroup-title { font-size: 0.8rem; font-weight: 700; color: var(--yellow); text-transform: uppercase; letter-spacing: 0.5px; margin: 1rem 0 0.4rem; }
-    .table-wrap { background: var(--near); border: 1px solid var(--border); border-radius: 3px; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th, td { text-align: left; padding: 0.65rem 1rem; border-bottom: 1px solid var(--border); }
-    th { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; color: var(--sub); font-weight: 700; }
-    tbody tr:last-child td { border-bottom: none; }
-    td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
-    td.addr { color: var(--sub); }
-    .empty, .loading, .error { text-align: center; padding: 3rem 1rem; color: var(--sub); }
-    .error { color: var(--red); }
+    .stop { background: var(--card); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 10px; overflow: hidden; }
+    .stop.done { opacity: .55; }
+    .stop-head { display: flex; align-items: center; gap: 10px; padding: 12px; }
+    .stop-title { flex: 1; min-width: 0; }
+    .stop-title b { display: block; font-size: 17px; }
+    .stop-title small { color: var(--muted); }
+    .check { flex: 0 0 auto; width: 52px; height: 52px; border-radius: 10px; border: 2px solid var(--border); background: var(--near); font-size: 26px; display: grid; place-items: center; cursor: pointer; }
+    .check.on { background: var(--green); border-color: var(--green); color: var(--black); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; text-decoration: none; cursor: pointer; font-size: 15px; }
+    .btn.primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+
+    .entry { border-top: 1px solid var(--border); padding: 10px 12px; }
+    .entry.skipped { opacity: .45; }
+    .entry-top { display: flex; align-items: baseline; gap: 8px; }
+    .entry-name { font-weight: 700; flex: 1; min-width: 0; }
+    .loaves { font-family: 'Arial Black', Arial, sans-serif; font-size: 18px; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .tag { font-size: 12px; font-weight: 700; border-radius: 3px; padding: 1px 6px; background: var(--near); color: var(--muted); border: 1px solid var(--border); }
+    .tag.red { color: var(--red); border-color: var(--red); }
+    .tag.blue { color: var(--blue); border-color: var(--blue); }
+    .tag.yellow { color: var(--yellow); border-color: var(--yellow); }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .note { margin-top: 6px; color: var(--muted); font-style: italic; }
+    .addr { margin-top: 8px; background: var(--near); border-radius: 4px; padding: 8px 10px; white-space: pre-line; font-family: ui-monospace, Menlo, monospace; font-size: 14px; }
+
+    .empty { color: var(--muted); padding: 30px 0; text-align: center; }
+    .fab { position: fixed; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 6; }
+
+    .sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 20; display: none; align-items: flex-end; justify-content: center; }
+    .sheet-bg.open { display: flex; }
+    .sheet { background: var(--card); width: 100%; max-width: 760px; max-height: 88vh; overflow-y: auto; border-radius: 14px 14px 0 0; padding: 16px 16px calc(20px + env(safe-area-inset-bottom)); }
+    .sheet h3 { font-size: 18px; margin-bottom: 10px; }
+    .sheet .row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+    .sheet label { font-size: 13px; color: var(--muted); }
+    .sheet input, .sheet select, .sheet textarea { background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; min-height: 44px; width: 100%; }
+    .sheet .btns { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .sheet .msg { color: var(--red); min-height: 1.4em; margin-top: 6px; }
+
+    .toast { position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%); background: var(--white); color: var(--black); padding: 10px 16px; border-radius: 8px; font-weight: 700; z-index: 30; display: none; max-width: calc(100% - 32px); text-align: center; }
+
+    .gate { max-width: 360px; margin: 18vh auto 0; padding: 0 16px; }
+    .gate input { width: 100%; background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; margin: 12px 0; }
 
     @media print {
+      header, .chips, .fab, .actions, .check, .linkbtn, .toast { display: none !important; }
       body { background: #fff; color: #000; }
-      nav, .date-row, .toolbar-btn, #print-btn { display: none !important; }
-      .page { max-width: none; padding: 0; }
-      .page-eyebrow { color: #000; }
-      .stat, .table-wrap { background: #fff; border: 1px solid #999; }
-      .stat-num { color: #000; }
-      th { color: #333; }
-      td.addr { color: #333; }
-      .group-header { border-bottom-color: #000; }
-      .subgroup-title { color: #000; }
+      .summary, .stop, .stat { background: #fff; border-color: #999; }
+      .stop.done { opacity: 1; }
+      h2 { color: #000; }
+      .tag { color: #000; border-color: #999; }
+      main { padding: 0; max-width: none; }
     }
   </style>
 </head>
 <body>
-<nav>
-  <a href="/" class="nav-logo">Just<span>Bread</span></a>
-  <div class="nav-links">
-    <a href="/admin/">Orders</a>
-    <a href="/admin/bake-sheet/" class="active">Bake Sheet</a>
-  </div>
-</nav>
-
-<div class="page">
-  <div id="gate" class="gate">
-    <div class="page-eyebrow">Admin</div>
-    <h1 class="page-title" style="font-size:1.6rem;">Bake Sheet</h1>
-    <div class="card">
-      <label for="pw">Password</label>
-      <input type="password" id="pw" autocomplete="current-password">
-      <button class="btn" id="pw-submit">View</button>
-      <div id="gate-msg"></div>
-    </div>
+  <div id="gate" class="gate" hidden>
+    <div class="logo">Just<span>Bread</span> Admin</div>
+    <form id="login">
+      <input type="password" id="pw" placeholder="Password" autocomplete="current-password" required>
+      <button class="btn primary" style="width:100%">Log in</button>
+      <p id="gate-msg" style="color:var(--red);margin-top:8px"></p>
+    </form>
   </div>
 
-  <div id="dashboard" style="display:none;">
-    <div class="page-eyebrow">Admin</div>
-    <h1 class="page-title">Bake Sheet</h1>
-
-    <div class="date-row">
-      <div id="date-chips"></div>
-      <div class="date-picker-inline">
-        <input type="date" id="date-input">
-      </div>
-      <button class="toolbar-btn" id="print-btn">Print</button>
-    </div>
-
-    <div id="content"></div>
+  <div id="app" hidden>
+    <header>
+      <div class="logo">J<span>B</span></div>
+      <nav>
+        <a href="/admin/bake-sheet/" class="active">Sheet</a>
+        <a href="/admin/standing/">Standing</a>
+        <a href="/admin/">Payments</a>
+      </nav>
+    </header>
+    <main>
+      <div class="chips" id="chips"></div>
+      <div id="sheet"></div>
+    </main>
+    <button class="btn primary fab" id="add-btn">+ Order</button>
   </div>
-</div>
+
+  <div class="sheet-bg" id="modal-bg"><div class="sheet" id="modal"></div></div>
+  <div class="toast" id="toast"></div>
 
 <script>
-  const STORAGE_KEY = 'jb_admin_pw';
-  const gate = document.getElementById('gate');
-  const dashboard = document.getElementById('dashboard');
-  const gateMsg = document.getElementById('gate-msg');
-  const pwInput = document.getElementById('pw');
-  const pwSubmit = document.getElementById('pw-submit');
-  const dateChips = document.getElementById('date-chips');
-  const dateInput = document.getElementById('date-input');
-  const printBtn = document.getElementById('print-btn');
-  const content = document.getElementById('content');
-
-  let currentPassword = null;
-
-  function escapeHtml(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  }
-
-  function fmtDateStr(dateStr) {
-    // dateStr is YYYY-MM-DD — parse as local to avoid a timezone day-shift.
-    const [y, m, d] = dateStr.split('-').map(Number);
-    return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  function fmtAddress(addr) {
-    if (!addr) return '—';
-    const parts = [addr.line1, addr.line2, [addr.city, addr.state].filter(Boolean).join(', '), addr.postal_code].filter(Boolean);
-    return parts.join(', ') || '—';
-  }
-
-  function todayLocalISO() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  }
-
-  async function loadDateList() {
-    const res = await fetch('/api/bake-sheet', { headers: { 'x-admin-password': currentPassword } });
-    if (res.status === 401) return handleUnauthorized();
-    if (!res.ok) { dateChips.textContent = 'Failed to load dates.'; return null; }
-    const { dates } = await res.json();
-    return dates;
-  }
-
-  function renderChips(dates, selected) {
-    if (!dates.length) {
-      dateChips.innerHTML = '<span style="color:var(--sub);font-size:0.85rem;">No fulfillment dates yet</span>';
-      return;
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) n.setAttribute(k, v);
     }
-    dateChips.innerHTML = dates.map((d) => {
-      const label = fmtDateStr(d.fulfillment_date).replace(/, \d{4}$/, ''); // drop year for chip brevity
-      const active = d.fulfillment_date === selected ? 'active' : '';
-      return `<button class="chip ${active}" data-date="${d.fulfillment_date}">${escapeHtml(label)} · ${d.loaves}🍞</button>`;
-    }).join('');
-    dateChips.querySelectorAll('.chip').forEach((el) => {
-      el.addEventListener('click', () => loadDate(el.dataset.date));
-    });
+    for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+    return n;
+  };
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+  };
+
+  let current = null; // the loaded sheet
+  let thursday = null;
+
+  // ── API ────────────────────────────────────────────────────────────────
+  async function api(path, body) {
+    const res = await fetch(path, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {});
+    if (res.status === 401) { showGate(); throw new Error('Please log in again.'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    return data;
   }
 
-  function renderContent(data) {
-    if (!data.orders.length) {
-      content.innerHTML = '<div class="empty">No orders assigned to this date.</div>';
-      return;
+  function toast(msg) {
+    const t = $('#toast'); t.textContent = msg; t.style.display = 'block';
+    clearTimeout(toast.t); toast.t = setTimeout(() => { t.style.display = 'none'; }, 2600);
+  }
+
+  // ── dates ──────────────────────────────────────────────────────────────
+  const fmtDay = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
+  const addDays = (d, n) => { const t = new Date(`${d}T12:00:00Z`); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+  const nextThursday = (today) => { let d = today; while (new Date(`${d}T12:00:00Z`).getUTCDay() !== 4) d = addDays(d, 1); return d; };
+  const isThu = (d) => /^\d{4}-\d{2}-\d{2}$/.test(d) && new Date(`${d}T12:00:00Z`).getUTCDay() === 4;
+  const chargeDay = (iso) => new Date(iso).toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'short' });
+
+  // ── gate ───────────────────────────────────────────────────────────────
+  function showGate() { $('#app').hidden = true; $('#gate').hidden = false; $('#pw').focus(); }
+  $('#login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('#gate-msg').textContent = '';
+    try { await api('/api/login', { password: $('#pw').value }); $('#pw').value = ''; start(); }
+    catch (err) { $('#gate-msg').textContent = err.message; }
+  });
+
+  // ── chips ──────────────────────────────────────────────────────────────
+  async function loadChips() {
+    const { today, thursdays } = await api('/api/bake-sheet');
+    const next = nextThursday(today);
+    const days = [...new Set([next, addDays(next, 7), ...thursdays])].sort();
+    const saved = store.get('jb.thursday');
+    thursday = thursday || (saved && saved >= addDays(today, -7) ? saved : (thursdays.find((d) => d >= today) || next));
+    const chips = $('#chips');
+    chips.replaceChildren(
+      ...days.filter((d) => d >= addDays(today, -7)).map((d) => el('button', { class: `chip${d === thursday ? ' on' : ''}`, onclick: () => pick(d) }, d === next ? `This Thu · ${fmtDay(d)}` : fmtDay(d))),
+      el('label', { class: 'chip' }, el('input', { type: 'date', value: thursday, onchange: (e) => isThu(e.target.value) ? pick(e.target.value) : toast('Pick a Thursday') })),
+    );
+  }
+
+  async function pick(d) { thursday = d; store.set('jb.thursday', d); await loadChips(); await loadSheet(); }
+
+  // ── sheet ──────────────────────────────────────────────────────────────
+  async function loadSheet() {
+    const box = $('#sheet');
+    try { current = await api(`/api/bake-sheet?date=${thursday}`); }
+    catch (err) { box.replaceChildren(el('p', { class: 'empty' }, err.message)); return; }
+    render();
+  }
+
+  function render() {
+    const s = current.summary;
+    const box = $('#sheet');
+    const nodes = [];
+    nodes.push(el('div', { class: 'summary' },
+      el('div', { class: 'bake' }, `${s.to_bake} to bake`,
+        el('small', {}, `${s.ordered} ordered + ${s.extras} extra${s.extras_overridden ? ' (set by you)' : ''}`,
+          s.expected_loaves ? ` · includes ${s.expected_loaves} expected` : '', ' · ',
+          el('button', { class: 'linkbtn', onclick: editExtras }, 'change extras'))),
+      el('div', { class: 'grid' },
+        stat(s.local_loaves, 'Local'), stat(s.pickup_loaves, 'Pickup'), stat(s.shipped_loaves, 'Shipped'),
+        stat(`${s.stops_done}/${s.stops}`, 'Stops done'), stat(s.declined, 'Declined', s.declined > 0), stat(s.manual_or_standing, 'Manual / barter')),
+      el('div', { class: 'actions' }, el('button', { class: 'btn', onclick: () => window.print() }, 'Print'))));
+
+    if (!current.entries.length) nodes.push(el('p', { class: 'empty' }, 'Nothing on this Thursday yet.'));
+
+    const groups = [
+      ['local_delivery', 'Local delivery'],
+      ['pickup', 'Pickup'],
+      ['shipping', 'Shipped'],
+    ];
+    for (const [kind, title] of groups) {
+      const stops = current.stops.filter((x) => x.kind === kind);
+      const skippedOnly = current.entries.filter((e) => e.skipped && (kind === 'shipping' ? e.delivery_method === 'shipped' : e.delivery_method === kind) && !current.stops.some((x) => x.stop_key === e.stop_key));
+      if (!stops.length && !skippedOnly.length) continue;
+      const loaves = stops.reduce((a, x) => a + x.loaves, 0);
+      nodes.push(el('h2', {}, title, el('span', {}, `${loaves} loaves · ${stops.length} stop${stops.length === 1 ? '' : 's'}`)));
+      for (const stop of stops) nodes.push(renderStop(stop));
+      if (skippedOnly.length) nodes.push(el('div', { class: 'stop' }, ...skippedOnly.map((e) => renderEntry(e, false))));
     }
+    box.replaceChildren(...nodes);
+  }
 
-    const byMethod = { pickup: [], local_delivery: [], shipped: [] };
-    for (const o of data.orders) {
-      (byMethod[o.delivery_method] || (byMethod[o.delivery_method] = [])).push(o);
+  const stat = (v, label, warn) => el('div', { class: `stat${warn ? ' warn' : ''}` }, el('b', {}, v), el('span', {}, label));
+
+  function mapsUrl(a) {
+    const q = [a.line1, a.line2, a.city, a.state, a.postal_code].filter(Boolean).join(', ');
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
+
+  function renderStop(stop) {
+    const entries = current.entries.filter((e) => e.stop_key === stop.stop_key);
+    const names = [...new Set(entries.filter((e) => !e.skipped).map((e) => e.customer_name))].join(', ');
+    const done = !!stop.delivered_at;
+    const title = stop.kind === 'local_delivery' ? names : stop.label;
+    const sub = stop.kind === 'local_delivery'
+      ? `${stop.loaves} loaf${stop.loaves === 1 ? '' : 'ves'}`
+      : `${stop.loaves} loaves · ${stop.order_count} order${stop.order_count === 1 ? '' : 's'}`;
+    return el('div', { class: `stop${done ? ' done' : ''}` },
+      el('div', { class: 'stop-head' },
+        el('div', { class: 'stop-title' }, el('b', {}, title), el('small', {}, sub)),
+        stop.kind === 'local_delivery' && stop.address ? el('a', { class: 'btn', href: mapsUrl(stop.address), target: '_blank', rel: 'noopener' }, '📍 Map') : null,
+        el('button', { class: `check${done ? ' on' : ''}`, 'aria-label': done ? 'Delivered' : 'Mark delivered', onclick: () => toggleDelivered(stop) }, done ? '✓' : '')),
+      ...entries.map((e) => renderEntry(e, stop.kind === 'local_delivery' && entries.length === 1)));
+  }
+
+  // single: the stop header already shows this customer's name and loaves.
+  function renderEntry(e, single) {
+    const tags = [el('span', { class: 'tag' }, e.source_tag)];
+    if (e.kind === 'expected') tags.push(el('span', { class: 'tag blue' }, `Expected (charges ${chargeDay(e.expected_charge_at)})`));
+    if (e.declined) tags.push(el('span', { class: 'tag red' }, 'Declined'));
+    if (e.refunded_cents) tags.push(el('span', { class: 'tag yellow' }, `Partly refunded $${(e.refunded_cents / 100).toFixed(2)}`));
+    if (e.payment_status === 'unpaid') tags.push(el('span', { class: 'tag yellow' }, 'Unpaid'));
+    if (e.skipped) tags.push(el('span', { class: 'tag' }, 'Skipped'));
+
+    const acts = [];
+    if (e.customer_email) acts.push(el('a', { class: 'btn', href: `mailto:${e.customer_email}` }, '✉️ Email'));
+    if (e.customer_phone) {
+      acts.push(el('a', { class: 'btn', href: `tel:${e.customer_phone}` }, '📞 Call'));
+      acts.push(el('a', { class: 'btn', href: `sms:${e.customer_phone}` }, '💬 Text'));
     }
-    const totalsByMethod = Object.fromEntries(data.totalsByMethod.map((t) => [t.delivery_method, t]));
+    if (e.declined && e.id) acts.push(el('button', { class: 'btn', onclick: () => run(() => api('/api/order-edit', { action: 'resolve_declined', id: e.id }), 'Marked resolved') }, 'Resolved'));
+    acts.push(el('button', { class: 'btn', onclick: () => openActions(e) }, '⋯'));
 
-    let html = `
-      <div class="banner">
-        <div class="stat total"><div class="stat-num">${data.totalLoaves}</div><div class="stat-label">Total Loaves</div></div>
-        <div class="stat"><div class="stat-num">${totalsByMethod.local_delivery?.loaves || 0}</div><div class="stat-label">Local Delivery</div></div>
-        <div class="stat"><div class="stat-num">${totalsByMethod.pickup?.loaves || 0}</div><div class="stat-label">Pickup</div></div>
-        <div class="stat"><div class="stat-num">${totalsByMethod.shipped?.loaves || 0}</div><div class="stat-label">Shipped</div></div>
-      </div>
-    `;
+    return el('div', { class: `entry${e.skipped ? ' skipped' : ''}` },
+      single ? null : el('div', { class: 'entry-top' }, el('span', { class: 'entry-name' }, e.customer_name), el('span', { class: 'loaves' }, e.loaves)),
+      el('div', { class: 'tags' }, tags),
+      e.delivery_method === 'shipped' && e.address ? shippedAddress(e) : null,
+      e.note ? el('div', { class: 'note' }, e.note) : null,
+      el('div', { class: 'actions' }, acts));
+  }
 
-    // Local delivery — sorted by zip already, ready to route.
-    if (byMethod.local_delivery?.length) {
-      html += renderGroup('Local Delivery', byMethod.local_delivery, totalsByMethod.local_delivery, (o) => `
-        <tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="addr">${escapeHtml(fmtAddress(o.shipping_address))}</td><td class="num">${o.loaves}</td></tr>
-      `, ['Customer', 'Address', 'Loaves']);
+  function shippedAddress(e) {
+    const a = e.address;
+    const text = [a.name || e.customer_name, a.line1, a.line2, `${a.city || ''}, ${a.state || ''} ${a.postal_code || ''}`.trim()].filter(Boolean).join('\n');
+    return el('div', {},
+      el('div', { class: 'addr' }, text),
+      el('div', { class: 'actions' }, el('button', { class: 'btn', onclick: async () => {
+        try { await navigator.clipboard.writeText(text); toast('Address copied'); } catch { toast('Copy failed: long-press the address'); }
+      } }, '📋 Copy address')));
+  }
+
+  async function run(fn, okMsg) {
+    try { await fn(); if (okMsg) toast(okMsg); closeModal(); await loadSheet(); }
+    catch (err) { const m = $('#modal .msg'); if (m && $('#modal-bg').classList.contains('open')) m.textContent = err.message; else toast(err.message); }
+  }
+
+  async function toggleDelivered(stop) {
+    const delivered = !stop.delivered_at;
+    stop.delivered_at = delivered ? new Date().toISOString() : null; // instant feedback
+    current.summary.stops_done += delivered ? 1 : -1;
+    render();
+    try { await api('/api/stops', { thursday, stop_key: stop.stop_key, delivered }); }
+    catch (err) { toast(err.message); await loadSheet(); }
+  }
+
+  // ── modals ─────────────────────────────────────────────────────────────
+  function openModal(...kids) { $('#modal').replaceChildren(...kids, el('div', { class: 'msg' })); $('#modal-bg').classList.add('open'); }
+  function closeModal() { $('#modal-bg').classList.remove('open'); }
+  $('#modal-bg').addEventListener('click', (e) => { if (e.target.id === 'modal-bg') closeModal(); });
+  const row = (label, input) => el('div', { class: 'row' }, el('label', {}, label), input);
+  const cancelBtn = () => el('button', { class: 'btn', onclick: closeModal }, 'Close');
+
+  function editExtras() {
+    const input = el('input', { type: 'number', min: 0, inputmode: 'numeric', value: current.summary.extras });
+    openModal(el('h3', {}, `Extras for ${fmtDay(thursday)}`),
+      el('p', { style: 'color:var(--muted);margin-bottom:10px' }, `Default is 1 per 12 ordered (${Math.floor(current.summary.ordered / 12)}).`),
+      row('Extra loaves', input),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn primary', onclick: () => run(() => api('/api/stops', { thursday, extras: parseInt(input.value, 10) }), 'Extras saved') }, 'Save'),
+        el('button', { class: 'btn', onclick: () => run(() => api('/api/stops', { thursday, extras: null }), 'Back to default') }, 'Use default'),
+        cancelBtn()));
+  }
+
+  function openActions(e) {
+    const btns = [];
+    if (e.kind === 'order') {
+      btns.push(el('button', { class: 'btn', onclick: () => editField(e, 'fulfillment_date', 'Move to Thursday', 'date', thursday) }, 'Move to another Thursday'));
+      btns.push(el('button', { class: 'btn', onclick: () => editField(e, 'loaves', 'Loaves for this delivery', 'number', e.loaves) }, 'Change loaves'));
+      btns.push(el('button', { class: 'btn', onclick: () => editField(e, 'note', 'Note', 'text', e.note || '') }, 'Edit note'));
+      btns.push(el('button', { class: 'btn', onclick: () => editField(e, 'customer_phone', 'Phone', 'tel', e.customer_phone || '') }, 'Edit phone'));
+      if (e.delivery_method !== 'pickup') btns.push(el('button', { class: 'btn', onclick: () => editAddress(e) }, 'Edit address'));
     }
-
-    // Pickup — grouped by drop point.
-    if (byMethod.pickup?.length) {
-      const byLocation = {};
-      for (const o of byMethod.pickup) {
-        const key = o.pickup_location || 'Unspecified pickup point';
-        (byLocation[key] || (byLocation[key] = [])).push(o);
-      }
-      let inner = '';
-      for (const [location, orders] of Object.entries(byLocation)) {
-        const subtotal = orders.reduce((s, o) => s + o.loaves, 0);
-        inner += `<div class="subgroup-title">${escapeHtml(location)} — ${subtotal} loaves</div>`;
-        inner += `<div class="table-wrap"><table><thead><tr><th>Customer</th><th class="num">Loaves</th></tr></thead><tbody>`;
-        inner += orders.map((o) => `<tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="num">${o.loaves}</td></tr>`).join('');
-        inner += `</tbody></table></div>`;
-      }
-      html += `<div class="group"><div class="group-header"><div class="group-title">Pickup</div><div class="group-sub">${totalsByMethod.pickup.order_count} orders · ${totalsByMethod.pickup.loaves} loaves</div></div>${inner}</div>`;
+    if (e.stripe_subscription_id) {
+      if (e.kind === 'expected' && !e.skipped) btns.push(el('button', { class: 'btn', onclick: () => run(() => api('/api/subscription-control', { subscriptionId: e.stripe_subscription_id, action: 'skip_week', thursday }), 'Skipped. No charge this week.') }, 'Skip this week (no charge)'));
+      btns.push(el('button', { class: 'btn', onclick: () => skipUntil(e) }, 'Skip until…'));
+      if (e.skipped) btns.push(el('button', { class: 'btn', onclick: () => run(() => api('/api/subscription-control', { subscriptionId: e.stripe_subscription_id, action: 'resume' }), 'Resumed') }, 'Resume now'));
     }
-
-    // Shipped — sorted by zip, ready for label creation.
-    if (byMethod.shipped?.length) {
-      html += renderGroup('Shipped (UPS)', byMethod.shipped, totalsByMethod.shipped, (o) => `
-        <tr><td>${escapeHtml(o.customer_name || '—')}</td><td class="addr">${escapeHtml(fmtAddress(o.shipping_address))}</td><td class="num">${o.loaves}</td></tr>
-      `, ['Customer', 'Address', 'Loaves']);
+    if (e.kind === 'standing') {
+      btns.push(e.skipped
+        ? el('button', { class: 'btn', onclick: () => run(() => api('/api/standing-orders', { action: 'unskip', id: e.standing_order_id, thursday }), 'Back on') }, 'Undo skip')
+        : el('button', { class: 'btn', onclick: () => run(() => api('/api/standing-orders', { action: 'skip', id: e.standing_order_id, thursday }), 'Skipped this Thursday') }, 'Skip this Thursday'));
+      btns.push(el('button', { class: 'btn', onclick: () => {
+        const input = el('input', { type: 'number', min: 1, inputmode: 'numeric', value: e.loaves });
+        openModal(el('h3', {}, `${e.customer_name}: loaves this Thursday only`), row('Loaves', input),
+          el('div', { class: 'btns' }, el('button', { class: 'btn primary', onclick: () => run(() => api('/api/standing-orders', { action: 'override', id: e.standing_order_id, thursday, fields: { loaves: parseInt(input.value, 10) } }), 'Saved') }, 'Save'), cancelBtn()));
+      } }, 'Change loaves this Thursday'));
     }
-
-    content.innerHTML = html;
+    if (e.kind === 'order') btns.push(el('button', { class: 'btn danger', onclick: () => confirmCancel(e) }, 'Cancel this delivery'));
+    btns.push(cancelBtn());
+    openModal(el('h3', {}, e.customer_name), el('div', { class: 'btns' }, btns));
   }
 
-  function renderGroup(title, orders, totals, rowFn, headers) {
-    return `
-      <div class="group">
-        <div class="group-header">
-          <div class="group-title">${escapeHtml(title)}</div>
-          <div class="group-sub">${totals.order_count} orders · ${totals.loaves} loaves</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr>${headers.map((h) => `<th${h === 'Loaves' ? ' class="num"' : ''}>${h}</th>`).join('')}</tr></thead>
-            <tbody>${orders.map(rowFn).join('')}</tbody>
-          </table>
-        </div>
-      </div>
-    `;
+  function editField(e, field, label, type, value) {
+    const input = el('input', { type, value, ...(type === 'number' ? { min: 1, inputmode: 'numeric' } : {}) });
+    openModal(el('h3', {}, `${e.customer_name}: ${label}`), row(label, input),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn primary', onclick: () => {
+          let v = input.value;
+          if (type === 'number') v = parseInt(v, 10);
+          if (type === 'date' && !isThu(v)) { $('#modal .msg').textContent = 'Pick a Thursday.'; return; }
+          run(() => api('/api/order-edit', { action: 'edit', id: e.id, fields: { [field]: v } }), 'Saved');
+        } }, 'Save'), cancelBtn()));
   }
 
-  async function loadDate(dateStr) {
-    dateInput.value = dateStr;
-    content.innerHTML = '<div class="loading">Loading…</div>';
-    const res = await fetch(`/api/bake-sheet?date=${dateStr}`, { headers: { 'x-admin-password': currentPassword } });
-    if (res.status === 401) return handleUnauthorized();
-    if (!res.ok) { content.innerHTML = '<div class="error">Failed to load.</div>'; return; }
-    const data = await res.json();
-    renderContent(data);
-
-    const dates = await loadDateList();
-    if (dates) renderChips(dates, dateStr);
+  function editAddress(e) {
+    const a = e.address || {};
+    const f = Object.fromEntries(['line1', 'line2', 'city', 'state', 'postal_code'].map((k) => [k, el('input', { value: a[k] || '' })]));
+    openModal(el('h3', {}, `${e.customer_name}: address`),
+      row('Street', f.line1), row('Apt / unit', f.line2), row('City', f.city), row('State', f.state), row('ZIP', f.postal_code),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn primary', onclick: () => run(() => api('/api/order-edit', { action: 'edit', id: e.id, fields: { shipping_address: { ...a, ...Object.fromEntries(Object.entries(f).map(([k, i]) => [k, i.value.trim() || null])) } } }), 'Address saved') }, 'Save'),
+        cancelBtn()));
   }
 
-  function handleUnauthorized() {
-    sessionStorage.removeItem(STORAGE_KEY);
-    dashboard.style.display = 'none';
-    gate.style.display = 'block';
-    gateMsg.textContent = 'Wrong password.';
+  function skipUntil(e) {
+    const input = el('input', { type: 'date', value: addDays(thursday, 14) });
+    openModal(el('h3', {}, `${e.customer_name}: skip until`),
+      el('p', { style: 'color:var(--muted);margin-bottom:10px' }, 'No charges or deliveries until this Thursday. They get bread again on it.'),
+      row('Back on (a Thursday)', input),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn primary', onclick: () => {
+          if (!isThu(input.value)) { $('#modal .msg').textContent = 'Pick a Thursday.'; return; }
+          run(() => api('/api/subscription-control', { subscriptionId: e.stripe_subscription_id, action: 'skip_until', thursday: input.value }), `Skipped until ${fmtDay(input.value)}`);
+        } }, 'Skip'), cancelBtn()));
   }
 
-  async function init(password) {
-    currentPassword = password;
-    gate.style.display = 'none';
-    dashboard.style.display = 'block';
-
-    const dates = await loadDateList();
-    if (!dates) return;
-
-    const today = todayLocalISO();
-    // Default to the earliest upcoming date with orders; fall back to the
-    // most recent past one if everything on the list is already behind.
-    const upcoming = dates.filter((d) => d.fulfillment_date >= today);
-    const initial = (upcoming[0] || dates[dates.length - 1])?.fulfillment_date || today;
-
-    renderChips(dates, initial);
-    await loadDate(initial);
+  function confirmCancel(e) {
+    openModal(el('h3', {}, `Cancel ${e.customer_name}'s delivery on ${fmtDay(thursday)}?`),
+      el('p', { style: 'color:var(--muted);margin-bottom:10px' }, e.payment_status === 'paid' && e.source_tag !== 'Manual'
+        ? 'This takes it off the sheet. It does not refund. Refund in Stripe if needed; the sheet updates itself.'
+        : 'This takes it off the sheet.'),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn danger', onclick: () => run(() => api('/api/order-edit', { action: 'cancel', id: e.id }), 'Delivery cancelled') }, 'Cancel delivery'),
+        el('button', { class: 'btn', onclick: closeModal }, 'Keep it')));
   }
 
-  function attemptLogin() {
-    const password = pwInput.value;
-    if (!password) return;
-    sessionStorage.setItem(STORAGE_KEY, password);
-    init(password);
+  // ── add manual order ─────────────────────────────────────────────────
+  $('#add-btn').addEventListener('click', () => {
+    const f = {
+      name: el('input', { autocomplete: 'off' }), loaves: el('input', { type: 'number', min: 1, value: 1, inputmode: 'numeric' }),
+      method: el('select', {}, el('option', { value: 'local_delivery' }, 'Local delivery'), el('option', { value: 'pickup' }, 'Pickup point'), el('option', { value: 'shipped' }, 'Shipped')),
+      pickup: el('input', { placeholder: 'e.g. Energy City Brewing — Batavia' }),
+      line1: el('input', {}), line2: el('input', {}), city: el('input', {}), state: el('input', { value: 'IL' }), zip: el('input', { inputmode: 'numeric' }),
+      email: el('input', { type: 'email' }), phone: el('input', { type: 'tel' }),
+      thursday: el('input', { type: 'date', value: thursday }),
+      paid: el('select', {}, el('option', { value: 'unpaid' }, 'Unpaid'), el('option', { value: 'paid' }, 'Paid')),
+      note: el('input', {}),
+    };
+    const addrBox = el('div', {}, row('Street', f.line1), row('Apt / unit', f.line2), row('City', f.city), row('State', f.state), row('ZIP', f.zip));
+    const pickupBox = el('div', { hidden: true }, row('Pickup point', f.pickup));
+    f.method.addEventListener('change', () => { addrBox.hidden = f.method.value === 'pickup'; pickupBox.hidden = f.method.value !== 'pickup'; });
+    openModal(el('h3', {}, 'Add an order'),
+      row('Name', f.name), row('Loaves', f.loaves), row('How it gets there', f.method), addrBox, pickupBox,
+      row('Thursday', f.thursday), row('Paid?', f.paid), row('Email (optional)', f.email), row('Phone (optional)', f.phone), row('Note', f.note),
+      el('div', { class: 'btns' },
+        el('button', { class: 'btn primary', onclick: () => {
+          const method = f.method.value;
+          run(() => api('/api/order-edit', { action: 'create_manual', fields: {
+            name: f.name.value.trim(), loaves: parseInt(f.loaves.value, 10), delivery_method: method,
+            pickup_location: method === 'pickup' ? f.pickup.value.trim() : null,
+            address: method === 'pickup' ? null : { name: f.name.value.trim(), line1: f.line1.value.trim(), line2: f.line2.value.trim() || null, city: f.city.value.trim(), state: f.state.value.trim(), postal_code: f.zip.value.trim(), country: 'US' },
+            thursday: f.thursday.value, paid: f.paid.value === 'paid',
+            email: f.email.value.trim() || null, phone: f.phone.value.trim() || null, note: f.note.value.trim() || null,
+          } }), 'Order added');
+        } }, 'Add order'), cancelBtn()));
+  });
+
+  // ── start ──────────────────────────────────────────────────────────────
+  async function start() {
+    $('#gate').hidden = true; $('#app').hidden = false;
+    try { await loadChips(); await loadSheet(); } catch (err) { toast(err.message); }
   }
 
-  pwSubmit.addEventListener('click', attemptLogin);
-  pwInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') attemptLogin(); });
-  dateInput.addEventListener('change', () => { if (dateInput.value) loadDate(dateInput.value); });
-  printBtn.addEventListener('click', () => window.print());
-
-  const stored = sessionStorage.getItem(STORAGE_KEY);
-  if (stored) init(stored);
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' }).catch(() => {});
+  fetch('/api/login').then((r) => r.json()).then((d) => (d.loggedIn ? start() : showGate())).catch(showGate);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && thursday) loadSheet(); });
+})();
 </script>
 </body>
 </html>
