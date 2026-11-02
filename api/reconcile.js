@@ -23,6 +23,7 @@
 const Stripe = require('stripe');
 const { isAdminRequest } = require('../lib/adminAuth');
 const { processEvent, EVENT_TYPES } = require('../lib/stripeEvents');
+const { refreshAllSubscriptions } = require('../lib/subscriptions');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -63,6 +64,13 @@ module.exports = async function handler(req, res) {
       console.error(`Reconcile: failed to process ${event.type} ${event.id}:`, err.message);
       summary.errors.push({ eventId: event.id, type: event.type, message: err.message });
     }
+  }
+
+  try {
+    summary.subscriptions = await refreshAllSubscriptions(stripe);
+  } catch (err) {
+    console.error('Reconcile: subscription refresh failed:', err.message);
+    summary.errors.push({ type: 'subscription_refresh', message: err.message });
   }
 
   return res.status(200).json(summary);

@@ -161,3 +161,21 @@ test('pause and resume raise alerts', async () => {
   }), stripe);
   assert.deepEqual((await alerts(db)).map((a) => a.type), ['paused', 'resumed']);
 });
+
+test('daily refresh fills the mirror without alerts, and a later stale event is ignored', async () => {
+  const db = await freshDb();
+  const { refreshAllSubscriptions } = require('../../lib/subscriptions');
+  const live = subscriptionEvent('customer.subscription.updated', { created: '2026-11-02T00:00:00Z' }).data.object;
+  const ended = { ...live, id: 'sub_Z', status: 'canceled', ended_at: secs('2026-10-01T00:00:00Z'), cancellation_details: { reason: 'cancellation_requested' } };
+  const s = { ...stripe, subscriptions: { ...stripe.subscriptions, list: async function* () { yield live; yield ended; } } };
+  const now = secs('2026-11-09T13:00:00Z');
+  const r = await refreshAllSubscriptions(s, now);
+  assert.equal(r.refreshed, 2);
+  const subs = (await db.query('SELECT * FROM subscriptions ORDER BY stripe_subscription_id')).rows;
+  assert.deepEqual(subs.map((x) => [x.stripe_subscription_id, x.status, x.ended_reason]), [['sub_A', 'active', null], ['sub_Z', 'canceled', 'customer']]);
+  assert.equal((await alerts(db)).length, 0);
+  await processEvent(subscriptionEvent('customer.subscription.updated', {
+    created: '2026-11-05T00:00:00Z', sub: { cancel_at_period_end: true }, previous: { cancel_at_period_end: false },
+  }), stripe);
+  assert.equal((await db.query("SELECT cancel_at_period_end FROM subscriptions WHERE stripe_subscription_id='sub_A'")).rows[0].cancel_at_period_end, false);
+});
