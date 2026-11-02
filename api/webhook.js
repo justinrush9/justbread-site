@@ -13,11 +13,13 @@
  * The actual event handling lives in lib/orderProcessing.js, shared with
  * api/reconcile.js — this file is just signature verification + dispatch.
  *
- * Listens for:
+ * Listens for every type in lib/stripeEvents.js EVENT_TYPES:
  *   - checkout.session.completed (mode=payment)  -> one-time orders
- *   - invoice.paid                                -> every subscription
- *                                                     charge, including the
- *                                                     very first one
+ *   - invoice.paid / invoice.payment_failed       -> subscription orders,
+ *                                                     paid or declined
+ *   - charge.refunded                             -> refunds
+ *   - customer.subscription.created/updated/deleted -> subscriptions mirror
+ *                                                     and alerts
  *
  * checkout.session.completed for mode=subscription is intentionally
  * ignored — invoice.paid fires for that same initial charge too
@@ -34,7 +36,7 @@
  *   2. In Stripe Dashboard -> Developers -> Webhooks, add an endpoint
  *      pointing at https://www.justbread.shop/api/webhook (the "www." form
  *      — see CLAUDE.md gotcha re: apex redirect), listening for
- *      checkout.session.completed and invoice.paid.
+ *      every type in lib/stripeEvents.js EVENT_TYPES.
  *   3. Copy the signing secret it gives you into STRIPE_WEBHOOK_SECRET.
  *
  * If a delivery is ever missed anyway (signature mismatch, cold-start
@@ -43,7 +45,7 @@
  */
 
 const Stripe = require('stripe');
-const { processCheckoutSessionCompleted, processInvoicePaid } = require('../lib/orderProcessing');
+const { processEvent } = require('../lib/stripeEvents');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -73,14 +75,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    if (event.type === 'checkout.session.completed') {
-      await processCheckoutSessionCompleted(event, stripe);
-    }
-
-    if (event.type === 'invoice.paid') {
-      await processInvoicePaid(event, stripe);
-    }
-
+    await processEvent(event, stripe);
     return res.status(200).json({ received: true });
   } catch (err) {
     console.error('Webhook handler error:', err.message);

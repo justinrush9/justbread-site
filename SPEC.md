@@ -564,6 +564,9 @@ here first.
 - `standing_order_id` INTEGER, references `standing_orders`
 - `stripe_invoice_id` TEXT, unique when present (one row per invoice; how a
   failed-then-paid invoice updates its own row)
+- `stripe_payment_intent_id` TEXT (how a refund finds its order)
+- `amount_cents` INTEGER (amount charged; full vs. partial refund)
+- `billing_reason` TEXT (Stripe's reason; `subscription_cycle` = renewal, placed by core rule 5)
 - `stripe_event_id` and `stripe_customer_id` become nullable (manual and
   standing orders have neither)
 
@@ -614,14 +617,14 @@ message, `created_at`, `read_at`.
 Push endpoint (unique), keys, device label, `created_at`.
 
 ### `customer_email_prefs` (new)
-`stripe_customer_id` or email (unique), `delivery_emails` BOOLEAN default
+Email (lowercased, unique), `delivery_emails` BOOLEAN default
 true, `updated_at`. Backs the 9d opt-out.
 
 ### `emails_sent` (new)
-Order id (or subscription id for change confirmations, or broadcast id),
-email type, recipient, `sent_at`, `status` (`sent` | `failed`), provider
-message id. Unique on (order or subscription id, type, event) so nothing
-sends twice; failed rows are what the daily cron retries.
+Email type, `dedupe_key` (unique, e.g. `delivered:order:123`), recipient,
+order id / subscription id / broadcast id, `sent_at`, `status` (`sent` |
+`failed`), provider message id. The unique key means nothing sends twice;
+failed rows are what the daily cron retries.
 
 ### `broadcasts` (new)
 Subject, body, recipients count, optional pause-until date, `sent_at`.
@@ -632,6 +635,9 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-02: Phase 1 build: section 12 adds `stripe_payment_intent_id`,
+  `amount_cents`, `billing_reason` on orders; `emails_sent` keyed by a
+  unique dedupe key; email prefs keyed by email.
 - 2026-10-30: Added 9d, customer emails: order confirmation (new orders
   only), Delivered / Shipped notices with a one-click opt-out, change
   confirmations, and a notice to all subscribers with optional pause. Moved

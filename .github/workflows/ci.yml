@@ -1,0 +1,69 @@
+# Runs on GitHub's servers, which can reach Stripe (the build workspace
+# can't). On every push to a build/** or stripe-tests branch:
+#   1. unit tests (in-memory Postgres)
+#   2. db/schema.sql applied twice to a real Postgres 16 (must be idempotent)
+#   3. Stripe test-mode scenarios with test clocks (refuses non sk_test_ keys)
+# Results are committed to the stripe-test-results branch under
+# runs/<branch>/<sha>.json so they can be read with plain git.
+name: ci
+on:
+  push:
+    branches: ['build/**', stripe-tests]
+permissions:
+  contents: write
+concurrency: ci-${{ github.ref }}
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: pg }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci --no-audit --no-fund
+      - name: Unit tests
+        id: unit
+        run: npm test > unit.txt 2>&1; echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Schema on real Postgres (twice)
+        id: schema
+        env: { PGPASSWORD: pg }
+        run: |
+          ( psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f db/schema.sql &&
+            psql -h localhost -U postgres -v ON_ERROR_STOP=1 -q -f db/schema.sql ) > schema.txt 2>&1
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+      - name: Stripe test-mode scenarios
+        env:
+          STRIPE_TEST_KEY: ${{ secrets.STRIPE_TEST_KEY }}
+        run: |
+          if [ -f tests/stripe/run.js ]; then node tests/stripe/run.js > stripe.json 2> stripe.log || true; else echo '{"skipped":true}' > stripe.json; touch stripe.log; fi
+      - name: Publish results
+        run: |
+          set -e
+          BR=$(echo "${GITHUB_REF_NAME}" | tr '/' '_'); SHA=$(git rev-parse --short HEAD)
+          node -e '
+            const fs=require("fs");
+            const r={branch:process.env.GITHUB_REF_NAME, sha:process.argv[1],
+              unit:{exit:+process.argv[2], output:fs.readFileSync("unit.txt","utf8").slice(-20000)},
+              schema:{exit:+process.argv[3], output:fs.readFileSync("schema.txt","utf8").slice(-5000)},
+              stripe:{result:(()=>{try{return JSON.parse(fs.readFileSync("stripe.json","utf8"))}catch(e){return {unparsable:fs.readFileSync("stripe.json","utf8").slice(-5000)}}})(),
+                      log:fs.readFileSync("stripe.log","utf8").slice(-5000)}};
+            fs.writeFileSync("/tmp/result.json", JSON.stringify(r,null,2));
+          ' "$SHA" "${{ steps.unit.outputs.code }}" "${{ steps.schema.outputs.code }}"
+          git config user.name "ci bot"; git config user.email "actions@users.noreply.github.com"
+          git fetch origin stripe-test-results || true
+          if git rev-parse --verify origin/stripe-test-results >/dev/null 2>&1; then
+            git checkout -B stripe-test-results origin/stripe-test-results
+          else
+            git checkout --orphan stripe-test-results && git rm -rqf .
+          fi
+          mkdir -p "runs/$BR"
+          cp /tmp/result.json "runs/$BR/$SHA.json"; cp /tmp/result.json "runs/$BR/latest.json"
+          git add runs; git commit -qm "ci results $BR $SHA"
+          for i in 1 2 3; do git push -q origin stripe-test-results && break; git pull -q --rebase origin stripe-test-results; done

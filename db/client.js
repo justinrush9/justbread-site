@@ -23,9 +23,17 @@ function getPool() {
   return pool;
 }
 
+// Tests swap in an in-memory Postgres (see tests/helpers/db.js). Production
+// never calls this.
+let override = null;
+function setQueryImplementation(fn) {
+  override = fn;
+}
+
 async function query(text, params) {
+  if (override) return override(text, params);
   const client = getPool();
   return client.query(text, params);
 }
 
-module.exports = { query, getPool };
+module.exports = { query, getPool, setQueryImplementation };

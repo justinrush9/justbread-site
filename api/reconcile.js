@@ -5,9 +5,8 @@
  * Catches orders the live webhook missed (a dropped delivery, a signature
  * mismatch, a cold-start timeout, the endpoint briefly down) by re-walking
  * Stripe's own Events API for the lookback window and replaying anything
- * not already in `orders`. Safe to run as often as you like — insertion is
- * idempotent on stripe_event_id (see lib/orderProcessing.js), so an event
- * already in the table is just skipped, not duplicated.
+ * not already applied. Safe to run as often as you like: every handler in
+ * lib/stripeEvents.js is idempotent, so a replayed event changes nothing.
  *
  * Two ways in:
  *   - x-admin-password header — the "Sync from Stripe" button on /admin.
@@ -23,14 +22,20 @@
 
 const Stripe = require('stripe');
 const { isAdminRequest } = require('../lib/adminAuth');
-const { processCheckoutSessionCompleted, processInvoicePaid } = require('../lib/orderProcessing');
+const { processEvent, EVENT_TYPES } = require('../lib/stripeEvents');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-const HANDLERS = {
-  'checkout.session.completed': processCheckoutSessionCompleted,
-  'invoice.paid': processInvoicePaid,
-};
+// Pull every relevant event in the window, then replay oldest first, so
+// state builds up in the order it happened (the handlers also tolerate
+// out-of-order events, this just keeps the common case simple).
+async function collectEvents(since) {
+  const events = [];
+  for await (const event of stripe.events.list({ types: EVENT_TYPES, created: { gte: since }, limit: 100 })) {
+    events.push(event);
+  }
+  return events.sort((a, b) => a.created - b.created);
+}
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
@@ -38,27 +43,25 @@ module.exports = async function handler(req, res) {
 
   const days = Math.min(Math.max(parseInt(req.query?.days, 10) || 3, 1), 30);
   const since = Math.floor(Date.now() / 1000) - days * 86400;
-
   const summary = { days, checked: 0, inserted: 0, skipped: 0, errors: [] };
 
-  for (const [type, processEvent] of Object.entries(HANDLERS)) {
+  let events;
+  try {
+    events = await collectEvents(since);
+  } catch (err) {
+    console.error('Reconcile: failed to list events:', err.message);
+    return res.status(502).json({ ...summary, errors: [{ message: err.message }] });
+  }
+
+  for (const event of events) {
+    summary.checked += 1;
     try {
-      // stripe-node's list() result is directly async-iterable and
-      // auto-paginates — no need for a separate autoPagingEach call.
-      for await (const event of stripe.events.list({ type, created: { gte: since }, limit: 100 })) {
-        summary.checked += 1;
-        try {
-          const result = await processEvent(event, stripe);
-          if (result?.inserted) summary.inserted += 1;
-          else summary.skipped += 1;
-        } catch (err) {
-          console.error(`Reconcile: failed to process ${type} event ${event.id}:`, err.message);
-          summary.errors.push({ eventId: event.id, type, message: err.message });
-        }
-      }
+      const result = await processEvent(event, stripe);
+      if (result?.inserted || result?.updated) summary.inserted += 1;
+      else summary.skipped += 1;
     } catch (err) {
-      console.error(`Reconcile: failed to list ${type} events:`, err.message);
-      summary.errors.push({ type, message: err.message });
+      console.error(`Reconcile: failed to process ${event.type} ${event.id}:`, err.message);
+      summary.errors.push({ eventId: event.id, type: event.type, message: err.message });
     }
   }
 

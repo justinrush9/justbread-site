@@ -26,6 +26,7 @@ module.exports = async function handler(req, res) {
         `SELECT fulfillment_date, COUNT(*)::int AS order_count, COALESCE(SUM(loaves), 0)::int AS loaves
          FROM orders
          WHERE fulfillment_date IS NOT NULL
+           AND payment_status <> 'refunded' AND cancelled_at IS NULL
            AND fulfillment_date >= CURRENT_DATE - INTERVAL '7 days'
          GROUP BY fulfillment_date
          ORDER BY fulfillment_date`,
@@ -45,9 +46,10 @@ module.exports = async function handler(req, res) {
     const [orders, totals] = await Promise.all([
       query(
         `SELECT id, customer_name, customer_email, loaves, delivery_method,
-                pickup_location, shipping_address, order_type, cadence, status
+                pickup_location, shipping_address, order_type, cadence, status,
+                payment_status, refunded_cents
          FROM orders
-         WHERE fulfillment_date = $1
+         WHERE fulfillment_date = $1 AND payment_status <> 'refunded' AND cancelled_at IS NULL
          ORDER BY delivery_method,
                   pickup_location NULLS LAST,
                   shipping_address->>'postal_code' NULLS LAST,
@@ -57,7 +59,7 @@ module.exports = async function handler(req, res) {
       query(
         `SELECT delivery_method, COUNT(*)::int AS order_count, COALESCE(SUM(loaves), 0)::int AS loaves
          FROM orders
-         WHERE fulfillment_date = $1
+         WHERE fulfillment_date = $1 AND payment_status <> 'refunded' AND cancelled_at IS NULL
          GROUP BY delivery_method`,
         [date],
       ),
