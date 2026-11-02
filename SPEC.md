@@ -86,7 +86,7 @@ These are decided. Everything else in this spec follows from them.
 row, and a manual "Sync from Stripe" adds nothing new (the webhook missed
 nothing).
 
-## 4. Billing timing and renewals [TODO]
+## 4. Billing timing and renewals [BUILT, verified on test clocks]
 
 ### 4a. Weekly and every-other-week: Monday renewals
 
@@ -635,6 +635,13 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-02: Phase 2 verified on Stripe test clocks (13 scenarios: weekly and
+  every-other-week signups Mon 9 AM / Tue 11:59 / Tue 12:01 / Sat, skip one
+  week, skip until, resume early, monthly skip, Wednesday-to-Monday move):
+  every Thursday charged exactly once, renewals at Monday 6:00 AM. Observed:
+  setting `trial_end` creates a $0 `subscription_update` invoice (ignored by
+  the app); a skipped renewal shows as a void $0 invoice. Still to check by
+  hand before go-live: portal and receipt wording during `trialing`.
 - 2026-11-02: Phase 1 build: section 12 adds `stripe_payment_intent_id`,
   `amount_cents`, `billing_reason` on orders; `emails_sent` keyed by a
   unique dedupe key; email prefs keyed by email.
