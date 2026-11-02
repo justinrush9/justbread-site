@@ -1,0 +1,43 @@
+# Runs Stripe test-mode checks (test clocks) on GitHub's servers, which can
+# reach api.stripe.com. Triggered by pushing to the stripe-tests branch.
+# Results are committed to the stripe-test-results branch so they can be read
+# with plain git. Test mode only: the workflow refuses any non-sk_test_ key.
+name: stripe-tests
+on:
+  push:
+    branches: [stripe-tests]
+permissions:
+  contents: write
+concurrency: stripe-tests
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci --no-audit --no-fund
+      - name: Run Stripe test scenarios
+        env:
+          STRIPE_TEST_KEY: ${{ secrets.STRIPE_TEST_KEY }}
+        run: node tests/stripe/run.js > results.json 2> errors.log || true
+      - name: Publish results to stripe-test-results branch
+        run: |
+          set -e
+          SHA=$(git rev-parse --short HEAD)
+          cp results.json /tmp/results.json; cp errors.log /tmp/errors.log
+          git config user.name "stripe-tests bot"
+          git config user.email "actions@users.noreply.github.com"
+          git fetch origin stripe-test-results || true
+          if git rev-parse --verify origin/stripe-test-results >/dev/null 2>&1; then
+            git checkout -B stripe-test-results origin/stripe-test-results
+          else
+            git checkout --orphan stripe-test-results && git rm -rqf .
+          fi
+          mkdir -p runs
+          cp /tmp/results.json runs/$SHA.json; cp /tmp/errors.log runs/$SHA.log
+          cp /tmp/results.json latest.json; cp /tmp/errors.log latest.log
+          git add runs latest.json latest.log
+          git commit -qm "results for $SHA"
+          git push -q origin stripe-test-results
