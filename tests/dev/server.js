@@ -18,7 +18,13 @@ const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/p
   http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://localhost');
     if (url.pathname.startsWith('/api/')) {
-      const file = path.join(ROOT, `${url.pathname}.js`);
+      // Mirror vercel.json: admin endpoints rewrite to /api/admin?route=<name>.
+      let file = path.join(ROOT, `${url.pathname}.js`);
+      const name = url.pathname.slice('/api/'.length);
+      if (!fs.existsSync(file) && fs.existsSync(path.join(ROOT, 'lib/routes', `${name}.js`))) {
+        file = path.join(ROOT, 'api/admin.js');
+        url.searchParams.set('route', name);
+      }
       if (!fs.existsSync(file)) { res.writeHead(404); return res.end('{}'); }
       let body = '';
       for await (const c of req) body += c;

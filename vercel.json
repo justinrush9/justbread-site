@@ -7,8 +7,19 @@
     }
   ],
   "functions": {
-    "api/migrate.js": {
+    "api/admin.js": {
       "includeFiles": "db/schema.sql"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(bake-sheet|login|migrate|move-to-monday|order-edit|orders|production|standing-orders|stops|subscription-control)",
+      "destination": "/api/admin?route=$1"
+    }
+  ],
+  "git": {
+    "deploymentEnabled": {
+      "stripe-test-results": false
     }
   }
 }
