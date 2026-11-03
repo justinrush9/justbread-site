@@ -36,6 +36,8 @@
     ol { list-style: none; }
     .stop { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--card); }
     .stop.done { opacity: .5; }
+    .stop.helper { opacity: .55; border-style: dashed; }
+    .helper-tag { color: var(--yellow); font-weight: 700; }
     .stop.next { border-color: var(--yellow); }
     .num { flex: 0 0 34px; height: 34px; border-radius: 50%; background: var(--near); display: grid; place-items: center; font-weight: 700; }
     .stop.done .num { background: var(--green); color: var(--black); }
@@ -135,6 +137,22 @@
     await fetch('/api/stops', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ thursday, stop_key: stop.stop_key, delivered }) });
   }
 
+  async function handoff(stop, on) {
+    try { data = await api({ action: 'handoff', stop_key: stop.stop_key, on }); render(); } catch (e) { alert(e.message); }
+  }
+
+  function replan() {
+    const go = async (position) => {
+      try { data = await api({ action: 'replan', position }); render(); } catch (e) { alert(e.message); }
+    };
+    if (!navigator.geolocation) { go(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      (p) => go({ lat: p.coords.latitude, lng: p.coords.longitude }),
+      () => go(null), // refused or unavailable: starts from your last delivered stop
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 },
+    );
+  }
+
   function homeForm(current) {
     const input = el('input', { class: 'addr', value: current || '', placeholder: 'Street, city, ZIP', autocomplete: 'street-address' });
     return el('div', { class: 'card' },
@@ -158,10 +176,11 @@
     }
 
     const ordered = d.needs_compute && !d.method ? d.stops : d.stops;
-    const nextIdx = ordered.findIndex((s) => !s.delivered_at);
+    const open = (s) => !s.delivered_at && !s.handed_off_at;
+    const nextIdx = ordered.findIndex(open);
     if (nextIdx >= 0) {
       const s = ordered[nextIdx];
-      const after = ordered.slice(nextIdx + 1).find((x) => !x.delivered_at);
+      const after = ordered.slice(nextIdx + 1).find(open);
       out.push(el('div', { class: 'card current', id: 'current' },
         el('div', { class: 'label' }, `Stop ${nextIdx + 1} of ${ordered.length}`),
         el('h2', {}, s.title),
@@ -174,12 +193,22 @@
         el('div', { class: 'row' }, el('a', { class: 'btn primary', href: navUrl(d.home_address) }, '🏠 Navigate home'))));
     }
 
+    if (nextIdx >= 0 && ordered.some((s) => s.delivered_at || s.handed_off_at)) {
+      out.push(el('div', { class: 'row', style: 'margin-top:0' }, el('button', { class: 'btn', onclick: replan }, '📍 Re-plan from here')));
+    }
     out.push(el('h3', {}, 'All stops'));
-    out.push(el('ol', {}, ordered.map((s, i) => el('li', { class: `stop${s.delivered_at ? ' done' : ''}${i === nextIdx ? ' next' : ''}` },
-      el('div', { class: 'num' }, s.delivered_at ? '✓' : i + 1),
-      el('div', { class: 'info' }, el('b', {}, s.title), el('small', {}, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}${s.kind === 'pickup' ? ' · pickup' : ''}`)),
-      el('a', { class: 'btn', href: navUrl(s.query), 'aria-label': 'Navigate' }, '🧭'),
-      el('button', { class: 'btn', onclick: () => toggle(s), 'aria-label': s.delivered_at ? 'Undo delivered' : 'Mark delivered' }, s.delivered_at ? '↺' : '✓')))));
+    out.push(el('ol', {}, ordered.map((s, i) => {
+      const helper = s.handed_off_at && !s.delivered_at;
+      return el('li', { class: `stop${s.delivered_at ? ' done' : ''}${helper ? ' helper' : ''}${i === nextIdx ? ' next' : ''}` },
+        el('div', { class: 'num' }, s.delivered_at ? '✓' : helper ? '🤝' : i + 1),
+        el('div', { class: 'info' }, el('b', {}, s.title),
+          el('small', {}, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}${s.kind === 'pickup' ? ' · pickup' : ''}`),
+          helper ? el('div', { class: 'helper-tag' }, 'With helper') : null),
+        s.delivered_at ? null : el('button', { class: 'btn', onclick: () => handoff(s, !s.handed_off_at), 'aria-label': helper ? 'Take back from helper' : 'Hand off to helper' }, helper ? 'Undo' : '🤝'),
+        helper ? null : el('a', { class: 'btn', href: navUrl(s.query), 'aria-label': 'Navigate' }, '🧭'),
+        el('button', { class: 'btn', onclick: () => toggle(s), 'aria-label': s.delivered_at ? 'Undo delivered' : 'Mark delivered' }, s.delivered_at ? '↺' : '✓'));
+    })));
+    out.push(el('p', { class: 'muted', style: 'font-size:13px;margin-top:4px' }, '🤝 hands a stop to a helper: it leaves your route and no email goes out. Tick ✓ when they confirm it is delivered.'));
 
     const legs = legUrls(d.home_address, ordered);
     out.push(el('h3', {}, 'Whole route'));

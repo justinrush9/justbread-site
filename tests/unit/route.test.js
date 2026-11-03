@@ -125,3 +125,36 @@ test('more stops than one request allows: optimized in two halves, warned in adv
   }
   assert.equal((await positions(db)).length, st.stop_count);
 });
+
+test('hand off: off the route, no email; re-plan from the phone covers only what is left', async () => {
+  const db = await freshDb();
+  await seed(db, 4);
+  await settings.set('home_address', '1 Home Rd, Geneva, IL 60134');
+  const g = fakeGoogle(false);
+  await route.computeRoute(T, { fetchImpl: g.fetchImpl, apiKey: 'k', today: TODAY });
+  const { setHandedOff, buildSheet } = require('../../lib/sheet');
+  let stops = (await db.query('SELECT stop_key FROM stops WHERE fulfillment_date=$1 ORDER BY route_position', [T])).rows.map((r) => r.stop_key);
+  await setDelivered(T, stops[0], true);
+  await setHandedOff(T, stops[1], true);
+  await setHandedOff(T, stops[2], true);
+  const sheet = await buildSheet(T);
+  assert.equal(sheet.summary.stops_with_helper, 2);
+  const emailsSent = (await db.query(`SELECT count(*)::int AS n FROM emails_sent WHERE email_type='delivered'`)).rows[0].n;
+
+  const r = await route.replanFromHere(T, { lat: 41.88, lng: -88.31 }, { fetchImpl: g.fetchImpl, apiKey: 'k', today: TODAY });
+  assert.equal(r.replanned, 2, '5 stops - 1 delivered - 2 with helper');
+  const call = g.calls.at(-1).body;
+  assert.deepEqual(call.origin, { location: { latLng: { latitude: 41.88, longitude: -88.31 } } });
+  assert.equal(call.destination.address, '1 Home Rd, Geneva, IL 60134');
+  assert.equal(call.intermediates.length, 2);
+  const after = (await db.query('SELECT stop_key FROM stops WHERE fulfillment_date=$1 ORDER BY route_position', [T])).rows.map((x) => x.stop_key);
+  assert.deepEqual(after.slice(0, 3), stops.slice(0, 3), 'done and handed-off stops stay first');
+  assert.equal((await db.query(`SELECT count(*)::int AS n FROM emails_sent WHERE email_type='delivered'`)).rows[0].n, emailsSent, 'hand-off sends no email');
+
+  // No location: starts from the last delivered stop.
+  await route.replanFromHere(T, null, { fetchImpl: g.fetchImpl, apiKey: 'k', today: TODAY });
+  assert.ok(g.calls.at(-1).body.origin.address, 'address origin');
+  assert.notEqual(g.calls.at(-1).body.origin.address, '1 Home Rd, Geneva, IL 60134');
+  // The stored route stays valid: no automatic recompute was triggered by hand-offs.
+  assert.equal((await route.routeStatus(T, TODAY)).needs_compute, false);
+});

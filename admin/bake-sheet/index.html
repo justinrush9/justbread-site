@@ -257,7 +257,7 @@
       : `${stop.loaves} loaves · ${stop.order_count} order${stop.order_count === 1 ? '' : 's'}`;
     return el('div', { class: `stop${done ? ' done' : ''}` },
       el('div', { class: 'stop-head' },
-        el('div', { class: 'stop-title' }, el('b', {}, title), el('small', {}, sub)),
+        el('div', { class: 'stop-title' }, el('b', {}, title), el('small', {}, sub), stop.handed_off_at && !done ? el('div', { style: 'color:var(--yellow);font-weight:700;font-size:14px' }, '🤝 With helper') : null),
         stop.kind === 'local_delivery' && stop.address ? el('a', { class: 'btn', href: mapsUrl(stop.address), target: '_blank', rel: 'noopener' }, '📍 Map') : null,
         el('button', { class: `check${done ? ' on' : ''}`, 'aria-label': done ? 'Delivered' : 'Mark delivered', onclick: () => toggleDelivered(stop) }, done ? '✓' : '')),
       ...entries.map((e) => renderEntry(e, stop.kind === 'local_delivery' && entries.length === 1)));
