@@ -109,8 +109,14 @@
     } catch (e) { busy = false; $('#out').replaceChildren(el('p', { class: 'muted' }, e.message)); }
   }
 
+  // Settings actions (home, pickup address) answer with just the saved value,
+  // so reload the full route after them; route actions answer with the route.
   async function act(body, after) {
-    try { data = await api(body); if (after) after(); render(); } catch (e) { alert(e.message); }
+    try {
+      const reply = await api(body);
+      if (after) { await after(); return; }
+      data = reply; render();
+    } catch (e) { alert(e.message); }
   }
 
   async function deliveredNext(stop, next) {
@@ -133,7 +139,7 @@
     return el('div', { class: 'card' },
       el('b', {}, current ? 'Home address (start and end)' : 'Where does the route start and end?'),
       input,
-      el('div', { class: 'row' }, el('button', { class: 'btn primary', onclick: () => act({ action: 'home', value: input.value }, () => load()) }, 'Save address')));
+      el('div', { class: 'row' }, el('button', { class: 'btn primary', onclick: () => act({ action: 'home', value: input.value }, load) }, 'Save address')));
   }
 
   function render() {
@@ -191,7 +197,7 @@
         el('div', { class: 'muted', style: 'font-size:14px' }, 'Google finds most businesses by name. Add a street address if Navigate goes to the wrong place.'),
         pickups.map((s) => {
           const input = el('input', { class: 'addr', value: (d.pickup_addresses || {})[s.title] || '', placeholder: `${s.title}: street, city` });
-          return el('div', {}, input, el('div', { class: 'row' }, el('button', { class: 'btn', onclick: () => act({ action: 'pickup_address', label: s.title, value: input.value }, () => load()) }, `Save ${s.title.split(' —')[0]}`)));
+          return el('div', {}, input, el('div', { class: 'row' }, el('button', { class: 'btn', onclick: () => act({ action: 'pickup_address', label: s.title, value: input.value }, load) }, `Save ${s.title.split(' —')[0]}`)));
         })));
     }
     $('#out').replaceChildren(...out);
