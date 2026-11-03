@@ -41,7 +41,8 @@
     .stop.done .num { background: var(--green); color: var(--black); }
     .stop .info { flex: 1; min-width: 0; }
     .stop .info b { display: block; }
-    .stop .info small { color: var(--muted); }
+    .stop .info small { color: #e6e6e6; font-weight: 700; font-size: 15px; }
+    .qty { color: #e6e6e6; font-weight: 700; font-size: 18px; }
     input.addr { width: 100%; background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; min-height: 48px; margin-top: 8px; }
     h3 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 20px 0 8px; }
   </style>
@@ -164,7 +165,7 @@
       out.push(el('div', { class: 'card current', id: 'current' },
         el('div', { class: 'label' }, `Stop ${nextIdx + 1} of ${ordered.length}`),
         el('h2', {}, s.title),
-        el('div', { class: 'muted' }, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}${s.kind === 'pickup' ? ' · pickup point' : ''}`),
+        el('div', { class: 'qty' }, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}`, s.kind === 'pickup' ? el('span', { class: 'muted', style: 'font-weight:400' }, ' · pickup point') : null),
         el('div', { class: 'row' },
           el('a', { class: 'btn primary', href: navUrl(s.query) }, '🧭 Navigate'),
           el('button', { class: 'btn go', onclick: () => deliveredNext(s, after) }, after ? '✓ Delivered, next stop' : '✓ Delivered, go home'))));
