@@ -25,7 +25,7 @@
  *   Set return URL to: https://justbread.shop/manage/
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { stripe } = require('../lib/stripeClient');
 
 const ALLOWED_ORIGINS = [
   'https://justbread.shop',

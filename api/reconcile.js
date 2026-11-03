@@ -20,13 +20,12 @@
  *          after fixing something that was broken for a week.
  */
 
-const Stripe = require('stripe');
 const { isAdminRequest } = require('../lib/adminAuth');
 const { processEvent, EVENT_TYPES } = require('../lib/stripeEvents');
 const { refreshAllSubscriptions } = require('../lib/subscriptions');
 const { freezePast } = require('../lib/standingOrders');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const { stripe } = require('../lib/stripeClient');
 
 // Pull every relevant event in the window, then replay oldest first, so
 // state builds up in the order it happened (the handlers also tolerate

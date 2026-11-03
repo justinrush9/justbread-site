@@ -44,10 +44,9 @@
  * event history and catches it — don't hand-fix a missing row here.
  */
 
-const Stripe = require('stripe');
 const { processEvent } = require('../lib/stripeEvents');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const { stripe } = require('../lib/stripeClient');
 
 // Vercel: turn off automatic body parsing so we can read the raw bytes —
 // Stripe's signature check fails against a re-serialized JSON body.

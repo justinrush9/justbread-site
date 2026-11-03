@@ -83,6 +83,17 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 ```
 **SAFETY CONTRACT: June 2026 restructure is ADDITIVE ONLY. Never modify or delete existing Stripe products, prices, customers, or subscriptions. Existing subscriptions remain on legacy price IDs untouched.**
 
+### Stripe keys by environment (Nov 2026)
+- All Stripe clients come from `lib/stripeClient.js`. Production uses
+  `STRIPE_SECRET_KEY` (live). Every other environment (Vercel previews, local)
+  uses `STRIPE_TEST_SECRET_KEY` and refuses anything but an `sk_test_` key, so
+  a preview can never touch real customers.
+- Vercel Hobby allows at most 12 server functions: admin endpoints live in
+  `lib/routes/` behind `api/admin.js` (vercel.json rewrites keep the URLs).
+  Don't add new files under `api/` for admin features; add a route instead.
+- Preview builds get their own Neon database branch (Vercel Storage setting,
+  Nov 3 2026). Run `/admin/setup/` once on a new preview to create tables.
+
 ### Stripe Keys (as of June 11, 2026)
 - One live secret key active, named `Vercel Production` in Stripe dashboard
 - Set as `STRIPE_SECRET_KEY` in Vercel environment variables for justbread-api

@@ -28,7 +28,6 @@
  *   ALLOWED_ORIGIN             https://justbread.shop  (CORS)
  */
 
-const Stripe = require('stripe');
 const { PRICES } = require('../lib/prices');
 const { lookupDeliveryCode } = require('../lib/deliveryCodes');
 
@@ -109,7 +108,7 @@ module.exports = async function handler(req, res) {
   }
 
   // ── Build Stripe line items ──────────────────────────────────────
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const { stripe } = require('../lib/stripeClient');
   const isOT   = mode === 'ot';
   const key    = isOT ? 'onetime' : cadence; // price key
 
