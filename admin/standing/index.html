@@ -90,7 +90,7 @@
       const ended = s.end_date && String(s.end_date).slice(0, 10) < today;
       const where = s.delivery_method === 'pickup' ? s.pickup_location : s.delivery_method === 'shipped' ? 'Shipped' : (s.address?.line1 || 'Local delivery');
       return el('div', { class: `card${s.paused ? ' paused' : ''}${ended ? ' ended' : ''}` },
-        el('b', {}, s.name, ' · ', s.loaves, ' loaf', s.loaves === 1 ? '' : 'ves'),
+        el('b', {}, s.name, ' · ', s.loaves, s.loaves === 1 ? ' loaf' : ' loaves'),
         el('div', { class: 'meta' }, s.frequency === 'weekly' ? 'Every week' : 'Every other week', ` from ${fmt(s.start_date)}`,
           s.end_date ? `, last ${fmt(s.end_date)}` : '', s.paused ? ' · PAUSED' : ''),
         el('div', { class: 'meta' }, where),

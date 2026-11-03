@@ -251,7 +251,7 @@
     const done = !!stop.delivered_at;
     const title = stop.kind === 'local_delivery' ? names : stop.label;
     const sub = stop.kind === 'local_delivery'
-      ? `${stop.loaves} loaf${stop.loaves === 1 ? '' : 'ves'}`
+      ? `${stop.loaves} ${stop.loaves === 1 ? 'loaf' : 'loaves'}`
       : `${stop.loaves} loaves · ${stop.order_count} order${stop.order_count === 1 ? '' : 's'}`;
     return el('div', { class: `stop${done ? ' done' : ''}` },
       el('div', { class: 'stop-head' },
