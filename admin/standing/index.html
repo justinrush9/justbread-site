@@ -16,7 +16,7 @@
     header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
     .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; }
     .logo span { color: var(--yellow); }
-    header nav { margin-left: auto; display: flex; gap: 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    header nav { margin-left: auto; display: flex; gap: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
     header nav a { text-decoration: none; color: var(--muted); }
     header nav a.active { color: var(--yellow); }
     main { max-width: 760px; margin: 0 auto; padding: 14px 16px 90px; }
@@ -44,7 +44,8 @@
 <body>
   <header>
     <div class="logo">J<span>B</span></div>
-    <nav><a href="/admin/bake-sheet/">Sheet</a><a href="/admin/schedule/">Schedule</a>
+    <nav><a href="/admin/bake-sheet/">Sheet</a><a href="/admin/route/">Route</a>
+        <a href="/admin/schedule/">Schedule</a>
         <a href="/admin/standing/" class="active">Standing</a><a href="/admin/">Pay</a></nav>
   </header>
   <main><div id="list"></div></main>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="icon" href="/admin/icons/icon-192.png">
+  <title>Route</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black: #0a0a0a; --near: #141414; --card: #1a1a1a; --border: #2a2a2a; --muted: #8a8a8a; --white: #fff; --yellow: #f5e600; --red: #ff6b6b; --green: #6dff9a; }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.45; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+    button, input { font: inherit; color: inherit; }
+    a { color: inherit; }
+    header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; }
+    .logo span { color: var(--yellow); }
+    header nav { margin-left: auto; display: flex; gap: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+    header nav a { text-decoration: none; color: var(--muted); }
+    header nav a.active { color: var(--yellow); }
+    main { max-width: 760px; margin: 0 auto; padding: 14px 16px 60px; }
+    .muted { color: var(--muted); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; margin: 12px 0; }
+    .notice { border-color: var(--red); color: var(--red); }
+    .ok { color: var(--green); }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 0 16px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; text-decoration: none; cursor: pointer; font-size: 16px; }
+    .btn.primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .btn.go { background: var(--green); color: var(--black); border-color: var(--green); }
+    .btn.wide { width: 100%; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .current { border: 2px solid var(--yellow); scroll-margin-top: 70px; }
+    .current .label { color: var(--yellow); font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+    .current h2 { font-size: 22px; margin: 4px 0; }
+    ol { list-style: none; }
+    .stop { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--card); }
+    .stop.done { opacity: .5; }
+    .stop.next { border-color: var(--yellow); }
+    .num { flex: 0 0 34px; height: 34px; border-radius: 50%; background: var(--near); display: grid; place-items: center; font-weight: 700; }
+    .stop.done .num { background: var(--green); color: var(--black); }
+    .stop .info { flex: 1; min-width: 0; }
+    .stop .info b { display: block; }
+    .stop .info small { color: var(--muted); }
+    input.addr { width: 100%; background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 12px; min-height: 48px; margin-top: 8px; }
+    h3 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 20px 0 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">J<span>B</span></div>
+    <nav><a href="/admin/bake-sheet/">Sheet</a><a href="/admin/route/" class="active">Route</a><a href="/admin/schedule/">Schedule</a><a href="/admin/standing/">Standing</a><a href="/admin/">Pay</a></nav>
+  </header>
+  <main id="out"><p class="muted">Loading…</p></main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (v !== false && v != null) n.setAttribute(k, v);
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+    return n;
+  };
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } } };
+  const fmtDay = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric' });
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
+  const nextThu = () => { const t = new Date(`${today}T12:00:00Z`); while (t.getUTCDay() !== 4) t.setUTCDate(t.getUTCDate() + 1); return t.toISOString().slice(0, 10); };
+  const saved = store.get('jb.thursday');
+  const thursday = saved && saved >= today ? saved : nextThu();
+  let data = null;
+  let busy = false;
+
+  async function api(body) {
+    const res = await fetch(body ? '/api/route' : `/api/route?date=${thursday}`, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ date: thursday, ...body }) } : {});
+    if (res.status === 401) { location.href = '/admin/bake-sheet/'; throw new Error('Log in'); }
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(d.error || `Error ${res.status}`);
+    return d;
+  }
+
+  // Opens the Google Maps app on Android straight into turn-by-turn directions.
+  const navUrl = (dest) => `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving&dir_action=navigate`;
+
+  // Whole loop in Maps, split into legs that each fit one Maps link.
+  function legUrls(home, stops) {
+    const pts = [home, ...stops.map((s) => s.query), home];
+    const MAX_WAYPOINTS = 9;
+    const urls = [];
+    for (let i = 0; i < pts.length - 1; i += MAX_WAYPOINTS + 1) {
+      const end = Math.min(i + MAX_WAYPOINTS + 1, pts.length - 1);
+      const way = pts.slice(i + 1, end);
+      urls.push(`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(pts[i])}&destination=${encodeURIComponent(pts[end])}`
+        + (way.length ? `&waypoints=${encodeURIComponent(way.join('|'))}` : '') + '&travelmode=driving');
+    }
+    return urls;
+  }
+
+  async function load() {
+    try {
+      data = await api();
+      // On delivery day, bring the stored route up to date automatically (one
+      // Google call only when the stop list changed).
+      if (data.home_address && data.needs_compute && data.stop_count && thursday === today && !busy) {
+        busy = true; data = await api({ action: 'optimize' }); busy = false;
+      }
+      render();
+    } catch (e) { busy = false; $('#out').replaceChildren(el('p', { class: 'muted' }, e.message)); }
+  }
+
+  async function act(body, after) {
+    try { data = await api(body); if (after) after(); render(); } catch (e) { alert(e.message); }
+  }
+
+  async function deliveredNext(stop, next) {
+    // Tick first, then go, so the tick is saved even if Maps takes over.
+    await fetch('/api/stops', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ thursday, stop_key: stop.stop_key, delivered: true }) });
+    stop.delivered_at = new Date().toISOString();
+    render();
+    location.href = navUrl(next ? next.query : data.home_address);
+  }
+
+  async function toggle(stop) {
+    const delivered = !stop.delivered_at;
+    stop.delivered_at = delivered ? new Date().toISOString() : null;
+    render();
+    await fetch('/api/stops', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ thursday, stop_key: stop.stop_key, delivered }) });
+  }
+
+  function homeForm(current) {
+    const input = el('input', { class: 'addr', value: current || '', placeholder: 'Street, city, ZIP', autocomplete: 'street-address' });
+    return el('div', { class: 'card' },
+      el('b', {}, current ? 'Home address (start and end)' : 'Where does the route start and end?'),
+      input,
+      el('div', { class: 'row' }, el('button', { class: 'btn primary', onclick: () => act({ action: 'home', value: input.value }, () => load()) }, 'Save address')));
+  }
+
+  function render() {
+    const d = data;
+    const out = [el('div', { class: 'muted' }, `Route for ${fmtDay(thursday)} · `, el('a', { href: '/admin/bake-sheet/', style: 'color:var(--yellow)' }, 'change Thursday on the Sheet'))];
+
+    if (!d.home_address) { out.push(homeForm('')); $('#out').replaceChildren(...out); return; }
+    if (!d.stops.length) { out.push(el('p', { class: 'card muted' }, 'No local deliveries or pickup stops this Thursday.')); $('#out').replaceChildren(...out); return; }
+
+    if (d.over_limit) out.push(el('div', { class: 'card notice' }, `${d.stop_count} stops is more than Google optimizes in one request (${d.max_per_request}). It will be optimized in two halves.`));
+    if (d.method === 'fallback' && d.notice) out.push(el('div', { class: 'card notice' }, d.notice));
+    if (d.needs_compute) {
+      out.push(el('div', { class: 'card' }, d.stale ? 'Stops changed since the route was made.' : 'Route not optimized yet.',
+        el('div', { class: 'row' }, el('button', { class: 'btn primary', onclick: () => act({ action: 'optimize' }) }, d.stale ? 'Update route' : 'Optimize route'))));
+    }
+
+    const ordered = d.needs_compute && !d.method ? d.stops : d.stops;
+    const nextIdx = ordered.findIndex((s) => !s.delivered_at);
+    if (nextIdx >= 0) {
+      const s = ordered[nextIdx];
+      const after = ordered.slice(nextIdx + 1).find((x) => !x.delivered_at);
+      out.push(el('div', { class: 'card current', id: 'current' },
+        el('div', { class: 'label' }, `Stop ${nextIdx + 1} of ${ordered.length}`),
+        el('h2', {}, s.title),
+        el('div', { class: 'muted' }, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}${s.kind === 'pickup' ? ' · pickup point' : ''}`),
+        el('div', { class: 'row' },
+          el('a', { class: 'btn primary', href: navUrl(s.query) }, '🧭 Navigate'),
+          el('button', { class: 'btn go', onclick: () => deliveredNext(s, after) }, after ? '✓ Delivered, next stop' : '✓ Delivered, go home'))));
+    } else {
+      out.push(el('div', { class: 'card current' }, el('h2', { class: 'ok' }, 'All stops delivered'),
+        el('div', { class: 'row' }, el('a', { class: 'btn primary', href: navUrl(d.home_address) }, '🏠 Navigate home'))));
+    }
+
+    out.push(el('h3', {}, 'All stops'));
+    out.push(el('ol', {}, ordered.map((s, i) => el('li', { class: `stop${s.delivered_at ? ' done' : ''}${i === nextIdx ? ' next' : ''}` },
+      el('div', { class: 'num' }, s.delivered_at ? '✓' : i + 1),
+      el('div', { class: 'info' }, el('b', {}, s.title), el('small', {}, `${s.loaves} loa${s.loaves === 1 ? 'f' : 'ves'}${s.kind === 'pickup' ? ' · pickup' : ''}`)),
+      el('a', { class: 'btn', href: navUrl(s.query), 'aria-label': 'Navigate' }, '🧭'),
+      el('button', { class: 'btn', onclick: () => toggle(s), 'aria-label': s.delivered_at ? 'Undo delivered' : 'Mark delivered' }, s.delivered_at ? '↺' : '✓')))));
+
+    const legs = legUrls(d.home_address, ordered);
+    out.push(el('h3', {}, 'Whole route'));
+    out.push(el('div', { class: 'row' }, legs.map((u, i) => el('a', { class: 'btn', href: u, target: '_blank', rel: 'noopener' }, legs.length > 1 ? `View leg ${i + 1} of ${legs.length}` : 'View whole route in Maps'))));
+
+    out.push(el('div', { class: 'row' }, el('button', { class: 'btn', onclick: () => act({ action: 'reoptimize' }) }, 'Re-optimize')));
+    const u = d.usage;
+    out.push(el('p', { class: 'muted', style: 'margin-top:12px;font-size:14px' },
+      d.method === 'google' ? 'Optimized by Google. ' : '',
+      d.method === 'google' && d.notice ? `${d.notice} ` : '',
+      `Route optimizations this month: ${u.month} of ${u.free_per_month.toLocaleString()} free · today ${u.today} of ${u.daily_cap}.`));
+    out.push(homeForm(d.home_address));
+    const pickups = ordered.filter((s) => s.kind === 'pickup');
+    if (pickups.length) {
+      out.push(el('div', { class: 'card' }, el('b', {}, 'Pickup point addresses'),
+        el('div', { class: 'muted', style: 'font-size:14px' }, 'Google finds most businesses by name. Add a street address if Navigate goes to the wrong place.'),
+        pickups.map((s) => {
+          const input = el('input', { class: 'addr', value: (d.pickup_addresses || {})[s.title] || '', placeholder: `${s.title}: street, city` });
+          return el('div', {}, input, el('div', { class: 'row' }, el('button', { class: 'btn', onclick: () => act({ action: 'pickup_address', label: s.title, value: input.value }, () => load()) }, `Save ${s.title.split(' —')[0]}`)));
+        })));
+    }
+    $('#out').replaceChildren(...out);
+    const cur = $('#current'); if (cur) cur.scrollIntoView({ block: 'start' });
+  }
+
+  // Coming back from Maps (or after Android reloaded the app): reload from the server.
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' }).catch(() => {});
+  load();
+})();
+</script>
+</body>
+</html>

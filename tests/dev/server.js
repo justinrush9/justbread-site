@@ -10,6 +10,17 @@ const { freshDb } = require('../helpers/db');
 const seed = require('./seed');
 
 const ROOT = path.join(__dirname, '../..');
+
+// DEV_FAKE_GOOGLE=1: answer Routes API calls locally (reverses the stop order).
+if (process.env.DEV_FAKE_GOOGLE) {
+  process.env.GOOGLE_ROUTES_API_KEY = 'fake';
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init) => {
+    if (!String(url).startsWith('https://routes.googleapis.com/')) return realFetch(url, init);
+    const n = JSON.parse(init.body).intermediates.length;
+    return { ok: true, json: async () => ({ routes: [{ optimizedIntermediateWaypointIndex: [...Array(n).keys()].reverse(), duration: '2460s', distanceMeters: 22000 }] }) };
+  };
+}
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.png': 'image/png', '.webmanifest': 'application/manifest+json', '.css': 'text/css', '.jpg': 'image/jpeg' };
 
 (async () => {

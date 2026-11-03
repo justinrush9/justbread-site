@@ -323,7 +323,7 @@ no full street address is visible for local delivery entries; shipped
 entries show a copyable full address; ticking a stop with two orders marks
 both delivered.
 
-## 8. Delivery route [TODO]
+## 8. Delivery route [BUILT, needs Jay's phone check]
 
 - **Start and end at home**, every time. Home address is stored as a setting
   (not hard-coded).
@@ -639,6 +639,17 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-03: Phase 5 built: Route screen (current stop card with Navigate
+  and "Delivered, next stop", numbered list, whole-route legs of up to 9
+  waypoints, Re-optimize, usage line). Google computeRoutes with
+  optimizeWaypointOrder, home to home through local stops and pickup points
+  (not UPS); stored per Thursday, recomputed only when the stop set changes
+  or on Re-optimize; on delivery day the Route screen updates a stale route
+  automatically. App-side 150/day counter; ZIP/street fallback with a red
+  notice when there's no home address, no key, a Google error, or the cap is
+  hit; over 25 stops is optimized in two halves with an advance warning.
+  Home address and pickup point addresses are settings entered in the app
+  (never in code: the repo is public).
 - 2026-11-03: Google Cloud set up for the route (section 3). Vercel: admin
   endpoints consolidated into one function (Hobby 12-function limit); previews
   use their own Neon branch and only a test Stripe key.

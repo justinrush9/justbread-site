@@ -22,7 +22,7 @@
     header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
     .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
     .logo span { color: var(--yellow); }
-    header nav { margin-left: auto; display: flex; gap: 12px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    header nav { margin-left: auto; display: flex; gap: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
     header nav a { text-decoration: none; color: var(--muted); }
     header nav a.active { color: var(--yellow); }
 
@@ -115,6 +115,7 @@
       <div class="logo">J<span>B</span></div>
       <nav>
         <a href="/admin/bake-sheet/" class="active">Sheet</a>
+        <a href="/admin/route/">Route</a>
         <a href="/admin/schedule/">Schedule</a>
         <a href="/admin/standing/">Standing</a>
         <a href="/admin/">Pay</a>
@@ -232,6 +233,7 @@
       if (!stops.length && !skippedOnly.length) continue;
       const loaves = stops.reduce((a, x) => a + x.loaves, 0);
       nodes.push(el('h2', {}, title, el('span', {}, `${loaves} loaves · ${stops.length} stop${stops.length === 1 ? '' : 's'}`)));
+      if (kind === 'local_delivery') nodes.push(el('a', { class: 'btn primary', href: '/admin/route/', style: 'width:100%;margin-bottom:10px' }, '🧭 Start route'));
       for (const stop of stops) nodes.push(renderStop(stop));
       if (skippedOnly.length) nodes.push(el('div', { class: 'stop' }, ...skippedOnly.map((e) => renderEntry(e, false))));
     }
