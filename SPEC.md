@@ -347,6 +347,17 @@ both delivered.
   server. The login lasts 30 days on the device, so a reload mid-route never
   asks for the password.
 - After the last stop, Navigate goes home.
+- **Hand off (helper deliveries).** Any stop can be handed off: it leaves
+  Jay's remaining route and shows "With helper" on the sheet and route, and
+  no customer email is sent. When the helper confirms, Jay ticks it
+  Delivered, which sends the Delivered email then. Undo puts it back on
+  Jay's route.
+- **Re-plan from here.** One tap re-optimizes only Jay's remaining stops
+  (not delivered, not handed off), starting from the phone's current
+  location and ending at home. If location is unavailable or refused, it
+  starts from the last stop Jay delivered, or home if none. Completed and
+  handed-off stops keep their place at the top of the list. Uses one Google
+  request and counts toward the daily cap like any other.
 - **Secondary: "View whole route"** opens Google Maps with every stop loaded
   in the optimized order, for an overview before leaving or for following the
   whole loop in Maps. If the stops exceed what one Google Maps link can hold,
@@ -595,7 +606,7 @@ Thursday, or by the daily cron freezing a past one (6b).
 
 ### `stops` (new)
 Thursday, `stop_key` (normalized address, pickup point, or `shipping`),
-kind, label, `route_position`, `delivered_at`. Unique on (Thursday,
+kind, label, `route_position`, `delivered_at`, `handed_off_at`. Unique on (Thursday,
 `stop_key`). Holds delivered state (7c) and route order.
 
 ### `routes` (new)
@@ -639,6 +650,9 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-03: Added Hand off (helper deliveries, no email until ticked
+  Delivered) and Re-plan from here (remaining stops from the phone's location
+  to home), per Jay.
 - 2026-11-03: Phase 7 built. Email via Resend from "Just Bread"
   <orders@justbread.shop>, replies and Jay's alerts to info@justbread.shop.
   Alerts go by email and push (keys generated and stored in settings).

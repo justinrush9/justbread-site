@@ -247,3 +247,6 @@ ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS text_body TEXT;
 ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS attempts INTEGER NOT NULL DEFAULT 1;
 ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS last_error TEXT;
 ALTER TABLE alerts ADD COLUMN IF NOT EXISTS pushed_at TIMESTAMPTZ;
+
+-- ── Helper hand-off (section 8) ────────────────────────────────────────────
+ALTER TABLE stops ADD COLUMN IF NOT EXISTS handed_off_at TIMESTAMPTZ;
