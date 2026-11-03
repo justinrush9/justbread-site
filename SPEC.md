@@ -77,6 +77,9 @@ These are decided. Everything else in this spec follows from them.
 | Webhook endpoint enabled and subscribed to every event in sections 5 and 9c | [TODO] | `www.` URL (see CLAUDE.md). The endpoint currently receives events but its inserts fail on missing columns; Stripe may disable it after repeated failures, so check it's enabled at go-live |
 | Stripe failed payments: **Manage failed payments → Card payments → Manage**: Smart Retries, up to 3 retries within 5 days; **"If all retries for a payment fail: cancel the subscription"** | [DONE] 2026-10-30 | Jay, in Dashboard → Settings → Billing → Subscriptions and emails. A weekly sub declined Monday is cancelled by Saturday, before the next Monday renewal can create a second invoice |
 | Stripe customer emails | [DONE] 2026-10-30 | ON: expiring cards, card payment failures, hosted link for payments needing confirmation. OFF: trial-ending reminder and "trial over" statement message (`trial_end` is only used to set renewal dates, rule 9), upcoming-renewal emails (weekly subscribers would get one every week). Payment method updates: Stripe-hosted page; subscription management link: Stripe customer portal |
+| Google Cloud project `justbread-routes`, Routes API, key `justbread-server` restricted to Routes API only, in Vercel as `GOOGLE_ROUTES_API_KEY` (Production + Preview) | [DONE] 2026-11-03 | On Google's 90-day free trial: it cannot charge the card until Jay upgrades |
+| Google $5/month budget, email alerts at 50/90/100%, savings unchecked so it tracks real cost | [DONE] 2026-11-03 | Spend-cap enforcement isn't offered for Maps/Routes, so alerts only |
+| Google daily quota: ComputeRoutes per day = 150, ComputeRouteMatrix per day = 0 | [TODO] at trial upgrade | Google blocks quota edits during the free trial. Until then the app's own 150/day counter (section 8) is the cap |
 | Stripe billing mode | Decided | Classic. The site's Stripe library pins an API version older than 2025-09-30, so API-created subscriptions are classic. Test clocks (rule 10) run in classic mode; changing modes or upgrading the Stripe library means re-running them |
 | Legacy $35/mo every-other-week subs moved to current prices | Partly done | Jessica and Toni still pending; see CLAUDE.md |
 
@@ -353,7 +356,8 @@ both delivered.
 **Cost guardrails (required):**
 - The Google API key lives only on the server (Vercel env var), never in the
   browser, and is restricted to the Routes API.
-- A hard **daily request quota** of **150 requests/day** set in Google Cloud.
+- A hard **daily request quota** of **150 requests/day** set in Google Cloud
+  (blocked during Google's free trial; set at upgrade, see section 3).
   Sized so the absolute worst case (a bug hitting the cap every day for a
   month = 4,500) still stays inside Google's 5,000 free requests/month.
   Normal use is a few requests a week. One request optimizes a whole route,
@@ -370,7 +374,7 @@ both delivered.
   handle. Confirm the exact number at build time. If a Thursday ever exceeds
   it, the sheet says so in advance (when the stop count passes the limit, not
   on the morning of delivery), and the route is optimized in two halves.
-- A Google Cloud **budget alert** at $5/month.
+- A Google Cloud **budget alert** at $5/month. [DONE]
 - Expected cost at Jay's volume: $0 (well inside Google's monthly free
   usage; see change log for the pricing checked).
 
@@ -635,6 +639,9 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-03: Google Cloud set up for the route (section 3). Vercel: admin
+  endpoints consolidated into one function (Hobby 12-function limit); previews
+  use their own Neon branch and only a test Stripe key.
 - 2026-11-02: Phase 6 built: production schedule ported from the desktop
   app and fed by the bake sheet. Verified by running the desktop app's own
   calculation for 1 to 60 loaves at three start times: identical to the
