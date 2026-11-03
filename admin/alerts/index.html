@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="/admin/manifest.webmanifest">
+  <link rel="icon" href="/admin/icons/icon-192.png">
+  <title>Alerts</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black: #0a0a0a; --near: #141414; --card: #1a1a1a; --border: #2a2a2a; --muted: #8a8a8a; --white: #fff; --yellow: #f5e600; --red: #ff6b6b; --green: #6dff9a; }
+    body { background: var(--black); color: var(--white); font-family: Arial, sans-serif; font-size: 16px; line-height: 1.45; min-height: 100vh; }
+    button, input, textarea { font: inherit; color: inherit; }
+    a { color: inherit; }
+    header { position: sticky; top: 0; z-index: 5; background: var(--black); border-bottom: 1px solid var(--border); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: 'Arial Black', Arial, sans-serif; font-weight: 900; letter-spacing: 2px; }
+    .logo span { color: var(--yellow); }
+    header nav { margin-left: auto; display: flex; gap: 10px; font-size: 12px; font-weight: 700; text-transform: uppercase; overflow-x: auto; }
+    header nav a { text-decoration: none; color: var(--muted); white-space: nowrap; }
+    header nav a.active { color: var(--yellow); }
+    main { max-width: 760px; margin: 0 auto; padding: 14px 16px 60px; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tab { flex: 1; min-height: 44px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; cursor: pointer; }
+    .tab.on { border-color: var(--yellow); color: var(--yellow); }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+    .card.unread { border-left: 4px solid var(--yellow); }
+    .muted { color: var(--muted); font-size: 14px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; cursor: pointer; }
+    .btn.primary { background: var(--yellow); color: var(--black); border-color: var(--yellow); }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    h3 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 18px 0 8px; }
+    details { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+    summary { padding: 12px 14px; cursor: pointer; font-weight: 700; }
+    .mail { background: #fff; color: #111; border-radius: 0 0 8px 8px; padding: 12px 14px; }
+    .mail p { margin: 0 0 12px; }
+    .mail .subj { font-weight: 700; margin-bottom: 8px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    input.f, textarea.f { width: 100%; background: var(--near); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-top: 6px; }
+    textarea.f { min-height: 140px; }
+    .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border); }
+    .pill.on { color: var(--green); border-color: var(--green); }
+    .pill.off { color: var(--red); border-color: var(--red); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">J<span>B</span></div>
+    <nav><a href="/admin/bake-sheet/">Sheet</a><a href="/admin/route/">Route</a><a href="/admin/schedule/">Schedule</a><a href="/admin/standing/">Standing</a><a href="/admin/alerts/" class="active">Alerts</a><a href="/admin/">Pay</a></nav>
+  </header>
+  <main>
+    <div class="tabs">
+      <button class="tab" data-v="alerts">Alerts</button>
+      <button class="tab" data-v="cancellations">Cancellations</button>
+      <button class="tab" data-v="emails">Emails</button>
+    </div>
+    <div id="out"></div>
+  </main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const el = (tag, attrs = {}, ...kids) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === 'class') n.className = v; else if (k.startsWith('on')) n.addEventListener(k.slice(2), v); else if (v !== false && v != null) n.setAttribute(k, v);
+    }
+    for (const k of kids.flat()) if (k != null && k !== false) n.append(k.nodeType ? k : document.createTextNode(String(k)));
+    return n;
+  };
+  const when = (t) => t ? new Date(t).toLocaleString('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
+  const day = (t) => t ? new Date(t).toLocaleDateString('en-US', { timeZone: 'America/Chicago', weekday: 'short', month: 'short', day: 'numeric' }) : '';
+  let view = new URLSearchParams(location.search).get('v') || 'alerts';
+
+  async function api(q, body) {
+    const res = await fetch(`/api/alerts${q || ''}`, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {});
+    if (res.status === 401) { location.href = '/admin/bake-sheet/'; throw new Error('Log in'); }
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(d.error || `Error ${res.status}`);
+    return d;
+  }
+
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => { view = t.dataset.v; history.replaceState(null, '', `?v=${view}`); load(); }));
+
+  async function load() {
+    document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t.dataset.v === view));
+    try {
+      const d = await api(`?view=${view}`);
+      ({ alerts: renderAlerts, cancellations: renderCancellations, emails: renderEmails })[view](d);
+    } catch (e) { $('#out').replaceChildren(el('p', { class: 'muted' }, e.message)); }
+  }
+
+  // ── Alerts ─────────────────────────────────────────────────────────────
+  const b64ToBytes = (b64) => { const p = '='.repeat((4 - (b64.length % 4)) % 4); const s = atob((b64 + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from([...s].map((c) => c.charCodeAt(0))); };
+  async function enablePush(key) {
+    try {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) throw new Error('This browser does not support notifications. Open the installed app from your home screen.');
+      const reg = await navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' });
+      await navigator.serviceWorker.ready;
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') throw new Error('Notifications were not allowed. You can allow them in Chrome site settings.');
+      const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(key) });
+      await api('', { action: 'push_subscribe', subscription: sub.toJSON(), device: navigator.userAgent.slice(0, 120) });
+      alert('Notifications are on for this phone.');
+      load();
+    } catch (e) { alert(e.message); }
+  }
+
+  function renderAlerts(d) {
+    const pushOn = typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    $('#out').replaceChildren(
+      el('div', { class: 'row', style: 'margin-top:0;margin-bottom:10px' },
+        pushOn ? el('span', { class: 'pill on' }, 'Notifications on for this phone') : el('button', { class: 'btn primary', onclick: () => enablePush(d.vapid_public_key) }, '🔔 Turn on notifications'),
+        d.unread ? el('button', { class: 'btn', onclick: async () => { await api('', { action: 'read_all' }); load(); } }, `Mark all read (${d.unread})`) : null),
+      el('p', { class: 'muted', style: 'margin-bottom:10px' }, 'Every alert also goes by email to info@justbread.shop.'),
+      ...(d.alerts.length ? d.alerts.map((a) => el('div', { class: `card${a.read_at ? '' : ' unread'}` },
+        el('div', {}, a.message),
+        el('div', { class: 'row', style: 'margin-top:6px' }, el('span', { class: 'muted' }, when(a.created_at)),
+          a.read_at ? null : el('button', { class: 'btn', style: 'min-height:36px', onclick: async () => { await api('', { action: 'read', id: a.id }); load(); } }, 'Mark read')))) : [el('p', { class: 'muted' }, 'No alerts yet.')]));
+  }
+
+  // ── Cancellations ──────────────────────────────────────────────────────
+  function renderCancellations(d) {
+    const plan = (c) => `${c.loaves || '?'} ${c.loaves === 1 ? 'loaf' : 'loaves'} ${{ weekly: 'weekly', biweekly: 'every other week', monthly: 'monthly' }[c.cadence] || ''}`;
+    const how = (c) => (c.ended_at ? (c.ended_reason === 'failed_payment' ? 'Ended after failed payment' : 'Ended') : 'Ends') ;
+    $('#out').replaceChildren(
+      el('p', { class: 'muted', style: 'margin-bottom:10px' }, 'Scheduled cancellations and subscriptions that ended in the last 60 days.'),
+      ...(d.cancellations.length ? d.cancellations.map((c) => el('div', { class: 'card' },
+        el('b', {}, c.customer_name || c.customer_email || c.stripe_subscription_id),
+        el('div', { class: 'muted' }, plan(c)),
+        el('div', {}, `${how(c)} ${day(c.ended_at || c.cancel_at || c.next_renewal_at)}`),
+        c.cancellation_comment ? el('div', { class: 'muted' }, `Reason: ${c.cancellation_comment}`) : null,
+        c.customer_email ? el('div', { class: 'row' }, el('a', { class: 'btn', href: `mailto:${c.customer_email}` }, '✉️ Email')) : null)) : [el('p', { class: 'muted' }, 'No cancellations in the last 60 days.')]));
+  }
+
+  // ── Emails ─────────────────────────────────────────────────────────────
+  function renderEmails(d) {
+    const out = [];
+    out.push(el('div', { class: 'card' },
+      el('div', { class: 'row', style: 'margin-top:0' }, el('b', {}, 'Automatic customer emails'),
+        el('span', { class: `pill ${d.customer_emails_enabled ? 'on' : 'off'}` }, d.customer_emails_enabled ? 'ON' : 'OFF')),
+      el('p', { class: 'muted', style: 'margin-top:6px' }, d.customer_emails_enabled
+        ? 'Confirmations, delivered, shipped and change emails are going to customers.'
+        : 'Nothing automatic goes to customers until you read the drafts below and switch this on. Your own alerts always send.'),
+      d.production ? null : el('p', { class: 'muted', style: 'margin-top:6px' }, 'This is the test site: anything sent to a customer goes to info@justbread.shop instead, marked TEST.'),
+      el('div', { class: 'row' }, el('button', {
+        class: d.customer_emails_enabled ? 'btn danger' : 'btn primary',
+        onclick: async () => {
+          if (!d.customer_emails_enabled && !confirm('Turn on automatic customer emails? Only do this after approving the drafts.')) return;
+          await api('', { action: 'customer_emails', on: !d.customer_emails_enabled }); load();
+        },
+      }, d.customer_emails_enabled ? 'Turn off' : 'Turn on'))));
+
+    out.push(el('h3', {}, 'Drafts to approve'));
+    for (const p of d.previews) {
+      const box = el('div', { class: 'mail' }, el('div', { class: 'subj' }, p.subject));
+      box.insertAdjacentHTML('beforeend', p.html);
+      out.push(el('details', {}, el('summary', {}, p.name), box));
+    }
+
+    out.push(el('h3', {}, 'Notice to all subscribers'));
+    const subj = el('input', { class: 'f', placeholder: 'Subject' });
+    const body = el('textarea', { class: 'f', placeholder: 'Your message. "Hi <first name>," and your sign-off are added for you. Blank line = new paragraph.' });
+    const pause = el('input', { class: 'f', type: 'date' });
+    out.push(el('div', { class: 'card' },
+      el('div', { class: 'muted' }, `Goes to ${d.subscriber_count} active subscriber${d.subscriber_count === 1 ? '' : 's'}. Sends even while automatic emails are off, since you wrote it.`),
+      subj, body,
+      el('label', { class: 'muted', style: 'display:block;margin-top:10px' }, 'Optional: also pause everyone until this Thursday (no charges or deliveries before it)'), pause,
+      el('div', { class: 'row' },
+        el('button', { class: 'btn', onclick: async () => {
+          try { await api('', { action: 'broadcast_test', subject: subj.value, body: body.value }); alert('Test sent to info@justbread.shop.'); } catch (e) { alert(e.message); }
+        } }, 'Send a test to me'),
+        el('button', { class: 'btn primary', onclick: async () => {
+          if (!subj.value.trim() || !body.value.trim()) { alert('Add a subject and a message.'); return; }
+          const p = pause.value ? ` and pause everyone until ${pause.value}` : '';
+          if (!confirm(`Send this to ${d.subscriber_count} subscribers${p}?`)) return;
+          try {
+            const r = await api('', { action: 'broadcast', subject: subj.value, body: body.value, pause_until: pause.value || null });
+            alert(`Sent ${r.sent} of ${r.recipients}.${r.failed ? ` ${r.failed} failed (retried tomorrow).` : ''}${pause.value ? ` Paused ${r.paused}.` : ''}${r.pause_errors.length ? ` Couldn't pause: ${r.pause_errors.map((x) => x.name).join(', ')}` : ''}`);
+            load();
+          } catch (e) { alert(e.message); }
+        } }, 'Send to everyone'))));
+
+    out.push(el('h3', {}, 'Recent emails'));
+    out.push(...(d.recent.length ? d.recent.map((r) => el('div', { class: 'card' },
+      el('div', {}, r.subject || r.email_type),
+      el('div', { class: 'muted' }, `${r.recipient} · ${r.status}${r.last_error ? ` (${r.last_error})` : ''} · ${when(r.sent_at)}`))) : [el('p', { class: 'muted' }, 'None yet.')]));
+    $('#out').replaceChildren(...out);
+  }
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/admin/sw.js', { scope: '/admin/' }).catch(() => {});
+  load();
+})();
+
+</script>
+</body>
+</html>

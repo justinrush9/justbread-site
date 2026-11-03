@@ -28,5 +28,6 @@ module.exports = async function seed() {
   // A monthly subscriber charging Wednesday: shows as Expected.
   const wedTen = Math.floor(new Date(`${shiftDate(t, -1)}T16:00:00Z`).getTime() / 1000);
   await processEvent(subscriptionEvent('customer.subscription.updated', { created: '2026-11-01T00:00:00Z', sub: { id: 'sub_month', current_period_end: wedTen } }), fakeStripe());
+  await query(`INSERT INTO alerts (stripe_event_id, type, message) VALUES ('evt_dev1','payment_declined','Payment declined: Cameron Hopf, $15.00, for Thursday ${t}.'), ('evt_dev2','cancellation_scheduled','Cancellation scheduled: Linda Strong, 1 loaf weekly. Ends Thu, Nov 26. Reason: moving.')`);
   return t;
 };

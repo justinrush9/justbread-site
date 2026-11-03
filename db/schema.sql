@@ -239,3 +239,11 @@ SET delivery_method = CASE
     pickup_location = raw_metadata->>'delivery_override'
 WHERE delivery_method = 'shipped'
   AND (raw_metadata->>'delivery_code' IS NOT NULL OR fulfillment_type = 'local');
+
+-- ── Phase 7: email retries and settings for alerts ─────────────────────────
+ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS subject TEXT;
+ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS html TEXT;
+ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS text_body TEXT;
+ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS attempts INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE emails_sent ADD COLUMN IF NOT EXISTS last_error TEXT;
+ALTER TABLE alerts ADD COLUMN IF NOT EXISTS pushed_at TIMESTAMPTZ;

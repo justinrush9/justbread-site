@@ -8,7 +8,8 @@
   },
   "dependencies": {
     "pg": "^8.11.0",
-    "stripe": "^16.0.0"
+    "stripe": "^16.0.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.2.17"

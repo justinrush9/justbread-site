@@ -24,6 +24,7 @@ const { isAdminRequest } = require('../lib/adminAuth');
 const { processEvent, EVENT_TYPES } = require('../lib/stripeEvents');
 const { refreshAllSubscriptions } = require('../lib/subscriptions');
 const { freezePast } = require('../lib/standingOrders');
+const { retryFailed } = require('../lib/email');
 
 const { stripe } = require('../lib/stripeClient');
 
@@ -78,6 +79,12 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error('Reconcile: standing-order freeze failed:', err.message);
     summary.errors.push({ type: 'standing_freeze', message: err.message });
+  }
+
+  try {
+    summary.emails = await retryFailed();
+  } catch (err) {
+    summary.errors.push({ type: 'email_retry', message: err.message });
   }
 
   return res.status(200).json(summary);

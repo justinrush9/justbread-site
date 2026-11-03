@@ -6,6 +6,8 @@
  */
 
 const ROUTES = {
+  alerts: require('../lib/routes/alerts'),
+  'email-prefs': require('../lib/routes/email-prefs'),
   'bake-sheet': require('../lib/routes/bake-sheet'),
   login: require('../lib/routes/login'),
   migrate: require('../lib/routes/migrate'),

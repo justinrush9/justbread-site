@@ -450,7 +450,7 @@ set to the done time this schedule calculates from its start time, the two
 match to the minute and gram. The extras and buffer math matches the
 examples above.
 
-## 9c. Notifications, Alerts, and Cancellations [TODO]
+## 9c. Notifications, Alerts, and Cancellations [BUILT, needs Jay's phone check]
 
 Runs entirely on the server from Stripe webhooks. No Claude session and no
 per-event approval is involved: once set up, Stripe notifies the site and the
@@ -487,7 +487,7 @@ Jay is notified when:
 notification within a minute, one entry in Alerts, and one row in
 Cancellations; Stripe resending the same event produces no duplicate.
 
-## 9d. Customer emails [TODO]
+## 9d. Customer emails [BUILT, held until Jay approves the wording]
 
 Sent by the site through the same transactional email service as Jay's
 alerts (9c). Plain, short, written in Jay's voice (no em dashes). Every email
@@ -639,6 +639,19 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-03: Phase 7 built. Email via Resend from "Just Bread"
+  <orders@justbread.shop>, replies and Jay's alerts to info@justbread.shop.
+  Alerts go by email and push (keys generated and stored in settings).
+  Alerts screen: Alerts, Cancellations (60 days), Emails (all 17 drafts,
+  on/off switch, notice to all subscribers with test send and optional
+  pause). Safeguards: dedupe key per email; automatic customer emails held
+  until Jay switches them on; outside production every customer email goes
+  to info@ marked TEST (the preview database holds real addresses);
+  delivered/shipped honor a signed one-click opt-out; failed sends retried
+  by the daily cron (3 tries). Notices Jay writes send even while automatic
+  emails are off. The /manage opt-out switch is deferred: the signed link in
+  every delivered/shipped email covers it without exposing anyone's
+  settings to a typed-in email address.
 - 2026-11-03: Phase 5 built: Route screen (current stop card with Navigate
   and "Delivered, next stop", numbered list, whole-route legs of up to 9
   waypoints, Re-optimize, usage line). Google computeRoutes with
