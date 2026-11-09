@@ -70,6 +70,14 @@
   .note { font-size: 0.875rem; color: var(--muted); text-align: center; line-height: 1.65; margin-top: 2rem; }
   .note a { color: var(--yellow); }
 
+  .hdyh-choices { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+  .hdyh-choices button { background: none; color: var(--white); border: 1.5px solid var(--border); border-radius: 3px; padding: 0.6rem 0.9rem; font: 700 0.9rem Arial, sans-serif; cursor: pointer; min-height: 44px; }
+  .hdyh-choices button:hover, .hdyh-choices button.on { border-color: var(--yellow); color: var(--yellow); }
+  .hdyh-other { display: none; gap: 0.5rem; margin-top: 0.75rem; }
+  .hdyh-other input { flex: 1; min-width: 0; background: var(--black); color: var(--white); border: 1.5px solid var(--border); border-radius: 3px; padding: 0.6rem; font: 1rem Arial, sans-serif; }
+  .hdyh-other button { background: var(--yellow); color: #000; border: 0; border-radius: 3px; padding: 0 1rem; font: 900 0.85rem 'Arial Black', Arial, sans-serif; text-transform: uppercase; cursor: pointer; }
+  .hdyh-thanks { color: var(--green); font-weight: 700; margin-top: 0.5rem; }
+
   /* ── FOOTER ── */
   footer { border-top: 1px solid var(--border); padding: 28px 40px; text-align: center; }
   footer p { font-family: Arial, sans-serif; font-size: 13px; color: var(--muted); }
@@ -127,6 +135,13 @@
 </div>
 
 <div class="page">
+
+  <div class="card" id="hdyh" style="display:none">
+    <div class="card-label">One quick question</div>
+    <h3>How did you hear about us?</h3>
+    <div class="hdyh-choices" id="hdyh-choices"></div>
+    <div class="hdyh-other" id="hdyh-other"><input id="hdyh-text" maxlength="200" placeholder="Where? (optional)"><button id="hdyh-send">Send</button></div>
+  </div>
 
   <div class="card" id="card-local" style="display:none">
     <div class="card-label">Local delivery</div>
@@ -190,6 +205,37 @@
   } else {
     document.getElementById('card-generic').style.display = 'block';
   }
+
+  // How did you hear about us (first-time customers only; optional)
+  (function () {
+    if (!sessionId || !sessionId.startsWith('cs_')) return;
+    var box = document.getElementById('hdyh');
+    var choices = document.getElementById('hdyh-choices');
+    function send(source, other) {
+      fetch('/api/referral', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ session_id: sessionId, source: source, other: other || '' }) }).catch(function () {});
+      choices.parentNode.querySelector('h3').textContent = 'Thanks!';
+      choices.remove();
+      document.getElementById('hdyh-other').remove();
+    }
+    fetch('/api/referral?session_id=' + encodeURIComponent(sessionId)).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ask) return;
+      d.choices.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = c.label;
+        b.addEventListener('click', function () {
+          if (c.value === 'other') {
+            b.classList.add('on');
+            document.getElementById('hdyh-other').style.display = 'flex';
+            document.getElementById('hdyh-text').focus();
+          } else send(c.value);
+        });
+        choices.appendChild(b);
+      });
+      document.getElementById('hdyh-send').addEventListener('click', function () { send('other', document.getElementById('hdyh-text').value); });
+      box.style.display = 'block';
+    }).catch(function () {});
+  })();
 
   // Hamburger menu
   var hamburger = document.getElementById('nav-hamburger');

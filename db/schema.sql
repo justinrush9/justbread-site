@@ -250,3 +250,15 @@ ALTER TABLE alerts ADD COLUMN IF NOT EXISTS pushed_at TIMESTAMPTZ;
 
 -- ── Helper hand-off (section 8) ────────────────────────────────────────────
 ALTER TABLE stops ADD COLUMN IF NOT EXISTS handed_off_at TIMESTAMPTZ;
+
+-- ── Moving a week's delivery day (section 7f) ──────────────────────────────
+ALTER TABLE week_overrides ADD COLUMN IF NOT EXISTS delivery_date DATE;
+
+-- ── How did you hear about us (section 9e) ─────────────────────────────────
+CREATE TABLE IF NOT EXISTS referral_sources (
+  stripe_session_id  TEXT PRIMARY KEY,
+  customer_email     TEXT,
+  source             TEXT NOT NULL,
+  other_text         TEXT,
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);

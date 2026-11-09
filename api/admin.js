@@ -15,6 +15,7 @@ const ROUTES = {
   'order-edit': require('../lib/routes/order-edit'),
   orders: require('../lib/routes/orders'),
   production: require('../lib/routes/production'),
+  referral: require('../lib/routes/referral'),
   route: require('../lib/routes/route'),
   'standing-orders': require('../lib/routes/standing-orders'),
   stops: require('../lib/routes/stops'),

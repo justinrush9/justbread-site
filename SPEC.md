@@ -34,7 +34,9 @@ These are decided. Everything else in this spec follows from them.
    pays monthly (one delivery per month), one-time pays once. No plan bills on
    one cadence and delivers on another.
 3. **Everything is delivered Thursday.** Local delivery, pickup points, and
-   shipping (ships Thursday via UPS Ground, arrives Friday).
+   shipping (ships Thursday via UPS Ground, arrives Friday). Exception: Jay
+   can move one week's delivery day (holidays, section 7f). Internally the
+   week is still keyed by its Thursday.
 4. **New payments: cutoff Tuesday 12:00 PM Central.** A one-time order or a
    new subscription's first payment at or before the cutoff goes on that
    week's Thursday; after it, the next Thursday. Jay handles capacity edge
@@ -323,6 +325,36 @@ no full street address is visible for local delivery entries; shipped
 entries show a copyable full address; ticking a stop with two orders marks
 both delivered.
 
+### 7f. Moving a week's delivery day (holidays) [BUILT]
+
+Decided Nov 9: Thanksgiving week delivers **Wednesday Nov 25** instead of
+Thursday Nov 26.
+
+- On the Schedule screen, a week can be set to deliver on Tuesday,
+  Wednesday, Thursday (default) or Friday of that same week. Stored in
+  `week_overrides.delivery_date`. Every order, stop and production record
+  stays keyed by the week's Thursday, so nothing moves in the database.
+- Everything that shows a date shows the delivery day instead: week chips,
+  the Sheet, Route, Schedule, and customer emails.
+- **Production moves with it.** Starter feeds, mix and bake each happen the
+  same number of days before delivery as usual (Wednesday delivery: feeds
+  Monday, mix Tuesday, bake Wednesday).
+- **New-order cutoff moves earlier with it, never later.** Normal cutoff is
+  Tuesday noon, two days before delivery. For an earlier delivery day the
+  cutoff is noon two days before that day (Wednesday delivery: Monday noon).
+  New orders after it go to the following week. A later delivery day (Friday)
+  keeps the normal Tuesday noon cutoff.
+- **Renewals are not moved.** Rule 5 placement is unchanged, so no
+  subscriber gets two loaves one week and none the next. A renewal that
+  charges after that week's delivery (for example a Wednesday afternoon
+  renewal in Thanksgiving week) is still on that week's sheet as an expected
+  entry and is delivered before the charge, the same as any expected entry.
+- **Shipping** goes out on the delivery day. Thanksgiving week: ships
+  Wednesday, arrives Friday (UPS does not deliver on Thanksgiving).
+- Skip buttons, standing orders and extras are unchanged.
+- Customers are told by the notice to all subscribers (9c); the public
+  order page still says Thursday.
+
 ## 8. Delivery route [BUILT, needs Jay's phone check]
 
 - **Start and end at home**, every time. Home address is stored as a setting
@@ -538,6 +570,19 @@ re-ticking produces none; clicking "stop these emails" stops the next
 Delivered email and nothing else; a test portal cancellation produces one
 change confirmation with the last delivery date.
 
+## 9e. "How did you hear about us" [BUILT]
+
+- Asked on the order-confirmed page, **first-time customers only**: no
+  earlier order under the same email (any order created more than a minute
+  before this checkout).
+- Choices (Jay, Nov 9): Google / internet search, Instagram, Friend or
+  family, Another customer, Farmers market, Other (optional text box).
+  One tap answers; optional, can be ignored.
+- The server checks the checkout session with Stripe (must be real and
+  paid) before saving, one answer per checkout.
+- Jay sees counts (last 90 days and all time) and the recent answers on a
+  "Sources" tab of the Alerts screen.
+
 ## 10. Open decisions
 
 | # | Question | Options | Default if undecided |
@@ -622,7 +667,12 @@ Key/value: home address, default bake start time, starter buffer, recipe
 and timing constants, fridge-by time.
 
 ### `week_overrides` (new)
-Thursday (PK), extras override, start time override.
+Thursday (PK), extras override, start time override, `delivery_date`
+(null = Thursday; section 7f).
+
+### `referral_sources` (new)
+Checkout session id (PK), customer email, source, other text,
+`created_at` (section 9e).
 
 ### `alerts` (new)
 `stripe_event_id` (unique, blocks duplicates), type, subscription id,
@@ -650,6 +700,9 @@ the app's own 150/day cap and the monthly usage line.
 
 ## 13. Change log
 
+- 2026-11-09: Added 7f (move a week's delivery day; Thanksgiving delivers
+  Wednesday Nov 25) and 9e (how did you hear about us, first-time customers,
+  Jay's choices), per Jay.
 - 2026-11-03: Added Hand off (helper deliveries, no email until ticked
   Delivered) and Re-plan from here (remaining stops from the phone's location
   to home), per Jay.

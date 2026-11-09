@@ -13,7 +13,7 @@
   },
   "rewrites": [
     {
-      "source": "/api/(bake-sheet|login|migrate|move-to-monday|order-edit|orders|production|standing-orders|stops|subscription-control|route|alerts|email-prefs)",
+      "source": "/api/(bake-sheet|login|migrate|move-to-monday|order-edit|orders|production|standing-orders|stops|subscription-control|route|alerts|email-prefs|referral)",
       "destination": "/api/admin?route=$1"
     }
   ],

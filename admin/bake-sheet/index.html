@@ -40,6 +40,7 @@
     .stat b { display: block; font-size: 20px; }
     .stat span { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
     .stat.warn b { color: var(--red); }
+    .banner { background: var(--yellow); color: #000; font-weight: 700; padding: 10px 12px; border-radius: 6px; margin: 10px 0; }
     .linkbtn { background: none; border: 0; color: var(--yellow); text-decoration: underline; cursor: pointer; font-size: 14px; padding: 0; }
 
     h2 { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--yellow); margin: 22px 0 8px; display: flex; justify-content: space-between; }
@@ -184,14 +185,14 @@
 
   // ── chips ──────────────────────────────────────────────────────────────
   async function loadChips() {
-    const { today, thursdays } = await api('/api/bake-sheet');
+    const { today, thursdays, delivery_dates: dd = {} } = await api('/api/bake-sheet');
     const next = nextThursday(today);
     const days = [...new Set([next, addDays(next, 7), ...thursdays])].sort();
     const saved = store.get('jb.thursday');
     thursday = thursday || (saved && saved >= addDays(today, -7) ? saved : (thursdays.find((d) => d >= today) || next));
     const chips = $('#chips');
     chips.replaceChildren(
-      ...days.filter((d) => d >= addDays(today, -7)).map((d) => el('button', { class: `chip${d === thursday ? ' on' : ''}`, onclick: () => pick(d) }, d === next ? `This Thu · ${fmtDay(d)}` : fmtDay(d))),
+      ...days.filter((d) => d >= addDays(today, -7)).map((d) => el('button', { class: `chip${d === thursday ? ' on' : ''}`, onclick: () => pick(d) }, d === next ? `This week · ${fmtDay(dd[d] || d)}` : fmtDay(dd[d] || d))),
       el('label', { class: 'chip' }, el('input', { type: 'date', value: thursday, onchange: (e) => isThu(e.target.value) ? pick(e.target.value) : toast('Pick a Thursday') })),
     );
   }
@@ -220,7 +221,10 @@
         stat(`${s.stops_done}/${s.stops}`, 'Stops done'), stat(s.declined, 'Declined', s.declined > 0), stat(s.manual_or_standing, 'Manual / barter')),
       el('div', { class: 'actions' }, el('button', { class: 'btn', onclick: () => window.print() }, 'Print'))));
 
-    if (!current.entries.length) nodes.push(el('p', { class: 'empty' }, 'Nothing on this Thursday yet.'));
+    if (current.delivery_date && current.delivery_date !== thursday) {
+      nodes.push(el('div', { class: 'banner' }, `Delivery moved to ${fmtDay(current.delivery_date)} this week (normally ${fmtDay(thursday)}). Change it on the Schedule screen.`));
+    }
+    if (!current.entries.length) nodes.push(el('p', { class: 'empty' }, 'Nothing on this week yet.'));
 
     const groups = [
       ['local_delivery', 'Local delivery'],
@@ -322,7 +326,7 @@
 
   function editExtras() {
     const input = el('input', { type: 'number', min: 0, inputmode: 'numeric', value: current.summary.extras });
-    openModal(el('h3', {}, `Extras for ${fmtDay(thursday)}`),
+    openModal(el('h3', {}, `Extras for ${fmtDay(current.delivery_date || thursday)}`),
       el('p', { style: 'color:var(--muted);margin-bottom:10px' }, `Default is 1 per 12 ordered (${Math.floor(current.summary.ordered / 12)}).`),
       row('Extra loaves', input),
       el('div', { class: 'btns' },
@@ -395,7 +399,7 @@
   }
 
   function confirmCancel(e) {
-    openModal(el('h3', {}, `Cancel ${e.customer_name}'s delivery on ${fmtDay(thursday)}?`),
+    openModal(el('h3', {}, `Cancel ${e.customer_name}'s delivery on ${fmtDay(current.delivery_date || thursday)}?`),
       el('p', { style: 'color:var(--muted);margin-bottom:10px' }, e.payment_status === 'paid' && e.source_tag !== 'Manual'
         ? 'This takes it off the sheet. It does not refund. Refund in Stripe if needed; the sheet updates itself.'
         : 'This takes it off the sheet.'),

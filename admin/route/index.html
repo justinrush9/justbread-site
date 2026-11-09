@@ -105,7 +105,7 @@
       data = await api();
       // On delivery day, bring the stored route up to date automatically (one
       // Google call only when the stop list changed).
-      if (data.home_address && data.needs_compute && data.stop_count && thursday === today && !busy) {
+      if (data.home_address && data.needs_compute && data.stop_count && (data.delivery_date || thursday) === today && !busy) {
         busy = true; data = await api({ action: 'optimize' }); busy = false;
       }
       render();
@@ -163,10 +163,10 @@
 
   function render() {
     const d = data;
-    const out = [el('div', { class: 'muted' }, `Route for ${fmtDay(thursday)} · `, el('a', { href: '/admin/bake-sheet/', style: 'color:var(--yellow)' }, 'change Thursday on the Sheet'))];
+    const out = [el('div', { class: 'muted' }, `Route for ${fmtDay(d.delivery_date || thursday)} · `, el('a', { href: '/admin/bake-sheet/', style: 'color:var(--yellow)' }, 'change week on the Sheet'))];
 
     if (!d.home_address) { out.push(homeForm('')); $('#out').replaceChildren(...out); return; }
-    if (!d.stops.length) { out.push(el('p', { class: 'card muted' }, 'No local deliveries or pickup stops this Thursday.')); $('#out').replaceChildren(...out); return; }
+    if (!d.stops.length) { out.push(el('p', { class: 'card muted' }, 'No local deliveries or pickup stops this week.')); $('#out').replaceChildren(...out); return; }
 
     if (d.over_limit) out.push(el('div', { class: 'card notice' }, `${d.stop_count} stops is more than Google optimizes in one request (${d.max_per_request}). It will be optimized in two halves.`));
     if (d.method === 'fallback' && d.notice) out.push(el('div', { class: 'card notice' }, d.notice));

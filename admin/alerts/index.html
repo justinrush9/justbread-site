@@ -22,7 +22,7 @@
     header nav a.active { color: var(--yellow); }
     main { max-width: 760px; margin: 0 auto; padding: 14px 16px 60px; }
     .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .tab { flex: 1; min-height: 44px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; cursor: pointer; }
+    .tab { flex: 1; min-height: 44px; padding: 0 4px; font-size: 14px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--near); font-weight: 700; cursor: pointer; }
     .tab.on { border-color: var(--yellow); color: var(--yellow); }
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
     .card.unread { border-left: 4px solid var(--yellow); }
@@ -54,6 +54,7 @@
       <button class="tab" data-v="alerts">Alerts</button>
       <button class="tab" data-v="cancellations">Cancellations</button>
       <button class="tab" data-v="emails">Emails</button>
+      <button class="tab" data-v="sources">Sources</button>
     </div>
     <div id="out"></div>
   </main>
@@ -86,7 +87,7 @@
     document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t.dataset.v === view));
     try {
       const d = await api(`?view=${view}`);
-      ({ alerts: renderAlerts, cancellations: renderCancellations, emails: renderEmails })[view](d);
+      ({ alerts: renderAlerts, cancellations: renderCancellations, emails: renderEmails, sources: renderSources })[view](d);
     } catch (e) { $('#out').replaceChildren(el('p', { class: 'muted' }, e.message)); }
   }
 
@@ -131,6 +132,19 @@
         el('div', {}, `${how(c)} ${day(c.ended_at || c.cancel_at || c.next_renewal_at)}`),
         c.cancellation_comment ? el('div', { class: 'muted' }, `Reason: ${c.cancellation_comment}`) : null,
         c.customer_email ? el('div', { class: 'row' }, el('a', { class: 'btn', href: `mailto:${c.customer_email}` }, '✉️ Email')) : null)) : [el('p', { class: 'muted' }, 'No cancellations in the last 60 days.')]));
+  }
+
+  // ── Sources (how did you hear about us, 9e) ───────────────────────────
+  function renderSources(d) {
+    const total = d.counts.reduce((a, c) => a + c.last_90, 0);
+    $('#out').replaceChildren(
+      el('p', { class: 'muted', style: 'margin-bottom:10px' }, 'What first-time customers picked after checkout. Answering is optional, so not everyone shows up.'),
+      el('div', { class: 'card' }, el('b', {}, `Last 90 days (${total})`),
+        ...d.counts.map((c) => el('div', { class: 'row', style: 'justify-content:space-between;margin-top:6px' }, el('span', {}, c.label), el('b', {}, `${c.last_90}`, el('span', { class: 'muted' }, ` · ${c.all_time} all time`))))),
+      el('h3', {}, 'Recent answers'),
+      ...(d.recent.length ? d.recent.map((r) => el('div', { class: 'card' },
+        el('b', {}, r.label), r.other_text ? el('span', {}, `: ${r.other_text}`) : null,
+        el('div', { class: 'muted' }, `${r.customer_name || r.customer_email || 'Customer'} · ${when(r.created_at)}`))) : [el('p', { class: 'muted' }, 'No answers yet.')]));
   }
 
   // ── Emails ─────────────────────────────────────────────────────────────

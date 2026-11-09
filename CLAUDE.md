@@ -91,6 +91,12 @@ localOnetime: price_1TgVeRJVnPyvSLMUK2e4GsPX
 - Vercel Hobby allows at most 12 server functions: admin endpoints live in
   `lib/routes/` behind `api/admin.js` (vercel.json rewrites keep the URLs).
   Don't add new files under `api/` for admin features; add a route instead.
+- Holiday weeks (SPEC 7f): a week's delivery day can be moved on the Schedule
+  screen (`week_overrides.delivery_date`). Orders stay keyed by the week's
+  Thursday; use `lib/weeks.js` (`deliveryDateFor`) anywhere a date is shown
+  to Jay or a customer. Thanksgiving 2026 delivers Wed Nov 25.
+- "How did you hear about us" (SPEC 9e): public `/api/referral`, answers on
+  the Alerts screen's Sources tab.
 - Preview builds get their own Neon database branch (Vercel Storage setting,
   Nov 3 2026). Run `/admin/setup/` once on a new preview to create tables.
 
