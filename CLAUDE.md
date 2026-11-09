@@ -334,6 +334,17 @@ Re-read each subscription first to confirm item IDs. When both are done, delete
 this section; only remove `price_1OtXyoJVnPyvSLMUK1jhbHqU` from LEGACY_LOAF_PRICES
 after confirming no active subs remain on it.
 
+**Alexandria Notter (Nov 9 2026):** her original sub `sub_1U6CPnJVnPyvSLMU4tzkHFSh`
+was auto-cancelled (failed-payment rule) after Stripe Radar blocked her Link
+wallet as highest risk (never sent to her bank). She paid both open weeks with
+a new Visa 4403; Jay had a replacement created the same day:
+`sub_1UZz2PJVnPyvSLMUuhLARJHz`, weekly loaf + local delivery, same Wednesday
+11:07 AM anchor, no charge on creation. **This sub is `billing_mode: flexible`**
+(created through the Stripe connector, which uses a newer API version); every
+other sub is classic. The move-to-Monday tool and skip controls were only
+test-clocked in classic mode: run the flexible case on test clocks before
+moving or skipping this sub.
+
 Also still paused (not legacy, Jay's call): Judy Aldana sub_1S9PxzJVnPyvSLMUVsCNgZQ4 ($22/mo).
 
 ## Outstanding / Future Work
