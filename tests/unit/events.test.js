@@ -162,6 +162,17 @@ test('pause and resume raise alerts', async () => {
   assert.deepEqual((await alerts(db)).map((a) => a.type), ['paused', 'resumed']);
 });
 
+test('a true pause (status paused, portal pause on flexible subs) also raises alerts', async () => {
+  const db = await freshDb();
+  await processEvent(subscriptionEvent('customer.subscription.updated', {
+    created: '2026-11-05T12:00:00Z', sub: { status: 'paused' }, previous: { status: 'active' },
+  }), stripe);
+  await processEvent(subscriptionEvent('customer.subscription.updated', {
+    created: '2026-12-05T12:00:00Z', sub: { status: 'active' }, previous: { status: 'paused' },
+  }), stripe);
+  assert.deepEqual((await alerts(db)).map((a) => a.type), ['paused', 'resumed']);
+});
+
 test('daily refresh fills the mirror without alerts, and a later stale event is ignored', async () => {
   const db = await freshDb();
   const { refreshAllSubscriptions } = require('../../lib/subscriptions');
