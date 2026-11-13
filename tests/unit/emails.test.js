@@ -56,7 +56,7 @@ test('confirmation once for a new order, never for a renewal; previews never rea
   assert.equal(toCustomer().length, 1);
   assert.equal(toCustomer()[0].to[0], 'a@example.com');
   assert.equal(toCustomer()[0].reply_to, 'info@justbread.shop');
-  assert.match(toCustomer()[0].subject, /Your JustBread order/);
+  assert.match(toCustomer()[0].subject, /Your New JustBread Subscription/);
 
   // Same thing on a preview: redirected to info@ and marked TEST.
   await freshDb(); captureResend(); await settings.set('customer_emails_enabled', true);
