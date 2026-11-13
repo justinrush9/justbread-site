@@ -104,7 +104,7 @@ test('subscription changes email the customer; the daily refresh does not', asyn
   }), stripe);
   const m = toCustomer();
   assert.equal(m.length, 1);
-  assert.match(m[0].text, /no bread and no charge until Thursday, December 3/);
+  assert.match(m[0].text, /skipped until Thursday, December 3. No bread and no charges before then. Your card will be charged for that delivery on Monday morning, November 30/);
   const { refreshAllSubscriptions } = require('../../lib/subscriptions');
   const live = subscriptionEvent('customer.subscription.updated', { created: '2026-11-06T00:00:00Z', sub: { status: 'canceled', cancellation_details: { reason: 'cancellation_requested' } } }).data.object;
   await refreshAllSubscriptions({ ...stripe, subscriptions: { list: async function* () { yield live; } } });
