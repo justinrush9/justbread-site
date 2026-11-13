@@ -1,0 +1,550 @@
+{
+  "branch": "build/phase-6",
+  "sha": "c3bfa47",
+  "unit": {
+    "exit": 0,
+    "output": "\n> justbread-checkout@1.0.0 test\n> node --test tests/unit/*.test.js\n\nTAP version 13\n# Subtest: 30-day session cookie: valid, expires, and dies when the password changes\nok 1 - 30-day session cookie: valid, expires, and dies when the password changes\n  ---\n  duration_ms: 6.66701\n  ...\n# Subtest: templates: no em dashes anywhere, and every draft has a subject and body\nok 2 - templates: no em dashes anywhere, and every draft has a subject and body\n  ---\n  duration_ms: 20.821099\n  ...\n# Subtest: customer emails are held until switched on; alerts to Jay are not\nok 3 - customer emails are held until switched on; alerts to Jay are not\n  ---\n  duration_ms: 3339.387204\n  ...\n# Subtest: confirmation once for a new order, never for a renewal; previews never reach customers\nok 4 - confirmation once for a new order, never for a renewal; previews never reach customers\n  ---\n  duration_ms: 2921.929483\n  ...\n# Subtest: delivered: one email per order at the stop, once, with a working opt-out\nok 5 - delivered: one email per order at the stop, once, with a working opt-out\n  ---\n  duration_ms: 1970.519409\n  ...\n# Subtest: subscription changes email the customer; the daily refresh does not\nok 6 - subscription changes email the customer; the daily refresh does not\n  ---\n  duration_ms: 1467.448636\n  ...\n# Subtest: moving or cancelling one delivery emails the customer\nok 7 - moving or cancelling one delivery emails the customer\n  ---\n  duration_ms: 1228.075695\n  ...\n# email alert:1 failed: down\n# Subtest: alerts email Jay; a failed send is retried by the daily cron\nok 8 - alerts email Jay; a failed send is retried by the daily cron\n  ---\n  duration_ms: 1202.316214\n  ...\n# Subtest: push: dead devices are removed\nok 9 - push: dead devices are removed\n  ---\n  duration_ms: 1072.496716\n  ...\n# Subtest: notice to all subscribers: approved by Jay, so it sends even while automatic emails are off\nok 10 - notice to all subscribers: approved by Jay, so it sends even while automatic emails are off\n  ---\n  duration_ms: 1138.162877\n  ...\n# Subtest: one-time order: inserted once, replay is a no-op\nok 11 - one-time order: inserted once, replay is a no-op\n  ---\n  duration_ms: 3590.32834\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# Subtest: declined then retry succeeds: one row flips to paid, one alert\nok 12 - declined then retry succeeds: one row flips to paid, one alert\n  ---\n  duration_ms: 1507.26404\n  ...\n# Subtest: out of order: a late decline never turns a paid row back to declined\nok 13 - out of order: a late decline never turns a paid row back to declined\n  ---\n  duration_ms: 1491.095467\n  ...\n# Subtest: placement: renewal vs first payment\nok 14 - placement: renewal vs first payment\n  ---\n  duration_ms: 1821.499779\n  ...\n# Subtest: zero-amount invoices are not orders\nok 15 - zero-amount invoices are not orders\n  ---\n  duration_ms: 1471.84996\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# email alert:2 failed: RESEND_API_KEY is not set\n# email alert:4 failed: RESEND_API_KEY is not set\n# Subtest: refunds: partial keeps the order, full removes it, replays and late paid events change nothing\nok 16 - refunds: partial keeps the order, full removes it, replays and late paid events change nothing\n  ---\n  duration_ms: 1298.980231\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# email alert:3 failed: RESEND_API_KEY is not set\n# Subtest: subscription mirror: cancel scheduled, undone, stale events ignored, no duplicate alerts\nok 17 - subscription mirror: cancel scheduled, undone, stale events ignored, no duplicate alerts\n  ---\n  duration_ms: 1241.078553\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# Subtest: subscription ended after failed payments\nok 18 - subscription ended after failed payments\n  ---\n  duration_ms: 1144.894427\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# email alert:2 failed: RESEND_API_KEY is not set\n# Subtest: pause and resume raise alerts\nok 19 - pause and resume raise alerts\n  ---\n  duration_ms: 1136.81888\n  ...\n# email alert:1 failed: RESEND_API_KEY is not set\n# email alert:2 failed: RESEND_API_KEY is not set\n# Subtest: a true pause (status paused, portal pause on flexible subs) also raises alerts\nok 20 - a true pause (status paused, portal pause on flexible subs) also raises alerts\n  ---\n  duration_ms: 1680.933\n  ...\n# Subtest: daily refresh fills the mirror without alerts, and a later stale event is ignored\nok 21 - daily refresh fills the mirror without alerts, and a later stale event is ignored\n  ---\n  duration_ms: 1810.927714\n  ...\n# Subtest: first payment moves the next charge to a Monday; replays and renewals do not\nok 22 - first payment moves the next charge to a Monday; replays and renewals do not\n  ---\n  duration_ms: 1431.23412\n  ...\n# Subtest: new payments: Tuesday noon cutoff (core rule 4)\nok 23 - new payments: Tuesday noon cutoff (core rule 4)\n  ---\n  duration_ms: 21.008924\n  ...\n# Subtest: renewals: charge by Thursday noon -> that Thursday (core rule 5)\nok 24 - renewals: charge by Thursday noon -> that Thursday (core rule 5)\n  ---\n  duration_ms: 1.560868\n  ...\n# Subtest: renewal rule uses Central time, not UTC\nok 25 - renewal rule uses Central time, not UTC\n  ---\n  duration_ms: 0.533531\n  ...\n# Subtest: expected renewals: monthly renewal on Wednesday shows on that Thursday, then becomes the order\nok 26 - expected renewals: monthly renewal on Wednesday shows on that Thursday, then becomes the order\n  ---\n  duration_ms: 3634.391802\n  ...\n# Subtest: expected renewals: skipped, cancelled, and Thursday-afternoon cases\nok 27 - expected renewals: skipped, cancelled, and Thursday-afternoon cases\n  ---\n  duration_ms: 1469.819438\n  ...\n# Subtest: skip this week pauses until Thursday 12:01 PM; refuses an already-paid or later Thursday\nok 28 - skip this week pauses until Thursday 12:01 PM; refuses an already-paid or later Thursday\n  ---\n  duration_ms: 10.911477\n  ...\n# Subtest: skip until: pause ends after the prior Thursday noon so that Thursday renewals charge\nok 29 - skip until: pause ends after the prior Thursday noon so that Thursday renewals charge\n  ---\n  duration_ms: 0.633167\n  ...\n# Subtest: resume clears the pause; cancelled subscriptions cannot be skipped\nok 30 - resume clears the pause; cancelled subscriptions cannot be skipped\n  ---\n  duration_ms: 0.465983\n  ...\n# Subtest: move to Monday: Wednesday renewal moves to Monday of the same week; monthly and paused untouched\nok 31 - move to Monday: Wednesday renewal moves to Monday of the same week; monthly and paused untouched\n  ---\n  duration_ms: 5.976431\n  ...\n# Subtest: weekly standing order: every Thursday from start; skip one; end it\nok 32 - weekly standing order: every Thursday from start; skip one; end it\n  ---\n  duration_ms: 3064.181777\n  ...\n# Subtest: every other week alternates from the start date, across a month boundary\nok 33 - every other week alternates from the start date, across a month boundary\n  ---\n  duration_ms: 1613.54618\n  ...\n# Subtest: pause and resume\nok 34 - pause and resume\n  ---\n  duration_ms: 1282.426779\n  ...\n# Subtest: an edit changes every future Thursday and no past (frozen) one\nok 35 - an edit changes every future Thursday and no past (frozen) one\n  ---\n  duration_ms: 1318.122735\n  ...\n# Subtest: one-Thursday override from a single edit, and validation\nok 36 - one-Thursday override from a single edit, and validation\n  ---\n  duration_ms: 1171.534028\n  ...\n# Subtest: manual order, edits with history, cancel, resolve declined\nok 37 - manual order, edits with history, cancel, resolve declined\n  ---\n  duration_ms: 1287.953068\n  ...\n# Subtest: web schedule matches the desktop app exactly (1-60 loaves, three start times)\nok 38 - web schedule matches the desktop app exactly (1-60 loaves, three start times)\n  ---\n  duration_ms: 115.546978\n  ...\n# Subtest: Tuesday buffer: AM sized for count + 2, PM recalculated, red flag when short\nok 39 - Tuesday buffer: AM sized for count + 2, PM recalculated, red flag when short\n  ---\n  duration_ms: 0.361651\n  ...\n# Subtest: plan is fed by the sheet, honors a week start time, and flags orders after the AM feed\nok 40 - plan is fed by the sheet, honors a week start time, and flags orders after the AM feed\n  ---\n  duration_ms: 2681.797382\n  ...\n# Subtest: asks first-time customers once, records the answer\nok 41 - asks first-time customers once, records the answer\n  ---\n  duration_ms: 2560.945187\n  ...\n# Subtest: returning customers, unpaid or fake sessions are not asked\nok 42 - returning customers, unpaid or fake sessions are not asked\n  ---\n  duration_ms: 1804.004248\n  ...\n# Subtest: optimizes once, from home to home, through local stops and pickup points but not UPS\nok 43 - optimizes once, from home to home, through local stops and pickup points but not UPS\n  ---\n  duration_ms: 2704.679678\n  ...\n# Subtest: a new stop makes the stored route stale and triggers one recompute\nok 44 - a new stop makes the stored route stale and triggers one recompute\n  ---\n  duration_ms: 2332.483709\n  ...\n# Subtest: falls back to ZIP order with a notice: no home, no key, Google error, daily cap\nok 45 - falls back to ZIP order with a notice: no home, no key, Google error, daily cap\n  ---\n  duration_ms: 1681.700288\n  ...\n# Subtest: more stops than one request allows: optimized in two halves, warned in advance\nok 46 - more stops than one request allows: optimized in two halves, warned in advance\n  ---\n  duration_ms: 1090.312842\n  ...\n# Subtest: hand off: off the route, no email; re-plan from the phone covers only what is left\nok 47 - hand off: off the route, no email; re-plan from the phone covers only what is left\n  ---\n  duration_ms: 956.604653\n  ...\n# Subtest: schema upgrades the Sep 2026 orders table without losing rows\nok 48 - schema upgrades the Sep 2026 orders table without losing rows\n  ---\n  duration_ms: 2641.49\n  ...\n# Subtest: baker's dozen extras\nok 49 - baker's dozen extras\n  ---\n  duration_ms: 1.743429\n  ...\n# Subtest: address normalization merges the same house\nok 50 - address normalization merges the same house\n  ---\n  duration_ms: 0.657871\n  ...\n# Subtest: sheet summary, stops, and delivered per stop\nok 51 - sheet summary, stops, and delivered per stop\n  ---\n  duration_ms: 3123.460745\n  ...\n# Subtest: previews only ever get a test key\nok 52 - previews only ever get a test key\n  ---\n  duration_ms: 2.163273\n  ...\n# Subtest: delivery day: default Thursday, set Wednesday, reset, bounds\nok 53 - delivery day: default Thursday, set Wednesday, reset, bounds\n  ---\n  duration_ms: 1947.267995\n  ...\n# Subtest: moved-earlier week: new-order cutoff is Monday noon, renewals stay put\nok 54 - moved-earlier week: new-order cutoff is Monday noon, renewals stay put\n  ---\n  duration_ms: 944.795702\n  ...\n# Subtest: a later delivery day (Friday) keeps the normal Tuesday noon cutoff\nok 55 - a later delivery day (Friday) keeps the normal Tuesday noon cutoff\n  ---\n  duration_ms: 800.468183\n  ...\n# Subtest: first renewal anchors off the real first week\nok 56 - first renewal anchors off the real first week\n  ---\n  duration_ms: 1.131109\n  ...\n# Subtest: production schedule shifts a day earlier and says so\nok 57 - production schedule shifts a day earlier and says so\n  ---\n  duration_ms: 728.133398\n  ...\n1..57\n# tests 57\n# suites 0\n# pass 57\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 27528.721545\n"
+  },
+  "schema": {
+    "exit": 0,
+    "output": "psql:db/schema.sql:15: NOTICE:  relation \"bakes\" already exists, skipping\npsql:db/schema.sql:32: NOTICE:  relation \"orders\" already exists, skipping\npsql:db/schema.sql:34: NOTICE:  relation \"idx_orders_status\" already exists, skipping\npsql:db/schema.sql:35: NOTICE:  relation \"idx_orders_bake_id\" already exists, skipping\npsql:db/schema.sql:43: NOTICE:  column \"delivery_method\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:45: NOTICE:  column \"pickup_location\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:46: NOTICE:  column \"shipping_address\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:47: NOTICE:  column \"fulfillment_date\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:50: NOTICE:  relation \"idx_orders_fulfillment_date\" already exists, skipping\npsql:db/schema.sql:70: NOTICE:  relation \"standing_orders\" already exists, skipping\npsql:db/schema.sql:72: NOTICE:  column \"source\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:74: NOTICE:  column \"payment_status\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:76: NOTICE:  column \"amount_cents\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:77: NOTICE:  column \"refunded_cents\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:78: NOTICE:  column \"declined_resolved_at\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:79: NOTICE:  column \"cancelled_at\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:80: NOTICE:  column \"history\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:81: NOTICE:  column \"customer_phone\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:82: NOTICE:  column \"note\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:83: NOTICE:  column \"stop_key\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:84: NOTICE:  column \"standing_order_id\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:85: NOTICE:  column \"stripe_invoice_id\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:86: NOTICE:  column \"stripe_payment_intent_id\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:87: NOTICE:  column \"billing_reason\" of relation \"orders\" already exists, skipping\npsql:db/schema.sql:90: NOTICE:  relation \"uq_orders_stripe_invoice\" already exists, skipping\npsql:db/schema.sql:91: NOTICE:  relation \"idx_orders_payment_intent\" already exists, skipping\npsql:db/schema.sql:92: NOTICE:  relation \"idx_orders_subscription\" already exists, skipping\npsql:db/schema.sql:121: NOTICE:  relation \"subscriptions\" already exists, skipping\npsql:db/schema.sql:122: NOTICE:  relation \"idx_subscriptions_next_renewal\" already exists, skipping\npsql:db/schema.sql:136: NOTICE:  relation \"standing_order_occurrences\" already exists, skipping\npsql:db/schema.sql:147: NOTICE:  relation \"stops\" already exists, skipping\npsql:db/schema.sql:155: NOTICE:  relation \"routes\" already exists, skipping\npsql:db/schema.sql:164: NOTICE:  relation \"production_starts\" already exists, skipping\npsql:db/schema.sql:170: NOTICE:  relation \"settings\" already exists, skipping\npsql:db/schema.sql:176: NOTICE:  relation \"week_overrides\" already exists, skipping\npsql:db/schema.sql:186: NOTICE:  relation \"alerts\" already exists, skipping\npsql:db/schema.sql:187: NOTICE:  relation \"idx_alerts_unread\" already exists, skipping\npsql:db/schema.sql:195: NOTICE:  relation \"push_subscriptions\" already exists, skipping\npsql:db/schema.sql:202: NOTICE:  relation \"api_usage\" already exists, skipping\npsql:db/schema.sql:208: NOTICE:  relation \"customer_email_prefs\" already exists, skipping\npsql:db/schema.sql:217: NOTICE:  relation \"broadcasts\" already exists, skipping\npsql:db/schema.sql:230: NOTICE:  relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:244: NOTICE:  column \"subject\" of relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:245: NOTICE:  column \"html\" of relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:246: NOTICE:  column \"text_body\" of relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:247: NOTICE:  column \"attempts\" of relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:248: NOTICE:  column \"last_error\" of relation \"emails_sent\" already exists, skipping\npsql:db/schema.sql:249: NOTICE:  column \"pushed_at\" of relation \"alerts\" already exists, skipping\npsql:db/schema.sql:252: NOTICE:  column \"handed_off_at\" of relation \"stops\" already exists, skipping\npsql:db/schema.sql:255: NOTICE:  column \"delivery_date\" of relation \"week_overrides\" already exists, skipping\npsql:db/schema.sql:264: NOTICE:  relation \"referral_sources\" already exists, skipping\n"
+  },
+  "stripe": {
+    "result": {
+      "ok": true,
+      "base_monday": "2026-11-23",
+      "results": [
+        {
+          "name": "weekly_mon_9am",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "weekly_tue_1159",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Tue 11/24 11:59",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Tue 11/24 11:59",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "weekly_tue_1201",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Tue 11/24 12:01",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Tue 11/24 12:01",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "weekly_sat",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Sat 11/28 10:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Sat 11/28 10:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "biweekly_mon_9am",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/21 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-24",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "biweekly_tue_1159",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Tue 11/24 11:59",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Tue 11/24 11:59",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/21 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-24",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "biweekly_tue_1201",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Tue 11/24 12:01",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Tue 11/24 12:01",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/14 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-17",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "biweekly_sat",
+          "ok": true,
+          "problems": [],
+          "invoices": [
+            {
+              "created": "Sat 11/28 10:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Sat 11/28 10:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": false
+            },
+            {
+              "created": "Mon 12/14 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-17",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "skip_one_week",
+          "ok": true,
+          "problems": [],
+          "log": [
+            {
+              "skipped": [
+                "2026-12-10"
+              ],
+              "resumesAt": 1796925660
+            }
+          ],
+          "invoices": [
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "void",
+              "paid": 0,
+              "thursday": null,
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/14 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-17",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "skip_until_3_weeks",
+          "ok": true,
+          "problems": [],
+          "log": [
+            {
+              "resumesAt": 1796925660
+            }
+          ],
+          "invoices": [
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "void",
+              "paid": 0,
+              "thursday": null,
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "void",
+              "paid": 0,
+              "thursday": null,
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/14 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-17",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "resume_early",
+          "ok": true,
+          "problems": [],
+          "log": [
+            {
+              "resumesAt": 1797530460
+            },
+            {
+              "resumed": true
+            }
+          ],
+          "invoices": [
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/23 9:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "void",
+              "paid": 0,
+              "thursday": null,
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        },
+        {
+          "name": "monthly_skip",
+          "ok": true,
+          "problems": [],
+          "skipped": {
+            "skipped": [
+              "2026-12-31"
+            ],
+            "resumesAt": 1798740060
+          },
+          "invoices": [
+            {
+              "created": "Wed 11/25 10:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": false
+            },
+            {
+              "created": "Fri 12/25 10:00",
+              "reason": "subscription_cycle",
+              "status": "void",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 1/25 10:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2027-01-28",
+              "monday6": false
+            }
+          ]
+        },
+        {
+          "name": "move_wed_to_mon",
+          "ok": true,
+          "problems": [],
+          "preview": {
+            "id": "sub_1UbPfJJVnPyvSLMU9ZmYKa5r",
+            "customer": "cus_VcezPwagPHGtEb",
+            "status": "active",
+            "cadence": "weekly",
+            "current_renewal": "Wed, Dec 2, 11:00 AM",
+            "action": "ready",
+            "target": 1796040000,
+            "new_renewal": "Mon, Nov 30, 6:00 AM",
+            "pays_for_thursday": "2026-12-03"
+          },
+          "applied": [
+            {
+              "id": "sub_1UbPfJJVnPyvSLMU9ZmYKa5r",
+              "changed": true,
+              "new_renewal": "Mon, Nov 30, 6:00 AM",
+              "pays_for_thursday": "2026-12-03"
+            }
+          ],
+          "invoices": [
+            {
+              "created": "Wed 11/25 11:00",
+              "reason": "subscription_create",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-11-26",
+              "monday6": false
+            },
+            {
+              "created": "Sat 11/28 10:00",
+              "reason": "subscription_update",
+              "status": "paid",
+              "paid": 0,
+              "thursday": null,
+              "monday6": false
+            },
+            {
+              "created": "Mon 11/30 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-03",
+              "monday6": true
+            },
+            {
+              "created": "Mon 12/7 6:00",
+              "reason": "subscription_cycle",
+              "status": "paid",
+              "paid": 1500,
+              "thursday": "2026-12-10",
+              "monday6": true
+            }
+          ]
+        }
+      ]
+    },
+    "log": ""
+  }
+}
